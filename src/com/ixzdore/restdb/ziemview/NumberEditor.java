@@ -45,6 +45,8 @@ public class NumberEditor extends BaseEditorImpl{
          editContainer.getAllStyles().setPaddingBottom(10);
         editContainer.getAllStyles().setBgColor(0x0f);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        //textField.setUIID("SmallLabel");
+        headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
           //        editContainer.setLayout(new GridLayout(2));
          editorConstraints.add(TextArea.NUMERIC);
          Validator val = new Validator();
@@ -66,7 +68,7 @@ public class NumberEditor extends BaseEditorImpl{
             if (this.requestParameter.value.get() != null ){
                 textField.setText(this.requestParameter.value.get());
             }else {
-                ////////log.p(attr.getPropertyIndex().toString());
+                //////////Log.p(attr.getPropertyIndex().toString());
             textField.setText(attr.default_value.get());                
             }
         }
@@ -102,14 +104,14 @@ public class NumberEditor extends BaseEditorImpl{
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -119,12 +121,12 @@ public class NumberEditor extends BaseEditorImpl{
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(textField);
@@ -140,7 +142,7 @@ public class NumberEditor extends BaseEditorImpl{
         editContainer.add(textLabel).add(textField);
         editContainer.revalidate();
         return editContainer;
-     };  
+     }
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -203,7 +205,7 @@ public class NumberEditor extends BaseEditorImpl{
         }
         //set the maximum size and minimum size
         String max = this.serviceAttribute.maximum_size.get();
-        Log.p("Max Size " + max);
+        //Log.p("Max Size " + max);
         if (max.indexOf(".") >= 0) max = max.substring(0,max.indexOf("."));
         try {
             textField.setMaxSize(Integer.parseInt(max));

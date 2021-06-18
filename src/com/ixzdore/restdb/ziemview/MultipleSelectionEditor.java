@@ -139,14 +139,14 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -156,12 +156,12 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
 
         editContainer.add(headerContainer).add(multiSelect);
@@ -178,8 +178,6 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -264,7 +262,7 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
                         this.serviceAttribute._parent_id
                         ;
                 //cheeck if there is any file like this already and if it is not too lod
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 if (!FileSystemStorage.getInstance()
                         .exists(FileSystemStorage.getInstance().getAppHomePath()+"/" 
                                 + fileName)) 
@@ -285,7 +283,7 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
                                     , true);                        
                     }
                 }
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);                
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 try {
                     //read the contents of the file to options
                     options = Util.readToString(FileSystemStorage.getInstance().
@@ -298,7 +296,7 @@ public class MultipleSelectionEditor extends BaseEditorImpl {
         }
         optionList = options;
         //convert options to a string array
-        //////log.p("Multiple Select " + options);
+        ////////Log.p("Multiple Select " + options);
         optionList = StringUtil.replaceAll(optionList, "\n", "");  
          optionList = StringUtil.replaceAll(optionList, "*", ",");        
         Object[] opa = StringUtil.tokenize(optionList, ",").toArray();

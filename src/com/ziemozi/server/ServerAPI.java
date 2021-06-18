@@ -7,11 +7,9 @@
 //not care whether it is being served locally or from online.
 package com.ziemozi.server;
 
-import ca.weblite.codename1.db.DAO;
 import ca.weblite.codename1.db.DAOProvider;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.codename1.components.InfiniteProgress;
 import com.codename1.components.ToastBar;
 import com.codename1.contacts.Contact;
 import com.codename1.db.Cursor;
@@ -19,8 +17,12 @@ import com.codename1.db.Database;
 import com.codename1.io.File;
 import com.codename1.io.FileSystemStorage;
 import com.ixzdore.restdb.ziemobject.Comment;
+import com.ixzdore.restdb.ziemobject.Fare;
 import com.ixzdore.restdb.ziemobject.Notification;
 import com.ixzdore.restdb.ziemobject.Post;
+import com.ixzdore.restdb.ziemobject.Route;
+import com.ixzdore.restdb.ziemobject.RouteStops;
+import com.ixzdore.restdb.ziemobject.Stop;
 import com.ixzdore.restdb.ziemobject.User;
 import com.codename1.io.JSONParser;
 import com.codename1.io.Log;
@@ -31,25 +33,20 @@ import com.codename1.io.Util;
 import com.codename1.io.rest.RequestBuilder;
 import com.codename1.io.rest.Response;
 import com.codename1.io.rest.Rest;
-import com.codename1.io.services.CachedData;
-import com.codename1.io.services.CachedDataService;
 import com.codename1.location.Location;
 import com.codename1.location.LocationManager;
-import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBase;
 import com.codename1.properties.PropertyBusinessObject;
-import com.codename1.ui.Button;
+
+import ca.weblite.codename1.json.JSONException;
 import static com.codename1.ui.CN.*;
-import com.codename1.ui.Dialog;
+
 import com.codename1.ui.Display;
 import com.codename1.ui.EncodedImage;
 import com.codename1.ui.FontImage;
 import com.codename1.ui.Image;
 import com.codename1.ui.URLImage;
-import com.codename1.ui.events.ActionEvent;
-import com.codename1.ui.events.ActionListener;
 import com.codename1.ui.plaf.Style;
-import com.codename1.ui.plaf.UIManager;
 import com.codename1.util.Callback;
 import com.codename1.util.StringUtil;
 import com.codename1.util.SuccessCallback;
@@ -63,22 +60,18 @@ import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
 import com.ixzdore.restdb.ziemobject.ServiceContact;
 import com.ixzdore.restdb.ziemobject.Group;
 import com.ixzdore.restdb.ziemobject.Wallet;
-import com.ziemozi.forms.ImagePicker;
 import com.ziemozi.server.local.localAPI;
-import com.ziemozi.server.online.onlineAPI;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 
@@ -91,16 +84,16 @@ public class ServerAPI {
     public static String AUTHY = "3IMDN8qW1tTuLdI7h8FMgjaw9YdVVQFe";
     public static final String authyUrl = "https://api.authy.com/protected/json/phones/verification/check";
     private static String token;
-    private static String sosService = "SOS";
-    private static String amFineService = "IAMFINE";
-    private static String likeService = "LIKE";
-    private static int aroundMeDistance = 10;//Distance in km to consider as around me
+    private static final String sosService = "SOS";
+    private static final String amFineService = "IAMFINE";
+    private static final String likeService = "LIKE";
+    private static final int aroundMeDistance = 10;//Distance in km to consider as around me
     public static Database db = null;
     public static DAOProvider dbProvider = null;
     public static final String dbConfig = "/setup.sql";
     public static final String dbname = "ziemozi";
 
-    private static Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+    private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
             "cloud_name", "okwui",
             "api_key", "839478323249426",
             "api_secret", "2sKLEGlDj_qwtJGHsifS9fZ_m8I"));
@@ -139,6 +132,17 @@ public class ServerAPI {
 
     private static RequestBuilder patch(String path) {
         if (token != null) {
+            return Rest.patch(BASE_URL + path).
+                    header("auth", token).header("x-apikey", API_KEY)
+                    .header("X-HTTP-Method-Override", "PATCH").jsonContent();
+        }
+        return Rest.patch(BASE_URL + path).header("x-apikey", API_KEY).
+                header("X-HTTP-Method-Override", "PATCH").jsonContent();
+
+    }
+    /*
+    private static RequestBuilder patch(String path) {
+        if (token != null) {
             return Rest.post(BASE_URL + path).
                     header("auth", token).header("x-apikey", API_KEY)
                     .header("X-HTTP-Method-Override", "PATCH").jsonContent();
@@ -148,17 +152,18 @@ public class ServerAPI {
 
     }
 
+     */
     public static boolean isLoggedIn() {
         //ServerAPI.refreshMe();
         boolean loggedIn = false;
         if (me != null) {
-            ////////////////log.p(me.getPropertyIndex().toString());
+            //////////////////Log.p(me.getPropertyIndex().toString());
             if ((me.authtoken.get() != null) && (me.firstName.get() != null)) {
                 loggedIn = true;
             }
         }
         token = Preferences.get("authtoken", null);
-        //////////////////log.p("token " + token);
+        ////////////////////Log.p("token " + token);
         return loggedIn;
     }
 
@@ -169,7 +174,7 @@ public class ServerAPI {
         String fetchUrl = "{\"phone\": \""
                 + u.phone.get() + "\" ," + "\"password\": \"" + u.password.get() + "\" }";
 
-        ////////////////log.p(fetchUrl);
+        //////////////////Log.p(fetchUrl);
         User s = null;
 
         ArrayList<User> users = genericZiemSearch("ziemozi-users",
@@ -189,7 +194,7 @@ public class ServerAPI {
             token = s.authtoken.get();
             s.getPropertyIndex().storeJSON("me.json");
             me = s;
-            ////log.p(s.getPropertyIndex().toJSON());
+            //////Log.p(s.getPropertyIndex().toJSON());
             loadUsers(me._id.get());
                         callback.onSucess(me);
 
@@ -199,15 +204,15 @@ public class ServerAPI {
 
     private static void signupOrLogin(String url, User u,
             final Callback<User> callback) {
-        ////////////////log.p(u.getPropertyIndex().toString());
-        ////////////////log.p("URL " + url);
+        //////////////////Log.p(u.getPropertyIndex().toString());
+        //////////////////Log.p("URL " + url);
         post(url).
                 body(u.getPropertyIndex().toJSON()).
                 getAsJsonMap(new Callback<Response<Map>>() {
                     @Override
                     public void onSucess(Response<Map> value) {
-                        ////////////////log.p("Response Code " + value.getResponseCode());
-                        ////////////////log.p(value.getResponseData().toString());
+                        //////////////////Log.p("Response Code " + value.getResponseCode());
+                        //////////////////Log.p(value.getResponseData().toString());
                         if (value.getResponseCode() != 201) {
                             callback.onError(u, null, value.
                                     getResponseCode(),
@@ -222,7 +227,7 @@ public class ServerAPI {
                                 get());
                         token = me.authtoken.get();
                         me.getPropertyIndex().storeJSON("me.json");
-                        ////////////////log.p(me.getPropertyIndex().toString());
+                        //////////////////Log.p(me.getPropertyIndex().toString());
                         callback.onSucess(me);
                         callSerially(() -> registerPush());
                     }
@@ -241,16 +246,16 @@ public class ServerAPI {
             me = new User();
             me.getPropertyIndex().loadJSON("me.json");
         }
-        ////////////////log.p("Refreshing Me " + me.getPropertyIndex().toString());
+        //////////////////Log.p("Refreshing Me " + me.getPropertyIndex().toString());
         if ( me._id.get() != null){
         Response<Map> map = get("ziemozi-users/" + me._id.get()).getAsJsonMap();
-        ////////////////log.p("Refreshing user " + map.getResponseData().toString());
-        ////////////////log.p("Refreshing User " + map.getResponseCode());
+        //////////////////Log.p("Refreshing user " + map.getResponseData().toString());
+        //////////////////Log.p("Refreshing User " + map.getResponseCode());
         if (map.getResponseCode() == 200) {
             me = new User();
             me.getPropertyIndex().
                     populateFromMap(map.getResponseData());
-            ////////////////log.p("Refreshed me " + me.getPropertyIndex().toString());
+            //////////////////Log.p("Refreshed me " + me.getPropertyIndex().toString());
             me.getPropertyIndex().storeJSON("me.json");
             me.authtoken.set(Preferences.get("authtoken", ""));
             token = me.authtoken.get();
@@ -267,7 +272,7 @@ public class ServerAPI {
                 queryParam("verification_code", code).
                 queryParam("country_code", "234").
                 queryParam("phone_number", phone).getAsJsonMap();
-        ////////////////log.p("Verify Result " + s.getResponseData());
+        //////////////////Log.p("Verify Result " + s.getResponseData());
         return "true".equals(s.getResponseData().get("success"));
     }
 
@@ -276,10 +281,10 @@ public class ServerAPI {
         //check if the image file has http, if it does not have
         //then use cloudinary to save the image first
         //before proceeding
-        ////////////////log.p("Refresh user " + u.getPropertyIndex().toString());
-        ////////////////log.p("Me is " + me.getPropertyIndex().toString());
+        //////////////////Log.p("Refresh user " + u.getPropertyIndex().toString());
+        //////////////////Log.p("Me is " + me.getPropertyIndex().toString());
         boolean posted = true;
-        ////////////////log.p("Avatar " + u.avatar.get());
+        //////////////////Log.p("Avatar " + u.avatar.get());
         if (u.avatar.get() != null) {
         if (u.avatar.get().indexOf("file:") >= 0) {
 
@@ -288,9 +293,9 @@ public class ServerAPI {
                         upload(u.avatar.get(), ObjectUtils.emptyMap());
                 String uploadUrl = uploadResult.get("url").toString();
                 u.avatar.set(uploadUrl);
-                ////////////////log.p("Avatar url " + uploadUrl);
+                //////////////////Log.p("Avatar url " + uploadUrl);
             } catch (Exception e) {
-                ////////////////log.p("Image upload failed \n" + e.getMessage());
+                //////////////////Log.p("Image upload failed \n" + e.getMessage());
                 ToastBar.showErrorMessage("Failed to upload profile image");
                 posted = false;
             }
@@ -299,14 +304,14 @@ public class ServerAPI {
         //Map uMap = u.getPropertyIndex().toMapRepresentation();
         //uMap.remove("_id"); // remove id field so the update can happen properly
         //u.getPropertyIndex().populateFromMap(uMap);
-        ////////////////log.p("Refresjing User Id " + me._id.get());
-        ////////////////log.p("Refreshing with " + u.getPropertyIndex().toString());
+        //////////////////Log.p("Refresjing User Id " + me._id.get());
+        //////////////////Log.p("Refreshing with " + u.getPropertyIndex().toString());
         Response<String> s = patch("ziemozi-users/" + me._id.get()).
                 body(u.getPropertyIndex().toJSON()).getAsString();
         posted = posted && (s.getResponseCode() == 201);
-        //////////////////log.p(u.getPropertyIndex().toJSON());
-        ////////////////log.p("User Patch Response Code " + s.getResponseCode());
-        ////////////////log.p("User Patch Response " + s.getResponseData());
+        ////////////////////Log.p(u.getPropertyIndex().toJSON());
+        //////////////////Log.p("User Patch Response Code " + s.getResponseCode());
+        //////////////////Log.p("User Patch Response " + s.getResponseData());
         //u.getPropertyIndex().storeJSON("me.json");
         }
         ServerAPI.refreshMe();
@@ -383,7 +388,30 @@ public class ServerAPI {
                 body(contactsToJSON(contacts)).getAsString();
         return "OK".equals(s.getResponseData());
     }
-
+    public static void pictureUpload(final Callback<String> resultURL,String picture) {
+        if(picture!=null){
+            MultipartRequest request = new MultipartRequest() {
+                protected void readResponse(InputStream input) throws IOException  {
+                    JSONParser jp = new JSONParser();
+                    Map<String, Object> result = jp.parseJSON(new InputStreamReader(input, "UTF-8"));
+                    String url = (String)result.get("url");
+                    if(url == null) {
+                        resultURL.onError(null, null, 1, result.toString());
+                        return;
+                    }
+                    resultURL.onSucess(url);
+                }
+            };
+            request.setUrl(BASE_URL + "media");
+            try {
+                request.addData("fileUpload", picture, "image/jpeg");
+                request.setFilename("fileUpload", "myPicture.jpg");
+                addToQueue(request);
+            } catch(IOException err) {
+                err.printStackTrace();
+            }
+        }
+    }
     public static MultipartRequest uploadMedia(String mime, String role,
             String visibility, String fileName, byte[] data,
             SuccessCallback<String> callback) {
@@ -464,8 +492,8 @@ public class ServerAPI {
     }
 
     private static List<Request> processRequestResponse(Response<Map> response) {
-        ////////////////log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
-        ////////////////log.p("\n\nRequest Response data \n" + response.getResponseData());
+        //////////////////Log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
+        //////////////////Log.p("\n\nRequest Response data \n" + response.getResponseData());
         if (response.getResponseCode() == 200) {
             List<Map> l = (List<Map>) response.getResponseData().get("root");
             List<Request> responseList = new ArrayList<>();
@@ -493,7 +521,7 @@ public class ServerAPI {
                         Request.class,
                         "", page, size, "", "");
 //        for (Request r:news){
-//            ////////////////log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
+//            //////////////////Log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
 //        }
         /**
          * return processRequestResponse( get("requests"). queryParam("page", ""
@@ -512,7 +540,7 @@ public class ServerAPI {
 
     public static boolean postRequest(Request pd) {
 
-        //////////log.p("\n " + pd.getPropertyIndex().toJSON());
+        ////////////Log.p("\n " + pd.getPropertyIndex().toJSON());
         Request newR = new Request();
         newR.getPropertyIndex().populateFromMap(pd.getPropertyIndex().toMapRepresentation());
         boolean post = false;
@@ -531,7 +559,7 @@ public class ServerAPI {
             //r.getPropertyIndex().populateFromMap(l);
             //r.getPropertyIndex().loadJSON("postRequestParameter");
             r.getPropertyIndex().populateFromMap(res.getResponseData());
-            //////////////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+            ////////////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
             pd._id.set(r._id.get());
         }
         }catch (Exception e){
@@ -586,7 +614,7 @@ public class ServerAPI {
             for (Map m : l) {
                 try {
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
+                            = (PropertyBusinessObject)type.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
                     responseList.add((T) pb);
                 } catch (Exception err) {
@@ -615,12 +643,12 @@ public class ServerAPI {
         //get those categories for which this category is their parent
         ArrayList<Category> cc = new ArrayList<Category>();
         ArrayList<Category> c = new ArrayList<Category>();
-        ////////log.p("Looking for children of " + ct.getPropertyIndex().toString());
+        //////////Log.p("Looking for children of " + ct.getPropertyIndex().toString());
         c = localAPI.genericZiemSearch("category", Category.class, "", 0, 99, "", "");
        for (Category cx:c){
            cx.refresh();
            List<Category> l = cx.parent.asList();
-           ////////log.p("Checking " + ct.name.get() + " against " + cx.name.get());
+           //////////Log.p("Checking " + ct.name.get() + " against " + cx.name.get());
            if (!l.isEmpty())
                 if (l.get(0)._id.get().equals(ct._id.get())) {
                      cc.add(cx);
@@ -680,8 +708,8 @@ public class ServerAPI {
         String hint = "";
         String filter = "";
         String query = "";
-        ////////////////log.p("Type of Selector: " + p.getClass().getCanonicalName());
-        ////////////////log.p("\nFilter is: " + filter);
+        //////////////////Log.p("Type of Selector: " + p.getClass().getCanonicalName());
+        //////////////////Log.p("\nFilter is: " + filter);
         ArrayList<Service> services = genericZiemSearch(url,
                 Service.class,
                 query, page, size, hint, filter);
@@ -691,15 +719,15 @@ public class ServerAPI {
                 Category c = (Category) p;
                 List<Category> cl = s.category.asList();
                 if (cl.size() > 0) {
-                    ////////////////log.p("Number of categories " + cl.size());
-                    //////////////////log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
+                    //////////////////Log.p("Number of categories " + cl.size());
+                    ////////////////////Log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
                     for (Category cc : cl) {
-                        ////////////////log.p("Category " + cc._id.get());
-                        ////////////////log.p("Service Category " + c._id.get());
+                        //////////////////Log.p("Category " + cc._id.get());
+                        //////////////////Log.p("Service Category " + c._id.get());
                         if (cc._id.get().equalsIgnoreCase(c._id.get())) {
-                            ////////////////log.p("Matched Category " + c._id.get());
+                            //////////////////Log.p("Matched Category " + c._id.get());
                             serviceList.add(s);
-                            ////////////////log.p("Services in Category " + serviceList.size());
+                            //////////////////Log.p("Services in Category " + serviceList.size());
                         }
                     }
                 }
@@ -749,10 +777,10 @@ public class ServerAPI {
         } else {
             //in this case we know which one it is. so most likely
             //it is either Categories,Providers,ServiceGroup
-            //////////////////log.p("Parent " + parent.toString());
-            //////////////////log.p("Is Categories " + parent.toString().indexOf("Categories"));
-            //////////////////log.p("Is Providers " + parent.toString().indexOf("Providers"));
-            //////////////////log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));            
+            ////////////////////Log.p("Parent " + parent.toString());
+            ////////////////////Log.p("Is Categories " + parent.toString().indexOf("Categories"));
+            ////////////////////Log.p("Is Providers " + parent.toString().indexOf("Providers"));
+            ////////////////////Log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));
             if (parent.toString().indexOf("Categories") >= 0) {
                 //categories
                 v = new Vector();
@@ -803,12 +831,12 @@ public class ServerAPI {
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Category> responseList = new ArrayList<>();
             for (Map m : l) {
-                ////////////////log.p("Category Map\n ");
+                //////////////////Log.p("Category Map\n ");
                 showMap(m);
                 Category p = new Category();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////////////log.p(p.getPropertyIndex().toString());                
+                ////////////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -824,7 +852,7 @@ public class ServerAPI {
                 Provider p = new Provider();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////////////log.p(p.getPropertyIndex().toString());
+                ////////////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -833,7 +861,7 @@ public class ServerAPI {
 
     private static ArrayList<Service> processServiceDefintionResponse(Response<Map> response) {
         if (response.getResponseCode() == 200) {
-            //////////////////log.p(response.toString());
+            ////////////////////Log.p(response.toString());
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Service> responseList = new ArrayList<>();
             for (Map m : l) {
@@ -849,12 +877,12 @@ public class ServerAPI {
     public static <T> ArrayList<T> genericZiemSearch(String url,
             Class<? extends PropertyBusinessObject> type,
             String text, int page, int size, String hint, String filter) {
-        ////////////////log.p("Query " + text);
+        //////////////////Log.p("Query " + text);
         //{"$orderby": "{" ,"_created": "-1" }}
         String fetchUrl = "{\"$orderby\":"
                 + "{" + "\"_created\": " + "-1" + " }}";
         hint = fetchUrl;
-        ////////////////log.p("Hint " + hint);
+        //////////////////Log.p("Hint " + hint);
         Response<Map> result = get(url).
                 queryParam("q", text).
                 queryParam("h", hint).
@@ -864,8 +892,8 @@ public class ServerAPI {
                 queryParam("metafields", "true").
                 queryParam("fetchChildren", "true").
                 getAsJsonMap();
-        //////////////log.p("\nResponse for " + url + " is " + result.getResponseCode());
-        //////log.p("\n Response Data" + result.getResponseData(), Log.DEBUG);
+        ////////////////Log.p("\nResponse for " + url + " is " + result.getResponseCode());
+        ////////Log.p("\n Response Data" + result.getResponseData(), Log.DEBUG);
 
         if ((result.getResponseCode() == 200)&&(result.getResponseData() != null)) {
             ArrayList<Map> l = new ArrayList<Map>();
@@ -877,15 +905,15 @@ public class ServerAPI {
             for (Map mm : l) {
                 try {
                     //showMap(mm);
-                     //                   //////////log.p("Ziemozi User from m" + m.get("ziemozi_user"));
+                     //                   ////////////Log.p("Ziemozi User from m" + m.get("ziemozi_user"));
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
-                    ////////////log.p(type.getSimpleName() +" plain -->\n" + pb.getPropertyIndex().toString()); 
+                            = (PropertyBusinessObject)type.newInstance();
+                    //////////////Log.p(type.getSimpleName() +" plain -->\n" + pb.getPropertyIndex().toString());
                     
                     pb.getPropertyIndex().populateFromMap(mm);
-                    //////////log.p(pb.getPropertyIndex().get("ziemozi_user").toString());
+                    ////////////Log.p(pb.getPropertyIndex().get("ziemozi_user").toString());
                     //
-                    //////log.p(type.getSimpleName() +" -->\n" + pb.getPropertyIndex().toJSON());
+                    ////////Log.p(type.getSimpleName() +" -->\n" + pb.getPropertyIndex().toJSON());
                     responseList.add((T) pb);
                 } catch (Exception err) {
                     Log.e(err);
@@ -929,30 +957,30 @@ public class ServerAPI {
     public static Boolean postRequestParameter(RequestParameter pd) {
         // String key = post("request_parameter").body(pd.getPropertyIndex().toJSON()).
         //       getAsString().getResponseData();
-        // ////////////////log.p("Saving Request PArameter ..\n");
+        // //////////////////Log.p("Saving Request PArameter ..\n");
         //  HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         // Storage.getInstance().writeObject("postRequestParameter", key);
         //  RequestParameter r = new RequestParameter();
         //  r.getPropertyIndex().populateFromMap(l);
-        //  ////////////////log.p("RP Save Response \n" + r.getPropertyIndex().toString());
+        //  //////////////////Log.p("RP Save Response \n" + r.getPropertyIndex().toString());
         //  pd._id.set(r._id.get());
         //  return r._id.get() != null;  
 //        String key = post("request-parameters").body(pd.getPropertyIndex().toJSON()).
         //              getAsString().getResponseData();
-        ////////////////log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
+        //////////////////Log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
         Response<Map> res = post("request-parameters").body(pd.getPropertyIndex()
                 .toJSON()).getAsJsonMap();
         //HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         //  Storage.getInstance().writeObject("postRequestParameter", key);
 
-        //    ////////////////log.p("\n RequestParameter response data is \n" + key);
+        //    //////////////////Log.p("\n RequestParameter response data is \n" + key);
         //try {
         //    JSONParser j = new JSONParser();
         //    Reader r = new InputStreamReader(
         //             Storage.getInstance().createInputStream("postRequestParameter"));
         //    Map<String,Object> l = j.parseJSON(r ) ;                  
         // } catch (Exception ex) {
-        //     ////////////////log.p(ex.getMessage());
+        //     //////////////////Log.p(ex.getMessage());
         // }
         //Display.getInstance().getResourceAsStream(getClass(), "/anapioficeandfire.json"), "UTF-8")) {
         //Map<String, Object> data = json.parseJSON(r);
@@ -962,7 +990,7 @@ public class ServerAPI {
         //r.getPropertyIndex().populateFromMap(l);
         //r.getPropertyIndex().loadJSON("postRequestParameter");
         r.getPropertyIndex().populateFromMap(res.getResponseData());
-        //////////////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+        ////////////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
         pd._id.set(r._id.get());
         return r._id.get() != null;
     }
@@ -1004,19 +1032,19 @@ public class ServerAPI {
 
     private static void showMap(Map m) {
         for (Object k : m.keySet()) {
-           //////log.p(k.toString() + " -- " + m.get(k).toString());
+           ////////Log.p(k.toString() + " -- " + m.get(k).toString());
         }
     }
 private static void showMapC(Map m) {
         for (Object k : m.keySet()) {
-           //////////log.p(k.toString() + " -- " + m.get(k).toString());
+           ////////////Log.p(k.toString() + " -- " + m.get(k).toString());
         }
     }    
 
     public static Service getService(String _id) {
         Service s = new Service();
         Response<Map> map = get("service-definition/" + _id).getAsJsonMap();
-        ////////////////log.p("Response " + map.getResponseData());
+        //////////////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -1025,10 +1053,10 @@ private static void showMapC(Map m) {
     }
 
     public static ServiceAttributeType getServiceAttributeType(String _id) {
-        ////////////////log.p("Get Service Attribute Type " + _id);
+        //////////////////Log.p("Get Service Attribute Type " + _id);
         ServiceAttributeType s = new ServiceAttributeType();
         Response<Map> map = get("service-attribute-type/" + _id).getAsJsonMap();
-        ////////////////log.p("Response " + map.getResponseData());
+        //////////////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -1049,9 +1077,9 @@ private static void showMapC(Map m) {
                 try {
                     showMap(m);
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) Request.class.newInstance();
+                            = (Request)Request.class.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
-                    ////////////////log.p(pb.getPropertyIndex().toString());
+                    //////////////////Log.p(pb.getPropertyIndex().toString());
                     responseList.add((Request) pb);
                 } catch (Exception err) {
                     Log.e(err);
@@ -1069,25 +1097,25 @@ private static void showMapC(Map m) {
         //we will post them as one batch. So we create them as a string and then save
         //first we have to pre_process before saving
         //media has to be saved first and the media has to be saved
-        ////////log.p("Saving Parameters for this request \n"  + rq.getPropertyIndex().toJSON());
+        //////////Log.p("Saving Parameters for this request \n"  + rq.getPropertyIndex().toJSON());
         //rq.refreshRequestParameters();
         //rq.refreshService();
         cloudinary.config.privateCdn = false;
         String jsonRequestParameter = "[\n";
         for (RequestParameter rqp : summedRp) {
-            Log.p("RequestParameter  attribute size " + rqp.service_attribute.size());
+            //Log.p("RequestParameter  attribute size " + rqp.service_attribute.size());
             if (rqp.service_attribute.size() > 0 ) {
             //rqp.refreshServiceAttribute();
-            ////////log.p("Request parameter to check for images \n"  + r.getPropertyIndex().toJSON());
+            //////////Log.p("Request parameter to check for images \n"  + r.getPropertyIndex().toJSON());
             String value = "";
             ServiceAttribute st = rqp.service_attribute.get(0);
             //
-            ////////log.p("Saving Request Parameters attribute\n" + st.getPropertyIndex().toString());
+            //////////Log.p("Saving Request Parameters attribute\n" + st.getPropertyIndex().toString());
             st.refreshTypeOfAttribute();
             //ServiceAttributeType tt = st.type_of_attribute.get(0);
             //String base_type = r.service_attribute.get(0).type_of_attribute.get(0).base_type.get();
             //
-            ////////log.p("Saving parameter for " + st.name.get());
+            //////////Log.p("Saving parameter for " + st.name.get());
             String base_type ="text";
             if (st.type_of_attribute.size() > 0) {
  
@@ -1104,40 +1132,41 @@ private static void showMapC(Map m) {
                 String[] imageList = Util.split(rqp.value.get(), "||");
                 for (String img : imageList) {
                     //for each image, save and append back to value
-                    ////////log.p("Image to save " + img);
+                    //////////Log.p("Image to save " + img);
                     if (!img.isEmpty()) {
                         try {
                             Map uploadResult = cloudinary.uploader().
                                     upload(img, ObjectUtils.emptyMap());
                             String uploadUrl = uploadResult.get("url").toString();
-                            ////////log.p("Image is saved as " + uploadUrl);
+                            //////////Log.p("Image is saved as " + uploadUrl);
                             if (value.length() < 2) {
                                 value = uploadUrl;
                             } else {
                                 value = value + " || " + uploadUrl;
                             }
                         } catch (Exception e) {
-                            ////////log.p("Image upload failed \n" + e.getMessage());
+                            //////////Log.p("Image upload failed \n" + e.getMessage());
                             posted = false;
                         }
                     }
                 }
-                ////////log.p("Value of attribute is " + value);
+                //////////Log.p("Value of attribute is " + value);
                 rqp.value.set(value);
-                rqp.summarize();
-            };
-            ////////log.p("Summarized with image " + r.getPropertyIndex().toJSON());
+                rqp.summarize(false);
+            }
+                //////////Log.p("Summarized with image " + r.getPropertyIndex().toJSON());
             jsonRequestParameter = jsonRequestParameter + rqp.getPropertyIndex().toJSON() + ",";
             }   
         }
-        ////////log.p("Now summarizing " + rq.getPropertyIndex().toJSON());
-        ////////log.p("Alter ego is " + rr.getPropertyIndex().toJSON());
-        String summedSummary = rq.requestSummary(summedRp);
+        //////////Log.p("Now summarizing " + rq.getPropertyIndex().toJSON());
+        //////////Log.p("Alter ego is " + rr.getPropertyIndex().toJSON());
+        String summedSummary = rq.requestSummary(summedRp,false);
         rq.summary.set(summedSummary);
+        rq.f_summary.set(rq.requestSummary(summedRp,true));
 
         jsonRequestParameter = jsonRequestParameter.substring(0,
                 jsonRequestParameter.lastIndexOf("}") + 1) + "\n]";
-        //////////////log.p(jsonRequestParameter);
+        ////////////////Log.p(jsonRequestParameter);
         Response res = post("request-parameters").body(
                 jsonRequestParameter).getAsString();
 
@@ -1145,38 +1174,38 @@ private static void showMapC(Map m) {
                 == 201 || res.getResponseCode() == 200) {
             posted = true;
         }
-        //////////////log.p("\n bulk parameter save response" + res.getResponseData().toString());
+        ////////////////Log.p("\n bulk parameter save response" + res.getResponseData().toString());
         //let us update the summary
         Request newR = new Request();
         newR.getPropertyIndex().populateFromMap(rq.getPropertyIndex().toMapRepresentation());
         
         //String s ="";
         //s=s+"{" + '"' + "summary" + '"' + ":" + '"'   + rq.summary.get().replaceAll("", '\') + '"' +"}";
-        ////////log.p("Update Summary to " + newR.summary.get());
+        //////////Log.p("Update Summary to " + newR.summary.get());
         
         res = patch("requests/" + rq._id.get()).body(newR).getAsString();
-        ////////log.p(res.getResponseCode() + "\n" + res.getResponseData());
+        //////////Log.p(res.getResponseCode() + "\n" + res.getResponseData());
         return posted;
     }
 
     public static ServiceAttribute getServiceAttribute(String _id) {
-        ////////////////log.p("Get Service Attributexx " + _id);
+        //////////////////Log.p("Get Service Attributexx " + _id);
         ServiceAttribute s = new ServiceAttribute();
         Response<Map> map = get("service-attributes/" + _id).getAsJsonMap();
-        ////////////////log.p("Response " + map.getResponseData());
+        //////////////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
         }
-        ////////////////log.p("Attributexx " + s.getPropertyIndex().toString());
+        //////////////////Log.p("Attributexx " + s.getPropertyIndex().toString());
         return s;
     }
 
     public static void updateRequestSummary(Request aThis) {
-        ////////////////log.p("Updating this request " + aThis._id.get());
+        //////////////////Log.p("Updating this request " + aThis._id.get());
         Response res = patch("requests/" + aThis._id.get()).
                 body(aThis.getPropertyIndex().toJSON()).getAsString();
-        ////////////////log.p(res.getResponseData().toString());
+        //////////////////Log.p(res.getResponseData().toString());
 //        
     }
 
@@ -1192,7 +1221,7 @@ private static void showMapC(Map m) {
         String fetchUrl = "{\"name\": \""
                 + sosService + "\" }";
 
-        ////////////////log.p(fetchUrl);
+        //////////////////Log.p(fetchUrl);
 
         ArrayList<Service> services = genericZiemSearch("service-definition",
                 Service.class,
@@ -1208,7 +1237,7 @@ private static void showMapC(Map m) {
         String fetchUrl = "{\"name\": \""
                 + amFineService + "\" }";
 
-        ////////////////log.p(fetchUrl);
+        //////////////////Log.p(fetchUrl);
 
         ArrayList<Service> services = genericZiemSearch("service-definition",
                 Service.class,
@@ -1224,7 +1253,7 @@ private static void showMapC(Map m) {
         String fetchUrl = "{\"name\": \""
                 + likeService + "\" }";
 
-        ////////////////log.p(fetchUrl);
+        //////////////////Log.p(fetchUrl);
 
         ArrayList<Service> services = genericZiemSearch("service-definition",
                 Service.class,
@@ -1243,15 +1272,15 @@ private static void showMapC(Map m) {
     public static DAOProvider dataProvider() {
 
         if (dbProvider == null) {
-            ////////////////log.p("Setting up database provider");
+            //////////////////Log.p("Setting up database provider");
             try {
                 db = Database.openOrCreate(dbname);
                 ServerAPI.dbProvider = new DAOProvider(db,1);
-                ////////////////log.p("Schema Version " + dbProvider.getSchemaVersion());
-                ////////////////log.p("Initialized database " + dbProvider.toString());
+                //////////////////Log.p("Schema Version " + dbProvider.getSchemaVersion());
+                //////////////////Log.p("Initialized database " + dbProvider.toString());
             } catch (Exception e) {
                 e.printStackTrace();
-                //////////////////log.p(e.getMessage());
+                ////////////////////Log.p(e.getMessage());
             }
         }
         return dbProvider;
@@ -1262,9 +1291,9 @@ private static void showMapC(Map m) {
         //take each loadable object
         //download them and put it in the database
         //Category
-        ////////////////log.p("Load To Local Database");
+        //////////////////Log.p("Load To Local Database");
         //dbProvider = ServerAPI.dataProvider();
-        //////log.p("Updating definitions");
+       // Log.p("Updating definitions");
         loadServices();
         loadCategories();
         loadServiceAttributes();
@@ -1273,6 +1302,10 @@ private static void showMapC(Map m) {
         loadProviders();
         loadServiceContacts();
         loadGroups();
+        loadFares();
+        loadRoutes();
+        loadRouteStops();
+        loadStops();
 
     }
     public static void loadToLocalDatabase() {
@@ -1280,41 +1313,44 @@ private static void showMapC(Map m) {
         //take each loadable object
         //download them and put it in the database
         //Category
-        ////////////////log.p("Load To Local Database");
-        //////////log.p("Syncing with Server");
-        //dbProvider = ServerAPI.dataProvider();
-        ////log.p("load Services");
+        //////////////////Log.p("Load To Local Database");
+        //Log.p("Syncing with Server");
+        //Log.p("load Services");
         loadServices();
-        ////log.p("Load Categories");
+        //Log.p("Load Categories");
         loadCategories();
-        ////log.p("Load Service Attributes");
+        //Log.p("Load Service Attributes");
         loadServiceAttributes();
-        ////log.p("Load Attribute Typres");
+        //Log.p("Load Attribute Typres");
         loadServoceAttributeTypes();
-        ////log.p("Load Providers");
+        //Log.p("Load Providers");
         loadProviders();
-        ////log.p("Load Contacts");
+        //Log.p("Load Contacts");
         loadServiceContacts();
-        ////log.p("Load Requests");
+        //Log.p("Load Requests");
         loadRequests();
-        ////log.p("Load Groups");
+        //Log.p("Load Groups");
         loadGroups();
         //load users?
         loadUsers(ServerAPI.me()._id.get());
-        ////log.p("Load Request Parameters");
+        //Log.p("Load Request Parameters");
         loadRequestParameters();        
 //        
         loadWallets();
+        loadFares();
+        loadRoutes();
+        loadRouteStops();
+        loadStops();
     }
 //
         public static void loadWallets(){
        ArrayList<PropertyBusinessObject> wallets = 
                ServerAPI.genericZiemSearch("wallets",
                        Wallet.class, "",0, 9999, "", "");  
-       Log.p("Wallets are " + wallets.size());
+       //Log.p("Wallets are " + wallets.size());
 
         Boolean loaded=localAPI.saveLocalBatch(wallets);
-        Log.p("Loaded Wallets" + loaded);
+        //Log.p("Loaded Wallets" + loaded);
     } 
 //    
     
@@ -1322,7 +1358,7 @@ private static void showMapC(Map m) {
        ArrayList<PropertyBusinessObject> categories = 
                ServerAPI.genericZiemSearch("category",
                        Category.class, "",0, 9999, "", "");
-                //if (categories != null ) ////log.p("There are  " + categories.size() + " category records.");       
+                //if (categories != null ) //////Log.p("There are  " + categories.size() + " category records.");
        /*
         for (Category c:categories){
            
@@ -1342,7 +1378,7 @@ private static void showMapC(Map m) {
           ArrayList<PropertyBusinessObject> services = 
                ServerAPI.genericZiemSearch("service-definition",
                        Service.class, "",0, 99, "", "");
-       // if (services != null ) ////log.p("There are  " + services.size() + " service records.");
+       // if (services != null ) //////Log.p("There are  " + services.size() + " service records.");
        /*
         if (services != null ) {
             for (Service s:services){
@@ -1351,7 +1387,7 @@ private static void showMapC(Map m) {
         } 
         */
        Boolean saved = localAPI.saveLocalBatch(services);
-     //  ////log.p("Saved Services " + saved);
+     //  //////Log.p("Saved Services " + saved);
     }  
 
     public static void loadRequests() {
@@ -1365,9 +1401,9 @@ private static void showMapC(Map m) {
         }      
         }
         */
-       // //log.p("There are  " + requests.size() + " request records.");
+       //Log.p("There are  " + requests.size() + " request records.");
         // ArrayList<PropertyBusinessObject> filteredRequests = privacyCheckRequests(requests);
-        // //log.p("There are  " + filteredRequests.size() + " request records.");        
+        // ////Log.p("There are  " + filteredRequests.size() + " request records.");
         localAPI.saveLocalBatch(requests);
     }  
 public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<PropertyBusinessObject> toCheck){
@@ -1387,7 +1423,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
        }
       }
       */
-  //      //////////log.p("There are  " + requestParameters.size() + " Parameter records.");      
+  //      ////////////Log.p("There are  " + requestParameters.size() + " Parameter records.");
      localAPI.saveLocalBatch(requestParameters);
     }  
 
@@ -1401,13 +1437,13 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
           localAPI.saveLocal(sa,true);          
       }
       */
-    //    //////////log.p("There are  " + serviceAttributes.size() + " Attribute records.");      
+    //    ////////////Log.p("There are  " + serviceAttributes.size() + " Attribute records.");
      localAPI.saveLocalBatch(serviceAttributes);
     }  
 
     public static void loadUsers(String userid) {
                String fetchUrl = "{\"_id\": \"" + userid + "\" }"; 
-               ////log.p("Fetch User " + userid);
+               //////Log.p("Fetch User " + userid);
        ArrayList<PropertyBusinessObject> Users = 
                ServerAPI.genericZiemSearch("ziemozi-users",
                        User.class, fetchUrl,0, 9999, "", "");
@@ -1416,7 +1452,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
                       localAPI.saveLocal(st,true);
        }
        */
-      ////log.p("There are  " + Users.size() + " user records.");       
+      //////Log.p("There are  " + Users.size() + " user records.");
       if (Users != null ) localAPI.saveLocalBatch(Users);
     }
 
@@ -1429,7 +1465,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
                       localAPI.saveLocal(st,true);
        }
        */
-      //  //////////log.p("There are  " + serviceAttrTypes.size() + " Attribute records.");       
+      //  ////////////Log.p("There are  " + serviceAttrTypes.size() + " Attribute records.");
        localAPI.saveLocalBatch(serviceAttrTypes);
     }
 
@@ -1442,7 +1478,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
                     localAPI.saveLocal(p,true);                 
                }
      */
-        ////////////log.p("There are  " + providers.size() + " provider records.");     
+        //////////////Log.p("There are  " + providers.size() + " provider records.");
      localAPI.saveLocalBatch(providers);
     }
     private static void loadServiceContacts() {
@@ -1452,8 +1488,36 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
   
     localAPI.saveLocalBatch(contacts);  
     }
+    private static void loadRoutes() {
+        ArrayList<PropertyBusinessObject> routes =
+                ServerAPI.genericZiemSearch("busroute",
+                        Route.class, "",0, 9999, "", "");
+        //Log.p("Routes Found " + routes.size());
+        localAPI.saveLocalBatch(routes);
+    }
+    private static void loadFares() {
+        ArrayList<PropertyBusinessObject> fares =
+                ServerAPI.genericZiemSearch("fares",
+                        Fare.class, "",0, 9999, "", "");
+
+        localAPI.saveLocalBatch(fares);
+    }
+    private static void loadRouteStops() {
+        ArrayList<PropertyBusinessObject> routestops =
+                ServerAPI.genericZiemSearch("route-stops",
+                        RouteStops.class, "",0, 9999, "", "");
+
+        localAPI.saveLocalBatch(routestops);
+    }
+    private static void loadStops() {
+        ArrayList<PropertyBusinessObject> stops =
+                ServerAPI.genericZiemSearch("stop",
+                        Stop.class, "",0, 9999, "", "");
+
+        localAPI.saveLocalBatch(stops);
+    }
     public static void logout() {
-        ////log.p("Logging out");
+        //////Log.p("Logging out");
         if (Storage.getInstance().exists("me.json")) {
             Storage.getInstance().deleteStorageFile("me.json");
             ServerAPI.me = new User();
@@ -1461,12 +1525,12 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         //clear the cache
         Storage.getInstance().clearCache();
         Storage.getInstance().clearStorage();
-        ////log.p("Clearing database");
+        //////Log.p("Clearing database");
         
         cleardb();
-        ////log.p("Initializing Database");
+        //////Log.p("Initializing Database");
         initDb();
-        ////log.p("Done with Server logout");
+        //////Log.p("Done with Server logout");
        
     }
     public static void initDb() {
@@ -1491,6 +1555,10 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         dbClasses.add(new Group());
         dbClasses.add(new Request());
         dbClasses.add(new Wallet());
+        dbClasses.add(new Route());
+        dbClasses.add(new Fare());
+        dbClasses.add(new Stop());
+        dbClasses.add(new RouteStops());
         //
         //if db does not exist,let us create it
         //create a new configuration file /setup.sql
@@ -1508,7 +1576,8 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
     private static void writeStringToFile(File file, String content) throws IOException {
         FileSystemStorage fs = FileSystemStorage.getInstance();
         try (OutputStream os = fs.openOutputStream(file.getAbsolutePath())) {
-            Util.copy(new ByteArrayInputStream(content.getBytes("UTF-8")), os);
+            Util.copy(new ByteArrayInputStream(content.getBytes(
+                    "UTF-8")), os);
         }
 
     }
@@ -1520,11 +1589,11 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         try {
             db = Display.getInstance().openOrCreate("ziemozi");
         }catch (IOException ex) {
-            //log.p("Failed to Open Database");
+            ////Log.p("Failed to Open Database");
             ex.printStackTrace();
                 Log.sendLogAsync();            
         }
-        ////log.p(db.getDatabasePath("ziemozi"));
+        //////Log.p(db.getDatabasePath("ziemozi"));
         if (db != null) {
             String query = "";
             for (Object o : dbClasses) {
@@ -1532,7 +1601,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
 
                 config = config + query + "\n--\n";
                 try {
-                    ////log.p("query \n" + query); 
+                    //Log.p("query \n" + query);
                     db.execute(query);
                     //cur = db.executeQuery("select sql from sqlite_master where name='foo';");
                     //
@@ -1559,7 +1628,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-       //////////log.p(config);
+       ////////////Log.p(config);
         */
     }
 
@@ -1593,7 +1662,7 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         int lastComma = c.lastIndexOf(",");
         c = c.substring(0, lastComma);
         c = c + ");\n";
-        ////////////log.p(c);
+        //////////////Log.p(c);
         return c;
     }    
 
@@ -1639,15 +1708,20 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
 public static void cleardb(){
             try {
             db = Display.getInstance().openOrCreate("ziemozi");
-            db.delete("ziemozi");
+            Database.delete("ziemozi");
             db.close();
             
         } catch (IOException ex) {
             ex.printStackTrace();
-                        //log.p("Failed to Delete Database");
+                        ////Log.p("Failed to Delete Database");
                 Log.sendLogAsync();            
         }
         db=null;
 }
-     
+
+    public static String postTo(final String url, final String body) {
+        Response res = post(url).body(
+                body).getAsString();
+        return res.getResponseData().toString();
+    }
 }

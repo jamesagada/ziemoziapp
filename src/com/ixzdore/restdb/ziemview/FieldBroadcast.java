@@ -23,7 +23,7 @@ public class FieldBroadcast extends Observable{
   public void fieldChanged(Object o){
       setChanged();
       notifyObservers(o);
-      ////////log.p("Broadcasted change to " + this.countObservers()+ " listeners");
+      //////////Log.p("Broadcasted change to " + this.countObservers()+ " listeners");
       
   }
 }

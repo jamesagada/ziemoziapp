@@ -6,21 +6,16 @@
 package com.ixzdore.restdb.ziemobject;
 
 import com.codename1.components.ToastBar;
-import com.codename1.io.Log;
 import com.codename1.io.Util;
 import com.codename1.location.Location;
 import com.codename1.properties.BooleanProperty;
 import com.codename1.properties.IntProperty;
 import com.codename1.properties.ListProperty;
 import com.codename1.properties.Property;
-import com.codename1.properties.PropertyBase;
 import com.codename1.properties.PropertyBusinessObject;
 import com.codename1.properties.PropertyIndex;
 import com.codename1.ui.Dialog;
-import com.codename1.ui.Image;
 import com.codename1.util.StringUtil;
-import com.codename1.xml.Element;
-import com.codename1.xml.XMLParser;
 import com.ziemozi.server.ServerAPI;
 import com.ziemozi.server.local.localAPI;
 import java.util.ArrayList;
@@ -29,8 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -67,6 +60,7 @@ public class Request implements PropertyBusinessObject {
     public final ListProperty<Request, Request> comments
             = new ListProperty<>(
                     "comments", Request.class);
+    public final Property<String, Request> f_summary = new Property<>("f_summary");
     public final Property<String, Request> status = new Property<>("status");
     public final Property<String, Request> _created = new Property<>("_created");
     public final Property<String, Request> request_latitude = new Property("request_latitude");
@@ -75,7 +69,7 @@ public class Request implements PropertyBusinessObject {
     public final PropertyIndex idx = new PropertyIndex(this, "Request",
             _id, keep_private, escalations, parent, status, provider,
             service, summary, request_parameters, _created, likes, comments, ziemozi_user,
-            _parent_id, _parent_def, _parent_field, request_address, request_longitude, request_latitude);
+            _parent_id, _parent_def, _parent_field, request_address, f_summary,request_longitude, request_latitude);
 
     @Override
     public PropertyIndex getPropertyIndex() {
@@ -109,7 +103,7 @@ public class Request implements PropertyBusinessObject {
         this.status.set("Open");
         this.priority.set(getPriority());
         HashMap<String, Object> a = new HashMap<String, Object>();
-        ////////log.p("\nBegin Request As A Map\n");
+        //////////Log.p("\nBegin Request As A Map\n");
         //
         localAPI.showMap(this.getPropertyIndex().toMapRepresentation());
         a.putAll(this.getPropertyIndex().toMapRepresentation());
@@ -125,17 +119,17 @@ public class Request implements PropertyBusinessObject {
         a.put("ziemozi_user", aa);
         a.put("request_parameters", new ArrayList());
         //summarize this parameter and  add it into the field
-        ////////log.p("Adding Summary \n");
+        //////////Log.p("Adding Summary \n");
         a.put("summary", requestSummary());
         //also get the current location from the ServerAPI
         //and put it into the map
         Location loc = ServerAPI.getCurrentLocation();
-        ////////log.p("Current Location: " + loc);
-        ////////log.p("Current Latitude: " + loc.getLatitude());
+        //////////Log.p("Current Location: " + loc);
+        //////////Log.p("Current Latitude: " + loc.getLatitude());
         a.put("request_latitude", loc.getLatitude());
         a.put("request_longitude", loc.getLongitude());
-        ////////log.p("Latitude: " + a.get("request_latitude"));
-        ////////log.p("Summarized as " + a.get("summary"));
+        //////////Log.p("Latitude: " + a.get("request_latitude"));
+        //////////Log.p("Summarized as " + a.get("summary"));
         // we save the request first here
         //but before saving we have to determine if this is a child request
         //essentially a comment.
@@ -153,12 +147,12 @@ public class Request implements PropertyBusinessObject {
             a.put("parent", null);
         }
 
-        ////////log.p("\n\n This is requestmap to save\n");
+        //////////Log.p("\n\n This is requestmap to save\n");
         localAPI.showMap(a);
         Request r = new Request();
         r.getPropertyIndex().populateFromMap(a);
-        ////////log.p("saving request \n" + r.getPropertyIndex().toString());
-        ////////log.p("\n\n This is request map transformed to save\n");
+        //////////Log.p("saving request \n" + r.getPropertyIndex().toString());
+        //////////Log.p("\n\n This is request map transformed to save\n");
         localAPI.showMap(r.getPropertyIndex().toMapRepresentation());
         Boolean post = localAPI.postRequest(r);
         String msg = "Could not save the request/report";
@@ -188,7 +182,7 @@ public class Request implements PropertyBusinessObject {
                         ArrayList<RequestParameter> rq = new ArrayList<RequestParameter>();
                         rq.add(rps.get(i));
                         rpbag.add(rq);
-                        ////////log.p("RpBag Size " + rpbag.size());
+                        //////////Log.p("RpBag Size " + rpbag.size());
                     }
 
                 }
@@ -208,7 +202,7 @@ public class Request implements PropertyBusinessObject {
             //we send the entire batch to the server
 
             for (RequestParameter rp : summedRp) {
-                ////////log.p("Parent Id " + r._id.get());
+                //////////Log.p("Parent Id " + r._id.get());
                 rp._parent_id.set(r._id.get());
 
                 //   post = rp.save();
@@ -223,9 +217,9 @@ public class Request implements PropertyBusinessObject {
         if (post) {
             msg = "Saved successfully";
         }
-        ////////log.p(msg);
+        //////////Log.p(msg);
         ToastBar.showInfoMessage(msg);
-        ////////log.p("saved request \n" + r.getPropertyIndex().toJSON());
+        //////////Log.p("saved request \n" + r.getPropertyIndex().toJSON());
     }
 
     public ArrayList<RequestParameter> batchRequestParameters() {
@@ -237,7 +231,7 @@ public class Request implements PropertyBusinessObject {
         //we need to sort request-parameters 
         ArrayList<RequestParameter> rps = new ArrayList<RequestParameter>();
         rps.addAll(request_parameters.asList());
-        //////log.p("Request parameters  " + rps.size());
+        ////////Log.p("Request parameters  " + rps.size());
         Collections.sort(rps);
         //we have sorted the request parameters
         //now we create sublists such that request_parameters with the 
@@ -256,7 +250,7 @@ public class Request implements PropertyBusinessObject {
                     ArrayList<RequestParameter> rq = new ArrayList<RequestParameter>();
                     rq.add(rps.get(i));
                     rpbag.add(rq);
-                    ////////log.p("RpBag Size " + rpbag.size());
+                    //////////Log.p("RpBag Size " + rpbag.size());
                 }
 
             }
@@ -279,18 +273,18 @@ public class Request implements PropertyBusinessObject {
     }
 
     private RequestParameter sumRequests(ArrayList<RequestParameter> a) {
-        RequestParameter r = (RequestParameter) a.get(0);
-        ////////log.p("Summing " + r.service_attribute.getName());
+        RequestParameter r = a.get(0);
+        //////////Log.p("Summing " + r.service_attribute.getName());
         String rValue = r.value.get();
         int i = 1;
         while (i < a.size()) {
             rValue = rValue + "||" + a.get(i).value.get();
             //r.value.set(r.value.get() +"||" + a.get(i).value.get());
-            ////////log.p("Updated " + rValue);
+            //////////Log.p("Updated " + rValue);
             i++;
         }
         r.value.set(rValue);
-        ////////log.p("Fully summed " + r.value.get());
+        //////////Log.p("Fully summed " + r.value.get());
         return r;
     }
 
@@ -299,7 +293,7 @@ public class Request implements PropertyBusinessObject {
         //go through the contents of rb which are all lists
         //if the compareTo matches anyone, then found is tru
         //add r to that list
-        ////////log.p("Parameter to match \n" + r.getPropertyIndex().toString());
+        //////////Log.p("Parameter to match \n" + r.getPropertyIndex().toString());
         //r.refreshServiceAttribute();
         int i = 0;
         while (i < rb.size()) {
@@ -308,11 +302,11 @@ public class Request implements PropertyBusinessObject {
             while (j < f.size()) {
                 RequestParameter p = (RequestParameter) f.get(j);
                 //p.refreshServiceAttribute();
-                ////////log.p("Parameter testing to match\n" + p.getPropertyIndex().toString());                
+                //////////Log.p("Parameter testing to match\n" + p.getPropertyIndex().toString());
                 if (p.compareTo(r) == 0) {
                     //there is a match
-                    ////////log.p("Matched " + r.service_attribute.get(0).name.get());
-                    ////////log.p("With " + p.service_attribute.get(0).name.get());
+                    //////////Log.p("Matched " + r.service_attribute.get(0).name.get());
+                    //////////Log.p("With " + p.service_attribute.get(0).name.get());
                     found = true;
                     f.add(r);
                     break;
@@ -341,7 +335,7 @@ public class Request implements PropertyBusinessObject {
         List<RequestParameter>p = batchRequestParameters();
         if (p.size() < 1) return this.summary.get();
         if (p==null) return this.summary.get();
-        return requestSummary(p);
+        return requestSummary(p,false);
     }
     public String simpleRequestSummary() {
         if (!this._id.get().contains("local") )
@@ -350,7 +344,7 @@ public class Request implements PropertyBusinessObject {
         List<RequestParameter> p = this.request_parameters.asList();
         if (p.size() < 1) return this.summary.get();
         if (p==null) return this.summary.get();
-        Log.p("Request Parameters " + p.size());
+        //Log.p("Request Parameters " + p.size());
         return requestSimpleSummary(p);
     }
     public String requestSimpleSummary(List<RequestParameter> rList) {
@@ -364,18 +358,18 @@ public class Request implements PropertyBusinessObject {
 
         //rs = rs + "<p uiid=\"headline\">  " + l + "  </p>";
         Vector v = new Vector();
-        ////////log.p("\n" + rs+"\n");
+        //////////Log.p("\n" + rs+"\n");
         int i = 0;
         for (RequestParameter rp : rList) {
-            Log.p("Summarizing this parameter "
-                  + rp.getPropertyIndex().toJSON());
+            //Log.p("Summarizing this parameter "
+                  //+ rp.getPropertyIndex().toJSON());
 
-            Log.p("Number of service attributes before refreshing " + rp.service_attribute.size());
+            //Log.p("Number of service attributes before refreshing " + rp.service_attribute.size());
             if (!this._id.get().contains("local")) rp.refreshServiceAttribute();
-            Log.p("Number of service attributes after refreshing " + rp.service_attribute.size());
+            //Log.p("Number of service attributes after refreshing " + rp.service_attribute.size());
             if (rp.service_attribute.size() > 0) {
-                Log.p(rp.getPropertyIndex().toJSON());
-                Log.p(rp.service_attribute.asExplodedList().toString());
+                //Log.p(rp.getPropertyIndex().toJSON());
+                //Log.p(rp.service_attribute.asExplodedList().toString());
                 String ds = rp.service_attribute.get(0).display_sequence.get();
                 Boolean insummary = rp.service_attribute.get(0).include_in_summary.get();
                 if (insummary) {
@@ -387,18 +381,18 @@ public class Request implements PropertyBusinessObject {
                     //i=Integer.parseInt(rp.service_attribute.get(0).display_sequence.get());
 
                     try {
-                        v.add(i, rp.summarize());
+                        v.add(i, rp.summarize(false));
                     } catch (Exception e) {
-                        v.add(rp.summarize());
+                        v.add(rp.summarize(false));
                     }
                 }
                 //                rs = rs + rp.summarize() + ". <br>";
-                //                ////////log.p(rs);
+                //                //////////Log.p(rs);
             }
         }
         i = 0;
         while (i < v.size()) {
-            //////log.p("Summarizing " + v.get(i));
+            ////////Log.p("Summarizing " + v.get(i));
             rs = rs + v.get(i);
             i++;
         }
@@ -415,7 +409,7 @@ public class Request implements PropertyBusinessObject {
         return rs + " </body></doc>";
     }
 
-    public String requestSummary(List<RequestParameter> rList) {
+    public String requestSummary(List<RequestParameter> rList,Boolean functional) {
 
         //this.refreshRequestParameters();
         String rs = "<?xml version=\"1.0\" encoding=\"windows-1252\"?>\n"
@@ -426,10 +420,10 @@ public class Request implements PropertyBusinessObject {
         
         rs = rs + "<p uiid=\"headline\">  " + l + "  </p>";
         Vector v = new Vector();
-        ////////log.p("\n" + rs+"\n"); 
+        //////////Log.p("\n" + rs+"\n");
         int i = 0;
         for (RequestParameter rp : rList) {
-            //////log.p("Summarizing this parameter "
+            ////////Log.p("Summarizing this parameter "
              //       + rp.getPropertyIndex().toJSON());
             if (rp.service_attribute.size() > 0) {
                 String ds = rp.service_attribute.get(0).display_sequence.get();
@@ -443,18 +437,18 @@ public class Request implements PropertyBusinessObject {
                     //i=Integer.parseInt(rp.service_attribute.get(0).display_sequence.get());
 
                     try {
-                        v.add(i, rp.summarize());
+                        v.add(i, rp.summarize(functional));
                     } catch (Exception e) {
-                        v.add(rp.summarize());
+                        v.add(rp.summarize(functional));
                     }
                 }
                 //                rs = rs + rp.summarize() + ". <br>";
-                //                ////////log.p(rs);
+                //                //////////Log.p(rs);
             }
         }
         i = 0;
         while (i < v.size()) {
-            //////log.p("Summarizing " + v.get(i));
+            ////////Log.p("Summarizing " + v.get(i));
             rs = rs + v.get(i);
             i++;
         }
@@ -496,7 +490,7 @@ public class Request implements PropertyBusinessObject {
         //comments.clear();
         //if (this._id.get().contains("local")) return;
         ArrayList<Request> aa = localAPI.getCommentsFor(this._id.get());
-        ////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        //////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null) {
             comments.clear();
             comments.addAll(localAPI.getCommentsFor(this._id.get()));
@@ -504,11 +498,11 @@ public class Request implements PropertyBusinessObject {
     }
 
     public void refreshUser() {
-        ////////log.p("refreshing user in request" );
+        //////////Log.p("refreshing user in request" );
         //if (this._id.get().contains("local")) return;
         ArrayList<User> aa = localAPI.getUserFor(this._id.get());
-        //////log.p(" Number of Users on refreshing is  " + aa.size());
-        if (aa != null) ////////log.p(" Number of Users " + aa.size());
+        ////////Log.p(" Number of Users on refreshing is  " + aa.size());
+        if (aa != null) //////////Log.p(" Number of Users " + aa.size());
         {
             if (aa != null) {
                 ziemozi_user.clear();
@@ -525,7 +519,7 @@ public class Request implements PropertyBusinessObject {
         //if (this._id.get().contains("local")) return;
         ArrayList<Service> aa = localAPI.getServiceForRequest(this._id.get());
         //service.clear();
-        //////log.p("Refreshing Service found " + aa.size());
+        ////////Log.p("Refreshing Service found " + aa.size());
         if (aa != null) {
             service.clear();
             service.addAll(aa);
@@ -545,7 +539,7 @@ public class Request implements PropertyBusinessObject {
     }
 
     public void refreshRequestParameters() {
-        ////////log.p("refreshing services in request" );
+        //////////Log.p("refreshing services in request" );
         //if (this._id.get().contains("local")) return;
         ArrayList<RequestParameter> aa = localAPI.getRequestParametersForRequest(this._id.get());
         //request_parameters.clear();
@@ -600,15 +594,15 @@ public class Request implements PropertyBusinessObject {
         //String[] split = Util.split(summary.get(), "p>");
         //String s = requestSummary();
         String s = summary.get();
-        ////log.p("Request Summary for plaining is " + s);
+        //////Log.p("Request Summary for plaining is " + s);
         String[] split = Util.split(s, "p>");        
         for (String term : split) {
-            ////log.p("Term -" + term);
+            //////Log.p("Term -" + term);
             if ((term.indexOf("doc>") < 1) || (term.indexOf("body") < 1) || (term.indexOf("xml") < 1)) {
                 plain = StringUtil.replaceAll(term, "<", "");
                 plain = StringUtil.replaceAll(plain, "</", "");
                 plain_summary = plain_summary + " " + plain;
-                ////log.p(plain_summary);
+                //////Log.p(plain_summary);
             }
         }
         return plain_summary;
@@ -639,13 +633,13 @@ public class Request implements PropertyBusinessObject {
         }
         for (ServiceAttribute s : service.get(0).service_attributes) {
             //create a RequestParmeter for each
-            //////log.p("Setting up Request Parameters");
-            //////log.p(s.name.get() + " with id  " + s._id.get() );
+            ////////Log.p("Setting up Request Parameters");
+            ////////Log.p(s.name.get() + " with id  " + s._id.get() );
             if (s._id.get() != null){
             RequestParameter rq = new RequestParameter();
             rq.service_attribute.add(s);
             rq.value.set(s.default_value.get());
-            rq.summary.set(rq.summarize());
+            rq.summary.set(rq.summarize(false));
             this.request_parameters.add(rq);
             }
         }
@@ -681,7 +675,7 @@ public void createRequest(String parameter, Object value) {
             if (s.name.get().equalsIgnoreCase(parameter)) {  
                     rq.value.set(value.toString());
             }           
-            rq.summary.set(rq.summarize());
+            rq.summary.set(rq.summarize(false));
             this.request_parameters.add(rq);
         }
     }
@@ -692,7 +686,7 @@ public void createRequest(String parameter, Object value) {
         //we will try using the DAO
        // Random r = new Random(63546);
        // this._id.set("local_" + r.nextInt());//we use this to mark new records yet to be shared
-        this._id.set("local_" + String.valueOf(this.hashCode()) + String.valueOf(System.currentTimeMillis()));//we use this to mark new records yet to be shared
+        this._id.set("local_" + this.hashCode() + System.currentTimeMillis());//we use this to mark new records yet to be shared
         
         this._created.set(new Date().toString());
         this.status.set(getStatus());
@@ -720,7 +714,7 @@ public void createRequest(String parameter, Object value) {
         }
         this.service.get(0).refresh();
         this.summary.set(requestSummary());
-        //////////log.p( " Saved " + localAPI.saveLocal(this));
+        ////////////Log.p( " Saved " + localAPI.saveLocal(this));
         if (localAPI.saveLocal(this)) {
             //Ask if we should update to server now?
             Boolean sync = Dialog.show("", "Save To Server ?",
@@ -740,7 +734,7 @@ public void createRequest(String parameter, Object value) {
         //we will try using the DAO
         //Random r = new Random(63546);
         //this._id.set("local_" + r.nextInt());//we use this to mark new records yet to be shared
-        this._id.set("local_" + String.valueOf(this.hashCode()) + String.valueOf(System.currentTimeMillis()));//we use this to mark new records yet to be shared
+        this._id.set("local_" + this.hashCode() + System.currentTimeMillis());//we use this to mark new records yet to be shared
         
         this._created.set(new Date().toString());
         this.status.set(getStatus());
@@ -768,15 +762,15 @@ public void createRequest(String parameter, Object value) {
         }
         this.service.get(0).refresh();
         this.summary.set(requestSummary());
-        //////////log.p( " Saved " + localAPI.saveLocal(this));
-        //log.p("Saving Locally " + this._id);
+        ////////////Log.p( " Saved " + localAPI.saveLocal(this));
+        ////Log.p("Saving Locally " + this._id);
         if (localAPI.saveLocal(this)) {
             //Ask if we should update to server now?
-                Log.p("Successfully Saved Locally");
+                //Log.p("Successfully Saved Locally");
                 //ToastBar.showInfoMessage("Saved");
 
         }else {
-            Log.p("Failed To Save Locally");
+            //Log.p("Failed To Save Locally");
             //ToastBar.showInfoMessage("Failed to save local");
         }
     }
@@ -785,7 +779,7 @@ public void createRequest(String parameter, Object value) {
     public void makeReadyForSaving() {
  //       Random r = new Random();
 //        this._id.set("local_" + r.nextLong() + System.currentTimeMillis());//we use this to mark new records yet to be shared
-        this._id.set("local_" + String.valueOf(this.hashCode()) + String.valueOf(System.currentTimeMillis()));//we use this to mark new records yet to be shared
+        this._id.set("local_" + this.hashCode() + System.currentTimeMillis());//we use this to mark new records yet to be shared
         this._created.set(new Date().toString());
         this.status.set(getStatus());
         this.priority.set(getPriority());
@@ -817,19 +811,19 @@ public void createRequest(String parameter, Object value) {
      //   request_parameters.clear();
      //   request_parameters.addAll(rp);
         //this.service.get(0).refresh();
-        //////log.p(this.getPropertyIndex().toJSON());
-        //////log.p("Number of attributes From as list " + this.request_parameters.asList().size());
-        //////log.p("Number of attributes " + this.request_parameters.size());
+        ////////Log.p(this.getPropertyIndex().toJSON());
+        ////////Log.p("Number of attributes From as list " + this.request_parameters.asList().size());
+        ////////Log.p("Number of attributes " + this.request_parameters.size());
         this.summary.set(requestSummary());
     }
     public ArrayList<String> validateRequest(){
         ArrayList<String> errors = new ArrayList<String>();
 
         for (RequestParameter r:this.request_parameters.asList()) {
-            Log.p("service attributes " + r.service_attribute.size());
+            //Log.p("service attributes " + r.service_attribute.size());
             errors.addAll(r.validate());
-            Log.p(errors.size() +
-                    " errors found" + "found for " + r.service_attribute.get(0).name.get());
+            //Log.p(errors.size() +
+                    //" errors found" + "found for " + r.service_attribute.get(0).name.get());
         }
         if ((this.request_longitude.get() == null) || ( this.request_latitude == null )){
             errors.add("Could not get GPS address of location  fixed");

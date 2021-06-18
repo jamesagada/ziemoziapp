@@ -31,12 +31,7 @@ import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
 import com.codename1.ui.layouts.BoxLayout;
-import com.codename1.ui.spinner.DateSpinner;
-import com.codename1.ui.spinner.Picker;
-import com.codename1.ui.util.ImageIO;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
+
 import com.codename1.ext.codescan.CodeScanner;
 import com.codename1.ui.plaf.Border;
 
@@ -60,7 +55,7 @@ public class ObdScanner extends BaseEditorImpl {
         scanCode.getAllStyles().setBorder(Border.createBevelRaised());
         scanCode.addActionListener((evt) -> {
             //
-            //////log.p("Scan for barcode");
+            ////////Log.p("Scan for barcode");
             CodeScanner.getInstance().scanBarCode(new ScanResult() {
 
                 public void scanCompleted(String contents, String formatName, byte[] rawBytes) {
@@ -119,13 +114,13 @@ public class ObdScanner extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -135,12 +130,12 @@ public class ObdScanner extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
 
@@ -158,8 +153,6 @@ public class ObdScanner extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

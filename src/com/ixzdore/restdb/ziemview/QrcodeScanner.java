@@ -60,7 +60,7 @@ public class QrcodeScanner extends BaseEditorImpl {
         scanCode.getAllStyles().setBorder(Border.createBevelRaised());        
         scanCode.addActionListener((evt) -> {
             //
-            //////log.p("Scan for qrcode");
+            ////////Log.p("Scan for qrcode");
             CodeScanner.getInstance().scanQRCode(new ScanResult() {
 
                 public void scanCompleted(String contents, String formatName, byte[] rawBytes) {
@@ -119,13 +119,13 @@ public class QrcodeScanner extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -135,12 +135,12 @@ public class QrcodeScanner extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
 
@@ -158,8 +158,6 @@ public class QrcodeScanner extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

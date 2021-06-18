@@ -12,28 +12,22 @@ import com.codename1.ui.Image;
 import java.util.Date;
 /**
  *
- * @author jamesagada
- * ({
-    "_id",
-    "icon",
-    "description",
-    "name",
-    "_created",
-    "_mock"
-})
+ *
+ * name	type	description
+ * obj['name']	text	name of the stop
+ * obj['zone']	text	- missing description -
+ * obj['longitude']	text	longitude
+ * obj['latitude']	text	latitude
  */
 public class Stop implements PropertyBusinessObject{
     public final Property<String, Stop> _id = new Property<>("_id");
-    public final Property<String, Stop> first_name = new Property<>("first_name");
-    public final Property<String, Stop> description = new Property<>("description");
-    public final Property<String, Stop> balance = new Property<>("balance");
-    public final Property<String, Stop> ble_code = new Property<>("ble_code");
-    public final Property<String, Stop> qr_code = new Property<>("qr_code");
-    public final Property<String, Stop> phone_number = new Property<>("phone_number");
-    public final Property<String, Stop> email = new Property<>("email");
-    public final Property<String, Stop> last_name = new Property<>("last_name");
-    public final PropertyIndex idx = new PropertyIndex(this, "Wallet",
-            _id, phone_number, balance, email, first_name,last_name, description, ble_code,qr_code);
+    public final Property<String, Stop> name = new Property<>("name");
+    public final Property<String, Stop> zone = new Property<>("zone");
+    public final Property<String, Stop> longitude = new Property<>("longitude");
+    public final Property<String, Stop> latitude = new Property<>("latitude");
+
+    public final PropertyIndex idx = new PropertyIndex(this, "Stop",
+            _id, name, zone, longitude, latitude);
 
     @Override
     public PropertyIndex getPropertyIndex() {
@@ -41,9 +35,9 @@ public class Stop implements PropertyBusinessObject{
  
     }
         public Stop(){
-        first_name.setLabel("Name");
-        balance.setLabel("Balance");
-        phone_number.setLabel("Phone");
-        description.setLabel("Description");
+        name.setLabel("Name");
+        zone.setLabel("Zone");
+        longitude.setLabel("Longitude");
+        latitude.setLabel("Latitude");
     }
 }

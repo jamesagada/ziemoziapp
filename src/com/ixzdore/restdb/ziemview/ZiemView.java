@@ -139,7 +139,7 @@ public class ZiemView {
             }
         }
         ArrayList<Service> servicesToUse;
-        ////////log.p("newServices " + newServices.size() );
+        //////////Log.p("newServices " + newServices.size() );
         if (newServices.size() > 0) {
             servicesToUse = newServices;
         }else {
@@ -279,8 +279,8 @@ public class ZiemView {
             ////System.out.println("Map is --> " + sattr.toString());
             //withAttributeType.getPropertyIndex().populateFromMap((HashMap) sattr, ServiceAttributeType.class);
             //serviceAttribute.getPropertyIndex().populateFromMap((HashMap) sattr);
-            ////////log.p("\n\nClass type of attribute " + sattr.getClass().getCanonicalName());
-            ////////log.p("\n"+ sattr.toString());
+            //////////Log.p("\n\nClass type of attribute " + sattr.getClass().getCanonicalName());
+            //////////Log.p("\n"+ sattr.toString());
             ServiceAttribute serviceAttribute = (ServiceAttribute)sattr;
             //serviceAttribute.getPropertyIndex().populateFromMap((HashMap)sattr, ServiceAttributeType.class);
             ////System.out.println("Attribute Type " + withAttributeType.getPropertyIndex().toJSON());
@@ -468,22 +468,22 @@ public class ZiemView {
 
         int i = 0;
         while  (i < cnt.getComponentCount()) {
-            ////////log.p("Component Count is " + cnt.getComponentCount());
-            ////////log.p("Component number "+i);
-            ////////log.p(cnt.getComponentAt(i).toString());
-            ////////log.p(cnt.getComponentAt(i).getClass().getName());
+            //////////Log.p("Component Count is " + cnt.getComponentCount());
+            //////////Log.p("Component number "+i);
+            //////////Log.p(cnt.getComponentAt(i).toString());
+            //////////Log.p(cnt.getComponentAt(i).getClass().getName());
             if (cnt.getComponentAt(i).getClass().getName().endsWith("AttributeEditor")){
 
              AttributeEditor a = (AttributeEditor)cnt.getComponentAt(i);
-             RequestParameter r = (RequestParameter)a.getAttributeValue();
+             RequestParameter r = a.getAttributeValue();
              if (r != null) {
              ServiceAttribute s = r.service_attribute.get(0);
- //            ////////log.p("Request Parameter " + r.getPropertyIndex().toString());
-//             ////////log.p("Service Attribute is From Request Parameter " + s.getPropertyIndex().toString());
+ //            //////////Log.p("Request Parameter " + r.getPropertyIndex().toString());
+//             //////////Log.p("Service Attribute is From Request Parameter " + s.getPropertyIndex().toString());
              
                 if (s != null) {
                     request.request_parameters.add(r);
-                   ////////log.p("Service Attribute is From Request Parameter " + s.getPropertyIndex().toString()); 
+                   //////////Log.p("Service Attribute is From Request Parameter " + s.getPropertyIndex().toString());
                 }
             }
             }
@@ -491,8 +491,8 @@ public class ZiemView {
          //how do we deal with values not in the container or do we mark those as hidden and let it 
          //be processed automatically?
         }    
-        ////////log.p("Service " +service.getPropertyIndex().toJSON());
-        ////////log.p("Request " + request.getPropertyIndex().toString());
+        //////////Log.p("Service " +service.getPropertyIndex().toJSON());
+        //////////Log.p("Request " + request.getPropertyIndex().toString());
         this.request=request;
     }
     public void updateRequestFromContainer(){

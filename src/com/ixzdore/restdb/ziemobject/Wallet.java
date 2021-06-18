@@ -31,10 +31,12 @@ public class Wallet implements PropertyBusinessObject{
     public final Property<String, Wallet> qr_code = new Property<>("qr_code");
     public final Property<String, Wallet> phone_number = new Property<>("phone_number");
     public final Property<String, Wallet> email = new Property<>("email");
+    //public final Property<String,Wallet> name  = new Property<>("name");
     public final Property<String, Wallet> last_name = new Property<>("last_name");
     public final Property<String,Wallet> _created = new Property<>("_created");    
     public final PropertyIndex idx = new PropertyIndex(this, "Wallet",
-            _id, phone_number, balance, email, first_name,last_name, description, _created,ble_code,qr_code);
+            _id, phone_number, balance, email,
+            first_name,last_name,description, _created,ble_code,qr_code);
 
     @Override
     public PropertyIndex getPropertyIndex() {

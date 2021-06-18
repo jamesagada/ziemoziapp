@@ -100,16 +100,16 @@ public class MapShowForm extends Form {
         s.setBgTransparency(0);
         //FontImage mImg = FontImage.createMaterial(FontImage.MATERIAL_PLACE, s, Display.getInstance().convertToPixels(3));
         //markerImage should be the service logo!
-        ////////log.p(r.plain_summary());
+        //////////Log.p(r.plain_summary());
         r.refreshService();        
-        ////////log.p("Number of Services " + r.service.size());
-        ////////log.p(c.toString());
+        //////////Log.p("Number of Services " + r.service.size());
+        //////////Log.p(c.toString());
         Image serviceImage = ServerAPI.getServiceImage(r.service.get(0));
 
                c = getMarkerPosition(c,markers);
                cnt.setCameraPosition(c);
                
-            //////log.p("Placing marker here " + c.toString());       
+            ////////Log.p("Placing marker here " + c.toString());
             cnt.addMarker(
                     EncodedImage.createFromImage(serviceImage, false),
                     cnt.getCameraPosition(),
@@ -146,7 +146,7 @@ public class MapShowForm extends Form {
 
     private Coord getMarkerPosition(Coord c, HashMap markers) {
         //
-    ////////log.p("Requested Position is " + c.toString());    
+    //////////Log.p("Requested Position is " + c.toString());
     for (int i = 0; i <= MAX_NUMBER_OF_MARKERS; i++) {
         
         if (markers.containsValue(c)) {
@@ -156,7 +156,7 @@ public class MapShowForm extends Form {
             break;
         }
     }
-    ////////log.p("Provided Marker Position is " + c.toString());
+    //////////Log.p("Provided Marker Position is " + c.toString());
     markers.put(c.getLongitude(), c);
     return c;
      }

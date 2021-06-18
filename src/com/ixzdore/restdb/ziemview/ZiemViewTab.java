@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import static java.util.stream.Collectors.*;
-import static java.util.Map.Entry.*;
+
+
 
 //Read more: https://javarevisited.blogspot.com/2017/09/java-8-sorting-hashmap-by-values-in.html#ixzz6m5AvLPeC
 //import com.codename1.components.Button;
@@ -105,6 +105,7 @@ public class ZiemViewTab {
         requestContainer = new Container();
         requestContainer.putClientProperty("ziemView", this);
         contentContainer = new Container();
+        contentContainer.setUIID("Label");
         parameterTypeContainer = new Container();
         serviceContainer = new Container();
         contentAndParameter = new Container();//contian content and parameter
@@ -180,7 +181,7 @@ public class ZiemViewTab {
             }
         }
         ArrayList<Service> servicesToUse;
-        //////////////log.p("newServices " + newServices.size());
+        ////////////////Log.p("newServices " + newServices.size());
         if (newServices.size() > 0) {
             servicesToUse = newServices;
         } else {
@@ -192,7 +193,7 @@ public class ZiemViewTab {
         serviceTabContainer.setUIID("TabZ");
         serviceTabContainer.getTabsContainer().setUIID("TabZ");
         for (Service service : servicesToUse) {
-            // ////log.p("Service " + service.name.get() + "is enabled " + service.enabled.getBoolean());            
+            // //////Log.p("Service " + service.name.get() + "is enabled " + service.enabled.getBoolean());
             //add button to represent this service in the service list
             //this is only if the service has a service definition
             //Tabs serviceTabContainer = new Tabs();
@@ -248,7 +249,7 @@ public class ZiemViewTab {
             
         }
         ArrayList<Service> servicesToUse;
-        ////////////log.p("newServices " + newServices.size());
+        //////////////Log.p("newServices " + newServices.size());
         if (newServices.size() > 0) {
             servicesToUse = newServices;
         } else {
@@ -259,13 +260,13 @@ public class ZiemViewTab {
         for (Service service : services) {
             //add button to represent this service in the service list
             //this is only if the service has a service definition
-            //////log.p("Service " + service.name.get() + "is enabled " + service.enabled.get()); 
+            ////////Log.p("Service " + service.name.get() + "is enabled " + service.enabled.get());
             if (service.enabled.get() == null) {
                 service.enabled.set("FALSE");
             }
             Boolean isEnabled = service.enabled.getBoolean();
             if (service.service_attributes.size() <= 0) {
-                //////log.p("Refresh Service");
+                ////////Log.p("Refresh Service");
                 service.refresh();
             }
             if ((!service.getClass().getCanonicalName().equalsIgnoreCase("java.lang.String"))
@@ -346,37 +347,37 @@ public class ZiemViewTab {
                 //now we will implement the watching by cycling through the 
                 //components, and picking out which ones are watching what 
                 //and setting the observer and observable appropriately
-                //////////log.p("Check for Watched in " + $(".attribute").size() + " Components");
+                ////////////Log.p("Check for Watched in " + $(".attribute").size() + " Components");
                 ComponentSelector sel = $(".attribute");
                 ArrayList<Component> c_attr = findAttributes(contentContainer);
-                //////////log.p("Number of components " + c_attr.size());
+                ////////////Log.p("Number of components " + c_attr.size());
                 for (Component c : c_attr) {
                     AttributeEditor a = (AttributeEditor) c;
-                    ////log.p("Component with attribute" + c.getName());
-                    RequestParameter r = (RequestParameter) a.getAttributeValue();
+                    //////Log.p("Component with attribute" + c.getName());
+                    RequestParameter r = a.getAttributeValue();
                     ServiceAttribute s = a.attribute;
                     if (s.watch_this_attribute.size() <= 0) {
-                        //                   //////log.p("Refresh Service Attribute For Watch");
+                        //                   ////////Log.p("Refresh Service Attribute For Watch");
                         //                    s.refreshAttribute();
                     }
-                    //                  //////log.p("Refresh Attribute Size is " + s.watch_this_attribute.size());
+                    //                  ////////Log.p("Refresh Attribute Size is " + s.watch_this_attribute.size());
                     //ServiceAttribute ss = s;
                     //r.service_attribute.get();
 
-                    //////////log.p("Service attribute fom request " + ss.getPropertyIndex().toString());
-                    ////log.p("Should we watch " + s.getPropertyIndex().toString());
+                    ////////////Log.p("Service attribute fom request " + ss.getPropertyIndex().toString());
+                    //////Log.p("Should we watch " + s.getPropertyIndex().toString());
                     if (s != null) {
                         //ss.refreshAttribute();
-                        //////////log.p(ss.name.get() + "is watching " + ss.watch_this_attribute.size()  + " attributes");
+                        ////////////Log.p(ss.name.get() + "is watching " + ss.watch_this_attribute.size()  + " attributes");
                         if (s.watch_this_attribute.size() > 0) {
                             /// if (ss.watch_this_attribute.asList().get(0)
                             //        .getClass().getCanonicalName().endsWith("String")) {
                             //    ss.refreshAttribute();
                             //}
                             List<ServiceAttribute> w = s.watch_this_attribute.asList();
-                            //////////log.p("Watching " + w.size() + "attributes");
-                            //////////log.p("Watch this attribute " + w.get(0).getPropertyIndex().toString());
-                            ////////////log.p("We are going to watch " + w.get(0).name.get());
+                            ////////////Log.p("Watching " + w.size() + "attributes");
+                            ////////////Log.p("Watch this attribute " + w.get(0).getPropertyIndex().toString());
+                            //////////////Log.p("We are going to watch " + w.get(0).name.get());
                             //we need to set the watching on for this attribute
                             a.fieldWatcher.watchThisField(w.get(0), watchContext(findAttributes(
                                     contentContainer)));
@@ -400,7 +401,7 @@ public class ZiemViewTab {
             private void addObserver(AttributeEditor a, ServiceAttribute s) {
                 for (Component c : findAttributes(contentContainer)) {
                     AttributeEditor ao = (AttributeEditor) c;
-                    ////////////log.p(ao.attribute.name.get() + ":" + s.name.get());
+                    //////////////Log.p(ao.attribute.name.get() + ":" + s.name.get());
 
                     if (ao.attribute.name.get().equalsIgnoreCase(s.name.get())) {
                         ao.fieldBroadcast.addObserver(a.fieldWatcher);
@@ -413,7 +414,7 @@ public class ZiemViewTab {
                 Map<String, Object> c = new HashMap<String, Object>();
                 for (Object o : s) {
                     AttributeEditor ao = (AttributeEditor) o;
-                    ////////////log.p(ao.attribute.name.get());
+                    //////////////Log.p(ao.attribute.name.get());
                     c.put(ao.attribute.name.get(), ao.baseEditor);
                 }
                 return c;
@@ -426,7 +427,7 @@ public class ZiemViewTab {
     public ArrayList<Component> findAttributes(Container contentContainer) {
         ArrayList<Component> fa = new ArrayList<Component>();
         for (Component c : contentContainer.getChildrenAsList(true)) {
-            if (Container.class.isInstance(c)) {
+            if (c instanceof Container) {
                 if (c.getClientProperty("attribute") != null) {
                     fa.add(c);
                 } else {
@@ -599,7 +600,7 @@ public class ZiemViewTab {
                 // create the request from the display
                 // call the save function which should determine how the 
                 //object will be saved.
-                ToastBar.showInfoMessage("Saving ...");
+                //ToastBar.showInfoMessage("Saving ...");
                 
                 saveRequestFromContainer(contentContainer);
 
@@ -626,7 +627,7 @@ public class ZiemViewTab {
 
         //this.request now holds the request
         // the actual saving should be done by the request.
-        ////////////log.p("Save Request " + this.request.getPropertyIndex().toString());
+        //////////////Log.p("Save Request " + this.request.getPropertyIndex().toString());
         Service service = (Service) cnt.getClientProperty("service");        //service.refresh();
 
         if (service != null) {
@@ -654,7 +655,7 @@ public class ZiemViewTab {
                 ToastBar.showErrorMessage(err, 10);
                 return;
             }
-            Log.p(this.request.service.get(0).name.get());
+            //Log.p(this.request.service.get(0).name.get());
             dlg.add(CENTER, NewsfeedContainer.createSimpleNewsItem(p.ziemozi_user.get(0), this.request));
             Container saveControl = new Container();
             Button b = new Button("Save");
@@ -682,8 +683,9 @@ public class ZiemViewTab {
                 service.refresh();
                 this.request.service.add(service);
             }
-            //////log.p("This Request " + this.request.getPropertyIndex().toJSON());
+            ////////Log.p("This Request " + this.request.getPropertyIndex().toJSON());
             if (Boolean.parseBoolean(m.get("save").toString())) {
+                dlg.dispose();
                 this.request.saveLocal();
             MainForm main = new MainForm();
             main.refresh();
@@ -691,9 +693,11 @@ public class ZiemViewTab {
             }else{
                 //not saved
                 //just return to the view we are in
+                dlg.dispose();
                 ToastBar.showInfoMessage("Request Not Saved");
             }
         } else {
+
             ToastBar.showInfoMessage("Create a message first");
         }
     }
@@ -730,17 +734,17 @@ public class ZiemViewTab {
             req.request_parameters.clear();
             ArrayList<Component> coms = findAttributes(contentContainer);
             for (Component c : coms) {
-                Log.p("\n\nComponent to extract " + c.getName());
+                //Log.p("\n\nComponent to extract " + c.getName());
                 AttributeEditor a = (AttributeEditor) c;
-                RequestParameter r =  (RequestParameter) a.getAttributeValue();
-                Log.p("Attributes " + r.service_attribute.size());
+                RequestParameter r = a.getAttributeValue();
+                //Log.p("Attributes " + r.service_attribute.size());
                 if ((r != null) && (r.service_attribute.size() > 0)) {
                     ServiceAttribute s = r.service_attribute.get(0);
                     if (s != null) {
                         req.request_parameters.add(r);
-                        Log.p("Inside rquest parameter "
-                                +req.request_parameters.get(0).service_attribute.size());
-                        //Log.p("\n\nService Attribute" + s.name.get() + " has value " + r.value.get() + "\n");
+                        //Log.p("Inside rquest parameter "
+                                //+req.request_parameters.get(0).service_attribute.size());
+                        ////Log.p("\n\nService Attribute" + s.name.get() + " has value " + r.value.get() + "\n");
                         //is From Request Parameter " + r.getPropertyIndex().toString());
                     }
                 }
@@ -860,32 +864,32 @@ public class ZiemViewTab {
         HashMap gms = sortAttributeMap(gm);
         Set attributeKeys = gms.keySet();
         //add dummy components which we can swapout later
-        //////////log.p("Number of attributes to tab "+attributeKeys.size());
+        ////////////Log.p("Number of attributes to tab "+attributeKeys.size());
         addDummyComponents(tab, attributeKeys.size());
         for (Object k : attributeKeys) {
 
             ServiceAttribute attribute = (ServiceAttribute) gms.get(k);
             if (attribute._id.get() != null) {
 
-                //////log.p("\n\n----\n\nThe service attribute before refresh " 
+                ////////Log.p("\n\n----\n\nThe service attribute before refresh "
                 //       + attribute._id);                
                 if (attribute.type_of_attribute.size() <= 0) {
-                    //////log.p("Refresh Type of Attribute");
+                    ////////Log.p("Refresh Type of Attribute");
                     attribute.refreshAttribute();
                 }
-                //////log.p("\n\n----\n\nThe service attribute " +  attribute._id);
+                ////////Log.p("\n\n----\n\nThe service attribute " +  attribute._id);
                 //Component attr = editAttribute(attribute);
                 //$(attr).addTags("attribute");
                 Component attr = $(editAttribute(attribute)).addTags("attribute").asComponent();
-                //////////log.p("Components " + $(".attribute").size());
+                ////////////Log.p("Components " + $(".attribute").size());
                 attr.putClientProperty("attribute", "yes");
                 attr.setName(k.toString());
-                //Log.p("Attribute Name " + k.toString() + attribute.display_sequence.get()) ;
+                ////Log.p("Attribute Name " + k.toString() + attribute.display_sequence.get()) ;
                 try {
                     tab.addComponent(getAttributePosition(
                             Integer.parseInt(attribute.display_sequence.get()), tab), attr);
                 } catch (Exception e) {
-                    Log.p(e.getMessage());
+                    //Log.p(e.getMessage());
                     tab.add(attr);
                 }
             }
@@ -895,7 +899,7 @@ public class ZiemViewTab {
         while (i < tab.getComponentCount()) {
 
             Component c = tab.getComponentAt(i);
-            //////////log.p(c.getName());            
+            ////////////Log.p(c.getName());
             if (c.getName().startsWith("Dummy")) {
                 tab.removeComponent(c);
                 i--;
@@ -917,8 +921,15 @@ public class ZiemViewTab {
                 int rtval =0;
                 ServiceAttribute s1 = (ServiceAttribute) ((Map.Entry) (o1)).getValue();
                 ServiceAttribute s2 =  (ServiceAttribute) ((Map.Entry) (o2)).getValue();
-                rtval = Integer.parseInt(s1.display_sequence.get()) -
-                        Integer.parseInt(s2.display_sequence.get());
+                String ss1 = s1.display_sequence.get();
+                if ( ss1.contains(".") ) ss1= s1.display_sequence.get().substring(0,
+                        s1.display_sequence.get().indexOf(".")-1);
+                String ss2 = s2.display_sequence.get();
+                if ( ss2.contains(".")) ss2 = s2.display_sequence.get().substring(0,
+                        s2.display_sequence.get().indexOf(".")-1);
+
+                rtval = Integer.parseInt(ss1) -
+                        Integer.parseInt(ss2);
                 return rtval;
             }
         });
@@ -933,7 +944,7 @@ public class ZiemViewTab {
     }
 
     private int getAttributePosition(int sequence, Container t) {
-        Log.p("Number of Components is " + t.getComponentCount());
+        //Log.p("Number of Components is " + t.getComponentCount());
         int i = 0;
         if (sequence <= t.getComponentCount()) {
             i = sequence;
@@ -941,7 +952,7 @@ public class ZiemViewTab {
         if (sequence > t.getComponentCount()) {
             i = t.getComponentCount();
         }
-        Log.p("Sequence is " + sequence + "; Modified is " + i);
+        //Log.p("Sequence is " + sequence + "; Modified is " + i);
         return i;
     }
 
@@ -984,7 +995,7 @@ public class ZiemViewTab {
 
             ServiceAttribute sAttribute = (ServiceAttribute) sattr;
             String grp = sAttribute.display_group.get();
-            //////log.p(grp + " --> " + sAttribute.name.get());
+            ////////Log.p(grp + " --> " + sAttribute.name.get());
             if (grp == null) {
                 //this goes into a new group all by itself
                 //actually should go into the defaultGroup
@@ -1031,8 +1042,8 @@ public class ZiemViewTab {
             for (Object o : k) {
                 ServiceAttribute s = (ServiceAttribute) h.get(o);
                 //s.refreshAttribute();
-                ////////////log.p(s.getPropertyIndex().toString());
-                ////////////log.p("Display Group " + s.display_group.get());    
+                //////////////Log.p(s.getPropertyIndex().toString());
+                //////////////Log.p("Display Group " + s.display_group.get());
                 if (s.display_group.get() != null) {
                     if (s.display_group.get().equalsIgnoreCase(get)) {
                         //we have found the group

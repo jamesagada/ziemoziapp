@@ -52,7 +52,7 @@ public class Ziemozi implements PushCallback {
       
 addNetworkErrorListener(err -> {
             // prevent the event from propagating
-            ////log.p(err.getMessage());
+            //////Log.p(err.getMessage());
             Log.sendLogAsync();
             err.consume();
             if (err.getError() != null) {
@@ -114,7 +114,7 @@ addNetworkErrorListener(err -> {
 
     @Override
     public void pushRegistrationError(String error, int errorCode) {
-        ////log.p("Failed to register for push: " + error);
+        //////Log.p("Failed to register for push: " + error);
     }
 
     

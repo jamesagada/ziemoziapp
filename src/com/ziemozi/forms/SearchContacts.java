@@ -34,12 +34,12 @@ public class SearchContacts extends Form {
     public Button showOnMap;
     public TextField searchField = new TextField("Enter Search");
     public InfiniteContainer ic = new InfiniteContainer() {
-    public    ArrayList<ServiceContact>             allcontacts = localAPI.searchContacts(
+    public final ArrayList<ServiceContact>             allcontacts = localAPI.searchContacts(
                         "", 0, 9999);
         @Override
         public Component[] fetchComponents(int index, int amount) {
-            ////////log.p(searchField.getText());
-            ////////log.p("SearchPeople " + searchPeople);
+            //////////Log.p(searchField.getText());
+            //////////Log.p("SearchPeople " + searchPeople);
             ArrayList<ServiceContact> contacts = new ArrayList<ServiceContact>();
 
             if (index == 0) {
@@ -81,11 +81,11 @@ private Boolean filterContact(ServiceContact c, String s) {
             Boolean filterin = false;
             List<String> textTerms = StringUtil.tokenize(s, ",");
             String rs = c.summary().toLowerCase();
-            //////log.p(rs);
+            ////////Log.p(rs);
             for (String t : textTerms) {
-                //////log.p(t);
+                ////////Log.p(t);
                 if (rs.lastIndexOf(t.toLowerCase()) > 0) {
-                    //////log.p("found match for " + t);
+                    ////////Log.p("found match for " + t);
                     filterin = true;
                     break;
                 }
@@ -96,7 +96,7 @@ private Boolean filterContact(ServiceContact c, String s) {
 
         public SearchContacts() {
             super(new BorderLayout());
-            ////////log.p("\n\n Searching initiated \n\n");
+            //////////Log.p("\n\n Searching initiated \n\n");
             showOnMap = new Button("Map");
             searchField.setUIID("Title");
             searchField.getAllStyles().setAlignment(LEFT);
@@ -155,9 +155,9 @@ private Boolean filterContact(ServiceContact c, String s) {
 
         private Component createEntry(ServiceContact p) {
             if (p != null) {
-                //////log.p("Service Contact name " + p.name.get());
+                ////////Log.p("Service Contact name " + p.name.get());
                 //if (p.services.size() > 0) {
-                //////log.p("Creating Entry for " + p.summary());
+                ////////Log.p("Creating Entry for " + p.summary());
                 p.refresh();
 
                 MultiButton mb = new MultiButton(p.name.get());
@@ -166,7 +166,7 @@ private Boolean filterContact(ServiceContact c, String s) {
                 mb.setTextLine1(p.name.get());
                 mb.setTextLine2(p.fullAddress());
                 mb.setTextLine3(p.extendedDescription());
-                ////////log.p(p.plain_summary());
+                //////////Log.p(p.plain_summary());
                 //if ( )
 
                 mb.setIcon(p.getAvatar(8));

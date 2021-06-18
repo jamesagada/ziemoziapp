@@ -81,9 +81,9 @@ private Boolean filterProvider(Provider c, String s){
             String rs = c.summary().toLowerCase();
 
             for (String t : textTerms) {
-                //////log.p(t);
+                ////////Log.p(t);
                 if (rs.lastIndexOf(t.toLowerCase()) > 0) {
-                    //////log.p("found match for " + t);
+                    ////////Log.p("found match for " + t);
                     filterin = true;
                     break;
                 }
@@ -94,7 +94,7 @@ private Boolean filterProvider(Provider c, String s){
 
     public SearchProviders() {
         super(new BorderLayout());
-        ////////log.p("\n\n Searching initiated \n\n");
+        //////////Log.p("\n\n Searching initiated \n\n");
         showOnMap = new Button("Map");
         searchField.setUIID("Title");
         searchField.getAllStyles().setAlignment(LEFT);
@@ -153,9 +153,9 @@ private Boolean filterProvider(Provider c, String s){
 
     private Component createEntry(Provider p) {
         if (p != null) {
-            //////log.p("Provider name " + p.name.get());
+            ////////Log.p("Provider name " + p.name.get());
             //if (p.services.size() > 0) {
-                //////log.p("Creating Entry for " + p.summary());
+                ////////Log.p("Creating Entry for " + p.summary());
                 p.refresh();
                 
                 MultiButton mb = new MultiButton(p.name.get());
@@ -164,7 +164,7 @@ private Boolean filterProvider(Provider c, String s){
                 mb.setTextLine1(p.name.get());
                 mb.setTextLine2("Service Rated At " + p.rating.get() + " stars");
                 //mb.setTextLine3(p.extendedDescription());
-                ////////log.p(p.plain_summary());
+                //////////Log.p(p.plain_summary());
                 //if ( )
 
                 mb.setIcon(p.getAvatar(8));

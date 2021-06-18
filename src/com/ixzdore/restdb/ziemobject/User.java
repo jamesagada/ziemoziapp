@@ -142,7 +142,7 @@ public class User implements PropertyBusinessObject {
         //update the friends etc
         //refresh preferences
         //retrieve record from database and then
-        //////log.p("refreshing services in request" );
+        ////////Log.p("refreshing services in request" );
         ArrayList<UserPreference> up = localAPI.getUserPreferenceFor(this._id.get());
         //request_parameters.clear();
         //service.set(new ArrayList<Service>());
@@ -159,7 +159,7 @@ public class User implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<Group> aa = localAPI.getUserGroup(this._id.get());
-        ////log.p("Groups For " + this.fullName() + " is "+ aa.size() +"\n");
+        //////Log.p("Groups For " + this.fullName() + " is "+ aa.size() +"\n");
         if (aa != null ) {
            groups.clear();
             groups.addAll(aa);
@@ -182,15 +182,16 @@ public class User implements PropertyBusinessObject {
     }
 
     public Image getAvatar(float imageSize) {
-        ////log.p("User getting Avatar from " + avatar.get());
+        //////Log.p("User getting Avatar from " + avatar.get());
         String filename = avatar.get() + "";
-        //////log.p(" IndexOf File in filename " + filename.indexOf("file:"));
+
+        ////////Log.p(" IndexOf File in filename " + filename.indexOf("file:"));
         if (filename.indexOf("file:") >= 0){
             try {
                 //return Image.createImage(filename);
                 return Image.createImage(FileSystemStorage.getInstance().openInputStream(filename));
             } catch (IOException ex) {
-                ////////log.p(ex.getMessage());
+                //////////Log.p(ex.getMessage());
                 ToastBar.showErrorMessage("Failed to load avatar.");
             }
         }
@@ -198,7 +199,7 @@ public class User implements PropertyBusinessObject {
         if (existsInStorage(filename) && filename.length() > 1) {
 
             try (InputStream is
-                    = createStorageInputStream(filename);) {
+                    = createStorageInputStream(filename)) {
                 return Image.createImage(is);
             } catch (IOException err) {
                 Log.e(err);
@@ -218,15 +219,25 @@ public class User implements PropertyBusinessObject {
         if (avatarImg instanceof FontImage) {
             avatarImg = ((FontImage) avatarImg).toImage();
         }
+
         avatarImg = avatarImg.applyMask(mask);
+        //Log.p("Avatar " + avatar.get());
         if ((avatar.get() != null)) {
-           if   (avatar.get().indexOf("http") >= 0 )
-            return URLImage.createToStorage(
-                    EncodedImage.createFromImage(avatarImg, false),
-                    filename,
-                    avatarUrl(),
-                    URLImage.createMaskAdapter(temp));
-        }       
+            if (avatar.get().indexOf("http") >= 0) {
+                return URLImage.createToStorage(
+                        EncodedImage.createFromImage(avatarImg, false),
+                        filename,
+                        avatarUrl(),
+                        URLImage.createMaskAdapter(temp));
+            } else {
+                String avatar_url = "https://img.icons8.com/color/48/000000/human-head.png";
+                return URLImage.createToStorage(
+                        EncodedImage.createFromImage(avatarImg, false),
+                        avatar_url,
+                        avatar_url,
+                        URLImage.createMaskAdapter(temp));
+            }
+        }
         return avatarImg;
     }
 

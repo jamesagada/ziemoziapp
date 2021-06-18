@@ -6,8 +6,6 @@
 package com.ixzdore.restdb.ziemobject;
 
 import com.codename1.components.ToastBar;
-import com.codename1.io.Log;
-import com.codename1.properties.IntProperty;
 import com.codename1.properties.ListProperty;
 import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBusinessObject;
@@ -15,7 +13,6 @@ import com.codename1.properties.PropertyIndex;
 import com.ziemozi.server.ServerAPI;
 import com.ziemozi.server.local.localAPI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -60,16 +57,16 @@ public class RequestParameter implements PropertyBusinessObject,Comparable{
     Boolean save() {
         Boolean post = true;
         if (value.get() != null ) {
-        ////////log.p("\nOriginal Rp \n" + this.getPropertyIndex().toString());
+        //////////Log.p("\nOriginal Rp \n" + this.getPropertyIndex().toString());
         Map<String, Object> m = this.getPropertyIndex().toMapRepresentation();
         m.put("service_attribute", this.service_attribute.get(0).getPropertyIndex().toMapRepresentation());
         m.put("_parent_id",this._parent_id.get());
         //
-        //////////log.p(" Summary is " + this.service_attribute.get().getSummary(value.get()));
-        m.put("summary",this.service_attribute.get(0).getSummary(value.get()));
+        ////////////Log.p(" Summary is " + this.service_attribute.get().getSummary(value.get()));
+        m.put("summary",this.service_attribute.get(0).getSummary(value.get(), false));
         RequestParameter rp = new RequestParameter();
         rp.getPropertyIndex().populateFromMap(m);
-        ////////log.p("\nrequest parameter to save \n" + rp.getPropertyIndex().toString());
+        //////////Log.p("\nrequest parameter to save \n" + rp.getPropertyIndex().toString());
         post = ServerAPI.postRequestParameter(rp);
         ToastBar.showInfoMessage("Request Parameter" + this.service_attribute.get(0).name.get()+" Saved");
         }
@@ -78,23 +75,23 @@ public class RequestParameter implements PropertyBusinessObject,Comparable{
     Map<String,Object> asMap() {
         Map<String, Object> m = this.getPropertyIndex().toMapRepresentation();        
         if (value.get() != null ) {
-        ////////log.p("\nOriginal Rp \n" + this.getPropertyIndex().toString());
+        //////////Log.p("\nOriginal Rp \n" + this.getPropertyIndex().toString());
         m.put("service_attribute", this.service_attribute.get(0).getPropertyIndex().toMapRepresentation());
         m.put("_parent_id",this._parent_id.get());
         //
-        //////////log.p(" Summary is " + this.service_attribute.get().getSummary(value.get()));
-        m.put("summary",this.service_attribute.get(0).getSummary(value.get()));
+        ////////////Log.p(" Summary is " + this.service_attribute.get().getSummary(value.get()));
+        m.put("summary",this.service_attribute.get(0).getSummary(value.get(), false));
         //RequestParameter rp = new RequestParameter();
         //rp.getPropertyIndex().populateFromMap(m);
-        //////////log.p("\nrequest parameter to save \n" + rp.getPropertyIndex().toString());
+        ////////////Log.p("\nrequest parameter to save \n" + rp.getPropertyIndex().toString());
         } 
         return m;
     }
 
-    public String summarize() {
+    public String summarize(final Boolean functional) {
         ServiceAttribute s = this.service_attribute.get(0);
         if ((s._id == null) || (s == null)) return null;
-        this.summary.set(s.getSummary(value.get()));
+        this.summary.set(s.getSummary(value.get(),functional));
         return this.summary.get();
         
     }
@@ -105,9 +102,9 @@ public class RequestParameter implements PropertyBusinessObject,Comparable{
       //this.refreshServiceAttribute();
       //c.refreshServiceAttribute();
       int result =1;
-      //////log.p("This attribute " + this.getPropertyIndex().toJSON());
+      ////////Log.p("This attribute " + this.getPropertyIndex().toJSON());
       try {
-            //////log.p("Comparing attribute " + c.getPropertyIndex().toJSON());    
+            ////////Log.p("Comparing attribute " + c.getPropertyIndex().toJSON());
       result = this.service_attribute.get(0)._id.get().compareTo(
               c.service_attribute.get(0)._id.get());
       }catch(Exception e){
@@ -123,12 +120,12 @@ public class RequestParameter implements PropertyBusinessObject,Comparable{
             for (Object os:this.service_attribute){
                 if (os.getClass().getCanonicalName().contains("String")) {
                     // it is a string and we need to turn it into a service attrivute
-                    Log.p("Service Attribute " + os.toString());
+                    //Log.p("Service Attribute " + os.toString());
                     sa.add(localAPI.getServiceAttribute(os.toString()));
                 }
             }
         }
-       //Log.p("Request Parameter Id Is "  + this._id.get());
+       ////Log.p("Request Parameter Id Is "  + this._id.get());
        //ArrayList<ServiceAttribute> aa = localAPI.getServiceAttributesForParameter(this._id.get());
         //service_attribute.clear();
         if (sa != null){
@@ -138,14 +135,14 @@ public class RequestParameter implements PropertyBusinessObject,Comparable{
         
     }  
       public ArrayList<String> validate(){
-          //Log.p("Validating " + this.service_attribute.asList().get(0).description);
+          ////Log.p("Validating " + this.service_attribute.asList().get(0).description);
           ArrayList<String> errors = new ArrayList<String>();
           //whether the parameter is required. If so, its value cannot be null
           //this.refreshServiceAttribute();
-          Log.p("Attribute for value " + this.service_attribute.size());
+          //Log.p("Attribute for value " + this.service_attribute.size());
           if (this.service_attribute.size() > 0){
               Boolean required = this.service_attribute.get(0).required.getBoolean();
-              ////log.p(this.service_attribute.get(0).display_label.get()  +  "is required " + required);
+              //////Log.p(this.service_attribute.get(0).display_label.get()  +  "is required " + required);
               if (required) {
                   if (this.value.get() != null) {
                       if (this.value.get().equalsIgnoreCase("NULL")) {

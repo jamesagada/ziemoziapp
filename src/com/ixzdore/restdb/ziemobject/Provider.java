@@ -72,7 +72,7 @@ public class Provider implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<String> aa = localAPI.getProviderIcon(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             icon.clear();
             icon.addAll(aa);
@@ -136,7 +136,7 @@ public class Provider implements PropertyBusinessObject {
     }
 
     public Image getAvatar(float imageSize) {
-        ////////log.p("User getting Avatar from " + avatar.get());
+        //////////Log.p("User getting Avatar from " + avatar.get());
         refreshIcon();
         String filename = "providert-"+name.get();
         int size = convertToPixels(imageSize);
@@ -153,9 +153,9 @@ public class Provider implements PropertyBusinessObject {
             avatarImg = ((FontImage) avatarImg).toImage();
         }
         avatarImg = avatarImg.applyMask(mask);
-        //////log.p("Provider logo" + icon.toString());
+        ////////Log.p("Provider logo" + icon.toString());
         if ((icon.size() > 0) ) {
-            //////log.p("Icon " + icon.get(0).toString());
+            ////////Log.p("Icon " + icon.get(0).toString());
             
            //if   (logo.get(0).indexOf("http") >= 0 )
             return URLImage.createToStorage(

@@ -33,7 +33,7 @@ public class SelectServiceForm extends Form {
     private Component makeServiceSelector() {
         class StringArrayTreeModel implements TreeModel {
             
-            String[][] arr = new String[][]{
+            final String[][] arr = new String[][]{
                 {"Categories", "Providers", "Services"},
                 {"Civic", "Election", "Business"},
                 {"Police", "LASG", "AKSG"},
@@ -100,7 +100,7 @@ public class SelectServiceForm extends Form {
                 //call the ServicePostForm
                 //which will create an array of services 
                 //and  then display it in a service request form
-                ////////log.p("Selected Object: " + dt.getSelectedItem());
+                //////////Log.p("Selected Object: " + dt.getSelectedItem());
                ZiemForm f = new ZiemForm(dt.getSelectedItem(),"New Report/Request");
                f.show();
              }

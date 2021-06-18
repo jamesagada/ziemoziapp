@@ -46,7 +46,7 @@ public class FieldWatcher implements Observer{
    public void watchThisField(Object watchingField,Map<String,Object> c){
        this.watchField = watchingField;
       this.context = c;       
-       ////////log.p("Watching  This Field " + watchField.toString());       
+       //////////Log.p("Watching  This Field " + watchField.toString());
    }
     @Override
     public void update(Observable o, Object arg) {
@@ -56,13 +56,13 @@ public class FieldWatcher implements Observer{
         //the update the value of the observer.
         //arg is an editor
         BaseEditorImpl b = (BaseEditorImpl)arg;
-        ////////log.p(" I have been Informed that " + b.serviceAttribute.name.get() + " has changed");
+        //////////Log.p(" I have been Informed that " + b.serviceAttribute.name.get() + " has changed");
         //I am watching on behalf of watchingOnBehalfOf.
         //now I have to update the one I am watching for by calling her
         //executeWatch and passing along the watched object.
         //watchingOnBehalfOf.executeWatch(b);
         String watchformula = watchingOnBehalfOf.serviceAttribute.watch_formula.get();
-        ////////log.p("Watching with this formula " + watchformula);         
+        //////////Log.p("Watching with this formula " + watchformula);
         if (watchformula.length() > 0 ){
        
         Map<String,Object> parsedFormula = new HashMap<String,Object>();
@@ -83,28 +83,28 @@ public class FieldWatcher implements Observer{
   //      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         //relevance means if you are not relevant, you are hidden
         //We use the calculateFunction which returns an object
-        ////////log.p("Setting relevance");
+        //////////Log.p("Setting relevance");
         //convert formula to string and parse it to
         //extract Operator, and parameters
         //
         Boolean relevance = Boolean.parseBoolean(calculateFormula(formula));
         
-        ////////log.p("Relevance is " + relevance);
+        //////////Log.p("Relevance is " + relevance);
                 if (relevance  != null ) watchingOnBehalfOf.setRelevance(relevance);
                 
     }
 
     private void applyValueUpdate(BaseEditorImpl watchingOnBehalfOf, Object formula, BaseEditorImpl b) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        ////////log.p("Setting value");
+        //////////Log.p("Setting value");
         Object updatedValue = calculateFormula(formula);
-        ////////log.p("Updated Value " + updatedValue.toString());
+        //////////Log.p("Updated Value " + updatedValue.toString());
                 if (updatedValue != null ) watchingOnBehalfOf.setValue(updatedValue);
     }
 
     private void applyLookUp(BaseEditorImpl watchingOnBehalfOf, Object formula, BaseEditorImpl b) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        ////////log.p("Setting lookup");
+        //////////Log.p("Setting lookup");
         if (formula != null) {
             Object option = calculateFormula(formula);
             if (option != null ) watchingOnBehalfOf.setupOptions(option);
@@ -118,9 +118,9 @@ public class FieldWatcher implements Observer{
         //o e simply compute values of the parameters and insert into the expression
         
         String formatedExpression = formatExpression(f.toString(),context);
-        ////////log.p("Formated Expression " + formatedExpression);
+        //////////Log.p("Formated Expression " + formatedExpression);
         String result = bexec.executeAndReturnString(formatedExpression);
-        ////////log.p("Calculated Result " + result);
+        //////////Log.p("Calculated Result " + result);
         return result;
     }
 
@@ -134,22 +134,22 @@ public class FieldWatcher implements Observer{
        
         String result = format;
         String field ="";
-        ////////log.p("Found a match for the pattern  in " + format + "? " + r.match(result) );
+        //////////Log.p("Found a match for the pattern  in " + format + "? " + r.match(result) );
         
         while (r.match(result)) {
             //the right thing is to find the first item
               String wholeExpr = r.getParen(0);        // wholeExpr will be 'aaaab'
-              ////////log.p("wholeExpr " + wholeExpr);
+              //////////Log.p("wholeExpr " + wholeExpr);
                 String insideParens = r.getParen(1);     // insideParens will be 'aaaa'
-              ////////log.p("insideParens "+ insideParens);
+              //////////Log.p("insideParens "+ insideParens);
                 int startWholeExpr = r.getParenStart(0); // startWholeExpr will be index 1
-                ////////log.p("startWholeExpr "+ startWholeExpr);
+                //////////Log.p("startWholeExpr "+ startWholeExpr);
             int endWholeExpr = r.getParenEnd(0);     // endWholeExpr will be index 6
-                ////////log.p("endWholeExpr "+ endWholeExpr);            
+                //////////Log.p("endWholeExpr "+ endWholeExpr);
             int lenWholeExpr = r.getParenLength(0);
-                ////////log.p("lenWholeExpr "+ lenWholeExpr);            
+                //////////Log.p("lenWholeExpr "+ lenWholeExpr);
             Object o = objects.get(insideParens); //match name to context
-            ////////log.p("Objects From Context " + o.toString());
+            //////////Log.p("Objects From Context " + o.toString());
             if (o!=null){
                 BaseEditorImpl b = (BaseEditorImpl) o;                
                 field = '"' + b.getRequestParameter().value.get() + '"';
@@ -158,7 +158,7 @@ public class FieldWatcher implements Observer{
             }else {
                 result = StringUtil.replaceAll(result, wholeExpr, " ");
             }
-            ////////log.p("Result " + result);            
+            //////////Log.p("Result " + result);
         }
         //(function () { return "abc" }())
         return "( " +  result + " )";

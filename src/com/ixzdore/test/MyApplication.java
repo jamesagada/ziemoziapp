@@ -89,7 +89,7 @@ public class MyApplication implements PushCallback {
 
         addNetworkErrorListener(err -> {
                     // prevent the event from propagating
-                    ////log.p(err.getMessage());
+                    //////Log.p(err.getMessage());
                     Log.sendLogAsync();
                     err.consume();
                     if (err.getError() != null) {
@@ -149,7 +149,7 @@ public class MyApplication implements PushCallback {
 
     @Override
     public void pushRegistrationError(String error, int errorCode) {
-        ////log.p("Failed to register for push: " + error);
+        //////Log.p("Failed to register for push: " + error);
     }
 
 

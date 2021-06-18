@@ -32,8 +32,12 @@ import com.codename1.ui.events.ActionEvent;
 import com.codename1.ui.events.ActionListener;
 import com.codename1.ui.events.DataChangedListener;
 import com.codename1.ui.layouts.BorderLayout;
+import com.codename1.ui.layouts.FlowLayout;
+import com.codename1.ui.layouts.GridLayout;
 import com.codename1.ui.plaf.RoundBorder;
+import com.ixzdore.restdb.ziemobject.Fare;
 import com.ixzdore.restdb.ziemobject.RequestParameter;
+import com.ixzdore.restdb.ziemobject.Route;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
 import com.codename1.ui.layouts.BoxLayout;
@@ -50,13 +54,14 @@ import com.ixzdore.restdb.ziemobject.Provider;
 import com.ixzdore.restdb.ziemobject.Request;
 import com.ixzdore.restdb.ziemobject.Service;
 import com.ixzdore.restdb.ziemobject.ServiceContact;
+import com.ixzdore.restdb.ziemobject.Stop;
 import com.ixzdore.restdb.ziemobject.User;
 import com.ixzdore.restdb.ziemobject.UserPreference;
 import com.ixzdore.restdb.ziemobject.Group;
 import com.ixzdore.restdb.ziemobject.Wallet;
 import com.ziemozi.server.local.localAPI;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,7 +98,8 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         editContainer.getAllStyles().setPaddingBottom(10);
         editContainer.getAllStyles().setMarginBottom(10);
         mlist.getUnselectedStyle().setBgColor(0xf0f0);
-
+        //headerContainer.setLayout(new GridLayout(1,4));
+        headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
 
         //editContainer.getAllStyles().setBorder(Border.createRidgeBorder(2));
@@ -147,8 +153,8 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
-        helpButton.setUIID("Label");
-        helpButton.getStyle().setAlignment(LEFT);
+        //helpButton.setUIID("SmallLabel");
+
         helpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -162,7 +168,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 // Here we addnother object to the list
                 addOptionsFromObjectList();
             }
@@ -174,7 +180,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
@@ -197,8 +203,6 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -286,7 +290,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
                 String fileName = "options-" + this.serviceAttribute._id.get() + "_"
                         + this.serviceAttribute._parent_id;
                 //cheeck if there is any file like this already and if it is not too lod
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 if (!FileSystemStorage.getInstance()
                         .exists(FileSystemStorage.getInstance().getAppHomePath() + "/"
                                 + fileName)) {
@@ -306,7 +310,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
                                 true);
                     }
                 }
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);                
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 try {
                     //read the contents of the file to options
                     options = Util.readToString(FileSystemStorage.getInstance().
@@ -332,8 +336,8 @@ public class MultiObjectListEditor extends BaseEditorImpl {
 
             if (objType != null) {
                 //try and lookup the obj class with a factory 
-                //////log.p("Object type is " + objType);
-                //////log.p("MultiObjectList is " + optionList);
+                ////////Log.p("Object type is " + objType);
+                ////////Log.p("MultiObjectList is " + optionList);
                 Object cClass = objectFactory.get(objType);
                 if (cClass != null) {
                     try {
@@ -343,7 +347,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
 
                         pba.addAll(pbos);
                     } catch (Exception e) {
-                        //////log.p(e.getMessage());
+                        ////////Log.p(e.getMessage());
                     }
                 }
             }
@@ -354,24 +358,35 @@ public class MultiObjectListEditor extends BaseEditorImpl {
                 //String name = "" + px.getPropertyIndex().get("name").toString();
                 //String description = "" + px.getPropertyIndex().get("description").toString();
                 //String value = "" + px.getPropertyIndex().get("value");
-                ////////log.p("Multi object desc " + description);
+                //////////Log.p("Multi object desc " + description);
             String name ="";
+            String first_name ="";
+            String last_name ="";
+            String phone_number = "";
             String description ="";
             String summary ="";
             String value = "";
             String _id = "" + px.getPropertyIndex().get("_id").toString();
             if (px.getPropertyIndex().get("name") != null)
                 name = "" + px.getPropertyIndex().get("name").toString();
+            if (px.getPropertyIndex().get("first_name") != null)
+                    first_name = "" + px.getPropertyIndex().get("name").toString();
             if (px.getPropertyIndex().get("description") != null)            
                 description = "" + px.getPropertyIndex().get("description").toString();
             if (px.getPropertyIndex().get("summary") != null)            
                 summary = "" + px.getPropertyIndex().get("summary").toString();  
              if (px.getPropertyIndex().get("value") != null)             
                 value = "" + px.getPropertyIndex().get("value");
+            if (value.length() <2 ) {
+                value = first_name + " " + last_name;
+             }
             if (name.length() > 2) {
                 description = name;
-            }     
-            description = description + ".." + summary ;                
+            }
+            if (name.length() < 2){
+                name = first_name + " " + last_name;
+            }
+            //description = description + ".." + summary ;
                 //data.add(createListEntry(name, description + " " + value, px));
                 data.add(createListEntry(name, " " + value, px));                
             }
@@ -403,6 +418,9 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         objectFactory.put("Service", Service.class);
         objectFactory.put("Group",Group.class);
         objectFactory.put("Wallet",Wallet.class);
+        objectFactory.put("Route", Route.class);
+        objectFactory.put("Fare", Fare.class);
+        objectFactory.put("Stop", Stop.class);
     }
 
     private void addOptionsFromObjectList() {
@@ -411,9 +429,9 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         CheckBoxList ml = new CheckBoxList(new DefaultListModel());
         ml.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         String objType = serviceAttributeType.surveyjs_type.get();
-        //////log.p("Object type " + objType);        
+        ////////Log.p("Object type " + objType);
         if (objType.isEmpty()) objType = serviceAttribute.surveyjs_type.get();
-        Log.p("Object type " + objType);
+        //Log.p("Object type " + objType);
         Class<? extends PropertyBusinessObject> cClass =  objectFactory.get(objType);
         
         //(String url,
@@ -422,7 +440,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         ArrayList<PropertyBusinessObject> ol = localAPI.genericPBOZiemSearch(objType,
                 cClass,
                 "", 0, 9999, "", "");
-        Log.p("PBOs found " + ol.size());
+        //Log.p("PBOs found " + ol.size());
         ArrayList<Map<String, Object>> data = new ArrayList<>();
         ArrayList<Map<String, Object>> selectedData = new ArrayList<>();
         for (PropertyBusinessObject px : ol) {
@@ -449,7 +467,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
             //String value = "" + px.getPropertyIndex().get("value");
 
             description = _id + ".." + name + ".." + description + ".." + summary;
-            //////log.p("Multi object desc " + description);
+            ////////Log.p("Multi object desc " + description);
             
             data.add(createListEntry(name, description, px));
             if (name.length() > 2 ) description = name;
@@ -481,17 +499,14 @@ public class MultiObjectListEditor extends BaseEditorImpl {
                 }
                 //lets add to mList provided
                 //They dont duplicate
-                //////log.p("selected " + selectedData.size());
+                ////////Log.p("selected " + selectedData.size());
                 int i=0;
                 while( i < mlist.size()) {
-                    //////log.p("mlist item " + mlist.getModel().getItemAt(i).toString());
-                    if (selectedData.contains(mlist.getModel().getItemAt(i))) {
-                        selectedData.remove(mlist.getModel().getItemAt(i));
-                        
-                    }
+                    ////////Log.p("mlist item " + mlist.getModel().getItemAt(i).toString());
+                    selectedData.remove(mlist.getModel().getItemAt(i));
                  i++;   
                 }
-                //////log.p("updated selected " + selectedData.size());                
+                ////////Log.p("updated selected " + selectedData.size());
                 i=0;
                 while (i<selectedData.size()){
                     mlist.addItem(selectedData.get(i));
@@ -503,13 +518,13 @@ public class MultiObjectListEditor extends BaseEditorImpl {
              for (int k=0;k<mlist.size();k++){
                  HashMap entry = (HashMap)mlist.getModel().getItemAt(k);
                  PropertyBusinessObject p = (PropertyBusinessObject)entry.get("businessobject");
-                 //////log.p("Bussiness Object " + p.getPropertyIndex().toString());
-                 //////log.p(p.getPropertyIndex().toJSON());
+                 ////////Log.p("Bussiness Object " + p.getPropertyIndex().toString());
+                 ////////Log.p(p.getPropertyIndex().toJSON());
                  if (p != null)  sb.append(p.getPropertyIndex().toJSON()+",");
              }
              String ss = sb.toString();
              requestParameter.value.set(ss.substring(0, ss.lastIndexOf(",")) + "]");
-             //////log.p("Request Parameter Value " + requestParameter.value.get());
+             ////////Log.p("Request Parameter Value " + requestParameter.value.get());
             }
            //update the requestparameter value
            //the data is in the form of an array of jjson
@@ -546,7 +561,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
 
                for (int i= 0; i < mm.getSize(); i++){
                    ml.getMultiListModel().removeSelectedIndices(i);                
-                   //////log.p("Match " + tf.getText() + "::" + mm.getItemAt(i).toString());
+                   ////////Log.p("Match " + tf.getText() + "::" + mm.getItemAt(i).toString());
                    if (mm.getItemAt(i).toString().contains(tf.getText())){
                        searchResult.add(mm.getItemAt(i).toString());
                    }

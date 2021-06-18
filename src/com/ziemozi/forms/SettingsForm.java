@@ -36,11 +36,11 @@ import java.util.HashMap;
 //import java.util.logging.Logger;
 
 public class SettingsForm extends Form {
-    private Label cover = new Label(" ", "LoginTitle");
-    private Label avatar = new Label("", "LabelFrame");
-    private Button changeCover = 
+    private final Label cover = new Label(" ", "LoginTitle");
+    private final Label avatar = new Label("", "LabelFrame");
+    private final Button changeCover =
         new Button(MATERIAL_CAMERA_ALT, "CameraLabel");
-    private Button changeAvatar = 
+    private final Button changeAvatar =
         new Button(MATERIAL_CAMERA_ALT, "CameraLabel");
           User me = localAPI.me();  
     public SettingsForm() {
@@ -138,9 +138,9 @@ public class SettingsForm extends Form {
         cnt.setUIID("PaddedContainer");
         cnt.setScrollableY(true);
         */ 
-        ////////log.p("Name of " + me.getPropertyIndex().getName());
+        //////////Log.p("Name of " + me.getPropertyIndex().getName());
         me.refreshGroups();
-        ////log.p(me.getPropertyIndex().toString());
+        //////Log.p(me.getPropertyIndex().toString());
         PropertyBusinessObjectUI po = new PropertyBusinessObjectUI();
         po.excludeProperty(me._id);
         po.excludeProperty(me.requests);
@@ -159,8 +159,8 @@ public class SettingsForm extends Form {
         m.put("option_list", "'Male','Female','Other'");
         me.gender.putClientProperty("ziem-property-options", m);
         //HashMap h = (HashMap)me.gender.getClientProperty("ziem-property-options");
-        ////////log.p("Client property options" + h.get("option_list"));
-        ////////log.p("Going to edit " + me.getPropertyIndex().getName());
+        //////////Log.p("Client property options" + h.get("option_list"));
+        //////////Log.p("Going to edit " + me.getPropertyIndex().getName());
         Container cnt = po.createEditUI(me, false);
         Form edit = new Form("Edit", new BorderLayout());
         edit.add(BorderLayout.CENTER, cnt);

@@ -6,6 +6,7 @@
 package com.ixzdore.restdb.ziemview;
 
 import com.codename1.components.SpanLabel;
+import com.codename1.io.Log;
 import com.codename1.io.Util;
 import com.codename1.ui.BrowserComponent;
 import com.codename1.ui.Button;
@@ -53,6 +54,7 @@ public class BrowserEditor extends BaseEditorImpl{
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         browser.setURL(attr.default_value.get());
+        Log.p("Target URL "+ attr.default_value.get());
         helpButton.getStyle().setAlignment(LEFT);
         helpButton.addActionListener(new ActionListener() {
             @Override
@@ -68,7 +70,7 @@ public class BrowserEditor extends BaseEditorImpl{
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");

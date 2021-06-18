@@ -1,6 +1,5 @@
 package com.ziemozi.server.online;
 
-import com.ziemozi.server.*;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.codename1.components.ToastBar;
@@ -13,20 +12,15 @@ import com.codename1.io.JSONParser;
 import com.codename1.io.Log;
 import com.codename1.io.MultipartRequest;
 import com.codename1.io.Preferences;
-import com.codename1.io.Storage;
 import com.codename1.io.Util;
 import com.codename1.io.rest.RequestBuilder;
 import com.codename1.io.rest.Response;
 import com.codename1.io.rest.Rest;
-import com.codename1.io.services.CachedData;
-import com.codename1.io.services.CachedDataService;
 import com.codename1.location.Location;
 import com.codename1.location.LocationManager;
-import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBusinessObject;
 import static com.codename1.ui.CN.*;
-import com.codename1.ui.events.ActionEvent;
-import com.codename1.ui.events.ActionListener;
+
 import com.codename1.util.Callback;
 import com.codename1.util.StringUtil;
 import com.codename1.util.SuccessCallback;
@@ -37,18 +31,13 @@ import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.Service;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
-import com.ziemozi.forms.ImagePicker;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 ////import java.util.logging.Level;
 //import java.util.logging.Logger;
@@ -63,11 +52,11 @@ public class onlineAPI {
     public static String AUTHY = "3IMDN8qW1tTuLdI7h8FMgjaw9YdVVQFe";
     public static final String authyUrl = "https://api.authy.com/protected/json/phones/verification/check";
     private static String token;
-    private static String sosService = "SOS";
-    private static String amFineService = "IAMFINE";
-    private static int aroundMeDistance = 10;//Distance in km to consider as around me
+    private static final String sosService = "SOS";
+    private static final String amFineService = "IAMFINE";
+    private static final int aroundMeDistance = 10;//Distance in km to consider as around me
 
-    private static Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+    private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
             "cloud_name", "okwui",
             "api_key", "839478323249426",
             "api_secret", "2sKLEGlDj_qwtJGHsifS9fZ_m8I"));
@@ -119,13 +108,13 @@ public class onlineAPI {
         //ServerAPI.refreshMe();
         boolean loggedIn = false;
         if (me != null) {
-            ////////log.p(me.getPropertyIndex().toString());
+            //////////Log.p(me.getPropertyIndex().toString());
             if ((me.authtoken.get() != null) && (me.firstName.get() != null)) {
                 loggedIn = true;
             }
         }
         token = Preferences.get("authtoken", null);
-        //////////log.p("token " + token);
+        ////////////Log.p("token " + token);
         return loggedIn;
     }
 
@@ -136,7 +125,7 @@ public class onlineAPI {
         String fetchUrl = "{\"phone\": \""
                 + u.phone.get() + "\" ," + "\"password\": \"" + u.password.get() + "\" }";
 
-        ////////log.p(fetchUrl);
+        //////////Log.p(fetchUrl);
         User s = null;
 
         ArrayList<User> users = genericZiemSearch("ziemozi-users",
@@ -164,15 +153,15 @@ public class onlineAPI {
 
     private static void signupOrLogin(String url, User u,
             final Callback<User> callback) {
-        ////////log.p(u.getPropertyIndex().toString());
-        ////////log.p("URL " + url);
+        //////////Log.p(u.getPropertyIndex().toString());
+        //////////Log.p("URL " + url);
         post(url).
                 body(u.getPropertyIndex().toJSON()).
                 getAsJsonMap(new Callback<Response<Map>>() {
                     @Override
                     public void onSucess(Response<Map> value) {
-                        ////////log.p("Response Code " + value.getResponseCode());
-                        ////////log.p(value.getResponseData().toString());
+                        //////////Log.p("Response Code " + value.getResponseCode());
+                        //////////Log.p(value.getResponseData().toString());
                         if (value.getResponseCode() != 201) {
                             callback.onError(u, null, value.
                                     getResponseCode(),
@@ -187,7 +176,7 @@ public class onlineAPI {
                                 get());
                         token = me.authtoken.get();
                         me.getPropertyIndex().storeJSON("me.json");
-                        ////////log.p(me.getPropertyIndex().toString());
+                        //////////Log.p(me.getPropertyIndex().toString());
                         callback.onSucess(me);
                         callSerially(() -> registerPush());
                     }
@@ -206,15 +195,15 @@ public class onlineAPI {
             me = new User();
             me.getPropertyIndex().loadJSON("me.json");
         }
-        ////////log.p("Refreshing Me " + me.getPropertyIndex().toString());
+        //////////Log.p("Refreshing Me " + me.getPropertyIndex().toString());
         Response<Map> map = get("ziemozi-users/" + me._id.get()).getAsJsonMap();
-        ////////log.p("Refreshing user " + map.getResponseData().toString());
-        ////////log.p("Refreshing User " + map.getResponseCode());
+        //////////Log.p("Refreshing user " + map.getResponseData().toString());
+        //////////Log.p("Refreshing User " + map.getResponseCode());
         if (map.getResponseCode() == 200) {
             me = new User();
             me.getPropertyIndex().
                     populateFromMap(map.getResponseData());
-            ////////log.p("Refreshed me " + me.getPropertyIndex().toString());
+            //////////Log.p("Refreshed me " + me.getPropertyIndex().toString());
             me.getPropertyIndex().storeJSON("me.json");
             me.authtoken.set(Preferences.get("authtoken", ""));
             token = me.authtoken.get();
@@ -230,7 +219,7 @@ public class onlineAPI {
                 queryParam("verification_code", code).
                 queryParam("country_code", "234").
                 queryParam("phone_number", phone).getAsJsonMap();
-        ////////log.p("Verify Result " + s.getResponseData());
+        //////////Log.p("Verify Result " + s.getResponseData());
         return "true".equals(s.getResponseData().get("success"));
     }
 
@@ -239,10 +228,10 @@ public class onlineAPI {
         //check if the image file has http, if it does not have
         //then use cloudinary to save the image first
         //before proceeding
-        ////////log.p("Refresh user " + u.getPropertyIndex().toString());
-        ////////log.p("Me is " + me.getPropertyIndex().toString());
+        //////////Log.p("Refresh user " + u.getPropertyIndex().toString());
+        //////////Log.p("Me is " + me.getPropertyIndex().toString());
         boolean posted = true;
-        ////////log.p("Avatar " + u.avatar.get());
+        //////////Log.p("Avatar " + u.avatar.get());
         if (u.avatar.get().indexOf("file:") >= 0) {
 
             try {
@@ -250,9 +239,9 @@ public class onlineAPI {
                         upload(u.avatar.get(), ObjectUtils.emptyMap());
                 String uploadUrl = uploadResult.get("url").toString();
                 u.avatar.set(uploadUrl);
-                ////////log.p("Avatar url " + uploadUrl);
+                //////////Log.p("Avatar url " + uploadUrl);
             } catch (Exception e) {
-                ////////log.p("Image upload failed \n" + e.getMessage());
+                //////////Log.p("Image upload failed \n" + e.getMessage());
                 ToastBar.showErrorMessage("Failed to upload profile image");
                 posted = false;
             }
@@ -261,13 +250,13 @@ public class onlineAPI {
         //Map uMap = u.getPropertyIndex().toMapRepresentation();
         //uMap.remove("_id"); // remove id field so the update can happen properly
         //u.getPropertyIndex().populateFromMap(uMap);
-        ////////log.p("Refresjing User Id " + me._id.get());
-        ////////log.p("Refreshing with " + u.getPropertyIndex().toString());
+        //////////Log.p("Refresjing User Id " + me._id.get());
+        //////////Log.p("Refreshing with " + u.getPropertyIndex().toString());
         Response<String> s = patch("ziemozi-users/" + me._id.get()).
                 body(u.getPropertyIndex().toJSON()).getAsString();
-        //////////log.p(u.getPropertyIndex().toJSON());
-        ////////log.p("User Patch Response Code " + s.getResponseCode());
-        ////////log.p("User Patch Response " + s.getResponseData());
+        ////////////Log.p(u.getPropertyIndex().toJSON());
+        //////////Log.p("User Patch Response Code " + s.getResponseCode());
+        //////////Log.p("User Patch Response " + s.getResponseData());
         //u.getPropertyIndex().storeJSON("me.json");
         onlineAPI.refreshMe();
         return (posted && (s.getResponseCode() == 201));
@@ -424,8 +413,8 @@ public class onlineAPI {
     }
 
     private static List<Request> processRequestResponse(Response<Map> response) {
-        ////////log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
-        ////////log.p("\n\nRequest Response data \n" + response.getResponseData());
+        //////////Log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
+        //////////Log.p("\n\nRequest Response data \n" + response.getResponseData());
         if (response.getResponseCode() == 200) {
             List<Map> l = (List<Map>) response.getResponseData().get("root");
             List<Request> responseList = new ArrayList<>();
@@ -453,7 +442,7 @@ public class onlineAPI {
                         Request.class,
                         "", page, size, "", "");
 //        for (Request r:news){
-//            ////////log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
+//            //////////Log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
 //        }
         /**
          * return processRequestResponse( get("requests"). queryParam("page", ""
@@ -471,7 +460,7 @@ public class onlineAPI {
 
     public static boolean postRequest(Request pd) {
 
-        //////////log.p("\n " + pd.getPropertyIndex().toJSON());
+        ////////////Log.p("\n " + pd.getPropertyIndex().toJSON());
         boolean post = false;
         Response<Map> res = post("requests").body(pd.getPropertyIndex().toJSON())
                 .getAsJsonMap();
@@ -482,7 +471,7 @@ public class onlineAPI {
             //r.getPropertyIndex().populateFromMap(l);
             //r.getPropertyIndex().loadJSON("postRequestParameter");
             r.getPropertyIndex().populateFromMap(res.getResponseData());
-            //////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+            ////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
             pd._id.set(r._id.get());
         }
 
@@ -534,7 +523,7 @@ public class onlineAPI {
             for (Map m : l) {
                 try {
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
+                            = (PropertyBusinessObject)type.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
                     responseList.add((T) pb);
                 } catch (Exception err) {
@@ -595,8 +584,8 @@ public class onlineAPI {
         String hint = "";
         String filter = "";
         String query = "";
-        ////////log.p("Type of Selector: " + p.getClass().getCanonicalName());
-        ////////log.p("\nFilter is: " + filter);
+        //////////Log.p("Type of Selector: " + p.getClass().getCanonicalName());
+        //////////Log.p("\nFilter is: " + filter);
         ArrayList<Service> services = genericZiemSearch(url,
                 Service.class,
                 query, page, size, hint, filter);
@@ -606,15 +595,15 @@ public class onlineAPI {
                 Category c = (Category) p;
                 List<Category> cl = s.category.asList();
                 if (cl.size() > 0) {
-                    ////////log.p("Number of categories " + cl.size());
-                    //////////log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
+                    //////////Log.p("Number of categories " + cl.size());
+                    ////////////Log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
                     for (Category cc : cl) {
-                        ////////log.p("Category " + cc._id.get());
-                        ////////log.p("Service Category " + c._id.get());
+                        //////////Log.p("Category " + cc._id.get());
+                        //////////Log.p("Service Category " + c._id.get());
                         if (cc._id.get().equalsIgnoreCase(c._id.get())) {
-                            ////////log.p("Matched Category " + c._id.get());
+                            //////////Log.p("Matched Category " + c._id.get());
                             serviceList.add(s);
-                            ////////log.p("Services in Category " + serviceList.size());
+                            //////////Log.p("Services in Category " + serviceList.size());
                         }
                     }
                 }
@@ -664,10 +653,10 @@ public class onlineAPI {
         } else {
             //in this case we know which one it is. so most likely
             //it is either Categories,Providers,ServiceGroup
-            //////////log.p("Parent " + parent.toString());
-            //////////log.p("Is Categories " + parent.toString().indexOf("Categories"));
-            //////////log.p("Is Providers " + parent.toString().indexOf("Providers"));
-            //////////log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));            
+            ////////////Log.p("Parent " + parent.toString());
+            ////////////Log.p("Is Categories " + parent.toString().indexOf("Categories"));
+            ////////////Log.p("Is Providers " + parent.toString().indexOf("Providers"));
+            ////////////Log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));
             if (parent.toString().indexOf("Categories") >= 0) {
                 //categories
                 v = new Vector();
@@ -718,12 +707,12 @@ public class onlineAPI {
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Category> responseList = new ArrayList<>();
             for (Map m : l) {
-                ////////log.p("Category Map\n ");
+                //////////Log.p("Category Map\n ");
                 showMap(m);
                 Category p = new Category();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////log.p(p.getPropertyIndex().toString());                
+                ////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -739,7 +728,7 @@ public class onlineAPI {
                 Provider p = new Provider();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////log.p(p.getPropertyIndex().toString());
+                ////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -748,7 +737,7 @@ public class onlineAPI {
 
     private static ArrayList<Service> processServiceDefintionResponse(Response<Map> response) {
         if (response.getResponseCode() == 200) {
-            //////////log.p(response.toString());
+            ////////////Log.p(response.toString());
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Service> responseList = new ArrayList<>();
             for (Map m : l) {
@@ -764,12 +753,12 @@ public class onlineAPI {
     public static <T> ArrayList<T> genericZiemSearch(String url,
             Class<? extends PropertyBusinessObject> type,
             String text, int page, int size, String hint, String filter) {
-        ////////log.p("Query " + text);
+        //////////Log.p("Query " + text);
         //{"$orderby": "{" ,"_created": "-1" }}
         String fetchUrl = "{\"$orderby\":"
                 + "{" + "\"_created\": " + "-1" + " }}";
         hint = fetchUrl;
-        ////////log.p("Hint " + hint);
+        //////////Log.p("Hint " + hint);
         Response<Map> result = get(url).
                 queryParam("q", text).
                 queryParam("h", hint).
@@ -781,8 +770,8 @@ public class onlineAPI {
                 //queryParam("flatten", "true").
                 queryParam("fetchChildren", "true").
                 getAsJsonMap();
-        ////////log.p("\nResponse for " + url + " is " + result.getResponseCode(), Log.DEBUG);
-        ////////log.p("\n Response Data" + result.getResponseData(), Log.DEBUG);
+        //////////Log.p("\nResponse for " + url + " is " + result.getResponseCode(), Log.DEBUG);
+        //////////Log.p("\n Response Data" + result.getResponseData(), Log.DEBUG);
 
         if (result.getResponseCode() == 200) {
             ArrayList<Map> l = (ArrayList<Map>) result.getResponseData().get("root");
@@ -794,10 +783,10 @@ public class onlineAPI {
                 try {
                     showMap(m);
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
+                            = (PropertyBusinessObject)type.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
                     //
-                    //////////log.p(pb.getPropertyIndex().toString());
+                    ////////////Log.p(pb.getPropertyIndex().toString());
                     responseList.add((T) pb);
                 } catch (Exception err) {
                     Log.e(err);
@@ -841,30 +830,30 @@ public class onlineAPI {
     public static Boolean postRequestParameter(RequestParameter pd) {
         // String key = post("request_parameter").body(pd.getPropertyIndex().toJSON()).
         //       getAsString().getResponseData();
-        // ////////log.p("Saving Request PArameter ..\n");
+        // //////////Log.p("Saving Request PArameter ..\n");
         //  HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         // Storage.getInstance().writeObject("postRequestParameter", key);
         //  RequestParameter r = new RequestParameter();
         //  r.getPropertyIndex().populateFromMap(l);
-        //  ////////log.p("RP Save Response \n" + r.getPropertyIndex().toString());
+        //  //////////Log.p("RP Save Response \n" + r.getPropertyIndex().toString());
         //  pd._id.set(r._id.get());
         //  return r._id.get() != null;  
 //        String key = post("request-parameters").body(pd.getPropertyIndex().toJSON()).
         //              getAsString().getResponseData();
-        ////////log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
+        //////////Log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
         Response<Map> res = post("request-parameters").body(pd.getPropertyIndex()
                 .toJSON()).getAsJsonMap();
         //HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         //  Storage.getInstance().writeObject("postRequestParameter", key);
 
-        //    ////////log.p("\n RequestParameter response data is \n" + key);
+        //    //////////Log.p("\n RequestParameter response data is \n" + key);
         //try {
         //    JSONParser j = new JSONParser();
         //    Reader r = new InputStreamReader(
         //             Storage.getInstance().createInputStream("postRequestParameter"));
         //    Map<String,Object> l = j.parseJSON(r ) ;                  
         // } catch (Exception ex) {
-        //     ////////log.p(ex.getMessage());
+        //     //////////Log.p(ex.getMessage());
         // }
         //Display.getInstance().getResourceAsStream(getClass(), "/anapioficeandfire.json"), "UTF-8")) {
         //Map<String, Object> data = json.parseJSON(r);
@@ -874,7 +863,7 @@ public class onlineAPI {
         //r.getPropertyIndex().populateFromMap(l);
         //r.getPropertyIndex().loadJSON("postRequestParameter");
         r.getPropertyIndex().populateFromMap(res.getResponseData());
-        //////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+        ////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
         pd._id.set(r._id.get());
         return r._id.get() != null;
     }
@@ -888,7 +877,7 @@ public class onlineAPI {
     }
 
     public static List<Request> searchRequests(String text, int page, int amount) {
-        ////////log.p("Searching For " + text);
+        //////////Log.p("Searching For " + text);
         //    https://mydb-fafc.restdb.io/rest/people?q={}&h={"$orderby": {"name": 1, "age": -1}}
 
         return genericZiemSearch("requests",
@@ -904,14 +893,14 @@ public class onlineAPI {
 
     private static void showMap(Map m) {
         for (Object k : m.keySet()) {
-            ////////log.p(k.toString() + " -- " + m.get(k).toString());
+            //////////Log.p(k.toString() + " -- " + m.get(k).toString());
         }
     }
 
     public static Service getService(String _id) {
         Service s = new Service();
         Response<Map> map = get("service-definition/" + _id).getAsJsonMap();
-        ////////log.p("Response " + map.getResponseData());
+        //////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -920,10 +909,10 @@ public class onlineAPI {
     }
 
     public static ServiceAttributeType getServiceAttributeType(String _id) {
-        ////////log.p("Get Service Attribute Type " + _id);
+        //////////Log.p("Get Service Attribute Type " + _id);
         ServiceAttributeType s = new ServiceAttributeType();
         Response<Map> map = get("service-attribute-type/" + _id).getAsJsonMap();
-        ////////log.p("Response " + map.getResponseData());
+        //////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -944,9 +933,9 @@ public class onlineAPI {
                 try {
                     showMap(m);
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) Request.class.newInstance();
+                            = (Request)Request.class.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
-                    ////////log.p(pb.getPropertyIndex().toString());
+                    //////////Log.p(pb.getPropertyIndex().toString());
                     responseList.add((Request) pb);
                 } catch (Exception err) {
                     Log.e(err);
@@ -975,36 +964,36 @@ public class onlineAPI {
                 String[] imageList = Util.split(r.value.get(), "||");
                 for (String img : imageList) {
                     //for each image, save and append back to value
-                    ////////log.p("Image to save " + img);
+                    //////////Log.p("Image to save " + img);
                     if (!img.isEmpty()) {
                         try {
                             Map uploadResult = cloudinary.uploader().
                                     upload(img, ObjectUtils.emptyMap());
                             String uploadUrl = uploadResult.get("url").toString();
-                            ////////log.p("Image is saved as " + uploadUrl);
+                            //////////Log.p("Image is saved as " + uploadUrl);
                             if (value.length() < 2) {
                                 value = uploadUrl;
                             } else {
                                 value = value + " || " + uploadUrl;
                             }
                         } catch (Exception e) {
-                            ////////log.p("Image upload failed \n" + e.getMessage());
+                            //////////Log.p("Image upload failed \n" + e.getMessage());
                             posted = false;
                         }
                     }
                 }
                 r.value.set(value);
-                r.summarize();
-            };
+                r.summarize(false);
+            }
 
             jsonRequestParameter = jsonRequestParameter + r.getPropertyIndex().toJSON() + ",";
         }
-        String summedSummary = rq.requestSummary(summedRp);
+        String summedSummary = rq.requestSummary(summedRp,false);
         rq.summary.set(summedSummary);
-
+        rq.f_summary.set(rq.requestSummary(summedRp,true));
         jsonRequestParameter = jsonRequestParameter.substring(0,
                 jsonRequestParameter.lastIndexOf("}") + 1) + "\n]";
-        ////////log.p(jsonRequestParameter);
+        //////////Log.p(jsonRequestParameter);
         Response res = post("request-parameters").body(
                 jsonRequestParameter).getAsString();
 
@@ -1012,31 +1001,31 @@ public class onlineAPI {
                 == 201 || res.getResponseCode() == 200) {
             posted = true;
         }
-        ////////log.p("\n bulk parameter save response" + res.getResponseData().toString());
+        //////////Log.p("\n bulk parameter save response" + res.getResponseData().toString());
 
         res = patch("requests/" + rq._id.get()).body(rq).getAsString();
-        ////////log.p(res.getResponseCode() + "\n" + res.getResponseData());
+        //////////Log.p(res.getResponseCode() + "\n" + res.getResponseData());
         return posted;
     }
 
     public static ServiceAttribute getServiceAttribute(String _id) {
-        ////////log.p("Get Service Attributexx " + _id);
+        //////////Log.p("Get Service Attributexx " + _id);
         ServiceAttribute s = new ServiceAttribute();
         Response<Map> map = get("service-attributes/" + _id).getAsJsonMap();
-        ////////log.p("Response " + map.getResponseData());
+        //////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
         }
-        ////////log.p("Attributexx " + s.getPropertyIndex().toString());
+        //////////Log.p("Attributexx " + s.getPropertyIndex().toString());
         return s;
     }
 
     public static void updateRequestSummary(Request aThis) {
-        ////////log.p("Updating this request " + aThis._id.get());
+        //////////Log.p("Updating this request " + aThis._id.get());
         Response res = patch("requests/" + aThis._id.get()).
                 body(aThis.getPropertyIndex().toJSON()).getAsString();
-        ////////log.p(res.getResponseData().toString());
+        //////////Log.p(res.getResponseData().toString());
 //        
     }
 
@@ -1052,7 +1041,7 @@ public class onlineAPI {
         String fetchUrl = "{\"name\": \""
                 + sosService + "\" }";
 
-        ////////log.p(fetchUrl);
+        //////////Log.p(fetchUrl);
 
         ArrayList<Service> services = genericZiemSearch("service-definition",
                 Service.class,
@@ -1068,7 +1057,7 @@ public class onlineAPI {
         String fetchUrl = "{\"name\": \""
                 + amFineService + "\" }";
 
-        ////////log.p(fetchUrl);
+        //////////Log.p(fetchUrl);
 
         ArrayList<Service> services = genericZiemSearch("service-definition",
                 Service.class,

@@ -39,6 +39,9 @@ public class TextEditor extends BaseEditorImpl{
          editContainer.putClientProperty("editor", this);  
          editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         editContainer.getAllStyles().setBgColor(0x0f);
+        //textField.setUIID("SmallLabel");
+        headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
+
          //editContainer.getStyle().setBorder(Border.createBevelRaised());
          //editContainer.setLayout(new GridLayout(2));
          selfRef=this;
@@ -49,7 +52,7 @@ public class TextEditor extends BaseEditorImpl{
         // we just create the field
         //textLabel.setText(_id);
         attr.refreshAttribute();
-        ////////log.p("Editing " + attr.getPropertyIndex().toString());
+        //////////Log.p("Editing " + attr.getPropertyIndex().toString());
         textField.setText(attr.default_value.get());    
         if (this.requestParameter == null ) {
             createRequestParameter(attr.type_of_attribute.get(0));
@@ -93,14 +96,14 @@ public class TextEditor extends BaseEditorImpl{
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                             c.putClientProperty("attribute", "attribute");            
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -110,15 +113,15 @@ public class TextEditor extends BaseEditorImpl{
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        ////////log.p(attr.name.get() + " multiplicity is " + attr.multiplicity.get());
+        //////////Log.p(attr.name.get() + " multiplicity is " + attr.multiplicity.get());
         if (attr.multiplicity.get() == null) attr.multiplicity.set(false);
-        ////////log.p(attr.name.get() + " multiplicity is " + attr.multiplicity.get());        
-        if ((Boolean) attr.multiplicity.get()) headerContainer.add(addAnotherButton);
+        //////////Log.p(attr.name.get() + " multiplicity is " + attr.multiplicity.get());
+        if (attr.multiplicity.get()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(textField);        
@@ -134,7 +137,7 @@ public class TextEditor extends BaseEditorImpl{
         editContainer.add(textLabel).add(textField);
         editContainer.revalidate();
         return editContainer;
-     };  
+     }
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -191,7 +194,7 @@ public class TextEditor extends BaseEditorImpl{
         }
         //set the maximum size and minimum size
        if (this.serviceAttribute.maximum_size.get() != null) {
-           String mxS = this.serviceAttribute.maximum_size.get().toString();
+           String mxS = this.serviceAttribute.maximum_size.get();
            if (mxS.indexOf(".") > 0)
                     mxS = mxS.substring(0, mxS.indexOf("."));
            int max = Integer.parseInt(mxS);

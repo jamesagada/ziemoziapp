@@ -21,10 +21,6 @@ import com.codename1.location.Location;
 import com.codename1.maps.Coord;
 import com.codename1.ui.BrowserComponent;
 import com.codename1.ui.Button;
-import com.codename1.maps.MapComponent;
-import com.codename1.maps.layers.PointsLayer;
-import com.codename1.maps.layers.PointLayer;
-import static com.codename1.ui.Component.LEFT;
 import com.codename1.ui.Container;
 import com.codename1.ui.Dialog;
 import com.codename1.ui.EncodedImage;
@@ -40,19 +36,18 @@ import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
 import com.codename1.ui.layouts.BoxLayout;
-import com.codename1.ui.layouts.LayeredLayout;
 import com.codename1.util.Callback;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+//import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import com.codename1.location.LocationManager;
 import com.codename1.ui.Component;
 import static com.codename1.ui.ComponentSelector.$;
-import com.codename1.ui.events.DataChangedListener;
 import com.codename1.ui.layouts.BorderLayout;
 import java.util.Vector;
 
@@ -99,21 +94,21 @@ public class LocationEditor extends BaseEditorImpl {
         // we just create the field
         //textLabel.setText(_id);
         setCurrentPosition();
-        ////////log.p("Address coming to edit is " + textField.getText());
+        //////////Log.p("Address coming to edit is " + textField.getText());
         if (this.requestParameter == null) {
             createRequestParameter(attr.type_of_attribute.get(0));
             setCurrentPosition();
-            ////////log.p("Address for null requestParameter is " + textField.getText());
+            //////////Log.p("Address for null requestParameter is " + textField.getText());
         } else {
             //requestParameter exists
             //so we now set the value attribute to the value of the component
-            ////////log.p("Request Parameter Value is " + requestParameter.value.get());
+            //////////Log.p("Request Parameter Value is " + requestParameter.value.get());
             if (this.requestParameter.value.get() != null) {
                 textField.setText(this.requestParameter.value.get());
             }
-            ////////log.p("Address for non null requestParmeter value is " + textField.getText());
+            //////////Log.p("Address for non null requestParmeter value is " + textField.getText());
         }
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
@@ -122,14 +117,14 @@ public class LocationEditor extends BaseEditorImpl {
         textField.setColumns(20);
         textField.setScrollVisible(true);
         //setEditorConstraints();
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 requestParameter.value.set(textField.getText());
                 ////System.out.println("Attribute " + attr.display_label.get() + " is "
                  //       + requestParameter.getPropertyIndex().toJSON());
-                       ////////log.p("Address is " + textField.getText());  
+                       //////////Log.p("Address is " + textField.getText());
                 if (textField.getText().length() > 0) {
                     try {
                         
@@ -140,7 +135,7 @@ public class LocationEditor extends BaseEditorImpl {
                         locationField.setLatitude(c.getLatitude());
                         locationField.setLongitude(c.getLongitude());
                         }
-                        ////////log.p("Co-ordinates is " + c.toString());
+                        //////////Log.p("Co-ordinates is " + c.toString());
                     }catch(Exception e){
                         e.printStackTrace();
                         ToastBar.showErrorMessage("Something went wrong");
@@ -152,7 +147,7 @@ public class LocationEditor extends BaseEditorImpl {
 
         //System.out.println("Attribute to edit is " + attr.getPropertyIndex().toJSON());
         // textField.setText(attr.default_value.get().toString());
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         helpButton.getStyle().setAlignment(LEFT);
         helpButton.addActionListener(new ActionListener() {
             @Override
@@ -168,13 +163,13 @@ public class LocationEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -184,12 +179,12 @@ public class LocationEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(showMap).add(textField);
@@ -206,8 +201,6 @@ public class LocationEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -278,21 +271,23 @@ public class LocationEditor extends BaseEditorImpl {
             ConnectionRequest request = new ConnectionRequest("https://maps.googleapis.com/maps/api/geocode/json", false);
             request.addArgument("key", MAP_API_KEY);
             request.addArgument("latlng", coord.getLatitude() + "," + coord.getLongitude());
-            Log.p("Waiting for Network");
+            //Log.p("Waiting for Network");
             NetworkManager.getInstance().addToQueueAndWait(request);
-            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()), "UTF-8"));
-            Log.p("Received Response " + response.toString());
+            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()),
+                    "UTF-8"));
+            //Log.p("Received Response " + response.toString());
             if (response.get("results") != null) {
                 ArrayList results = (ArrayList) response.get("results");
-                Log.p("Address is " + results.toString());
+                //Log.p("Address is " + results.toString());
                 if (results.size() > 0) {
-                    ret = (String) ((LinkedHashMap) results.get(0)).get("formatted_address");
+                    ret = (String) ((LinkedHashMap) results.get(0)).
+                            get("formatted_address");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.p("Formated address is " + ret);
+        //Log.p("Formated address is " + ret);
         return ret;
     }
 
@@ -302,7 +297,8 @@ public class LocationEditor extends BaseEditorImpl {
             @Override
             protected void readResponse(InputStream input) throws IOException {
                 String ret = "";
-                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input, "UTF-8"));
+                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input,
+                        "UTF-8"));
                 if (response.get("results") != null) {
                     ArrayList results = (ArrayList) response.get("results");
                     if (results.size() > 0) {
@@ -328,7 +324,8 @@ public class LocationEditor extends BaseEditorImpl {
             request.addArgument("address", address);
 
             NetworkManager.getInstance().addToQueueAndWait(request);
-            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()), "UTF-8"));
+            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()),
+                    "UTF-8"));
             if (response.get("results") != null) {
                 ArrayList results = (ArrayList) response.get("results");
                 if (results.size() > 0) {
@@ -341,7 +338,7 @@ public class LocationEditor extends BaseEditorImpl {
             ToastBar.showErrorMessage(e.getMessage());
             Log.sendLogAsync();
         }
-        Log.p("Returning Coord As " + ret.toString());
+        //Log.p("Returning Coord As " + ret.toString());
         return ret;
     }
 
@@ -350,7 +347,8 @@ public class LocationEditor extends BaseEditorImpl {
             @Override
             protected void readResponse(InputStream input) throws IOException {
                 Coord ret = null;
-                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input, "UTF-8"));
+                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input,
+                        "UTF-8"));
                 if (response.get("results") != null) {
                     ArrayList results = (ArrayList) response.get("results");
                     if (results.size() > 0) {
@@ -367,39 +365,13 @@ public class LocationEditor extends BaseEditorImpl {
 
         NetworkManager.getInstance().addToQueue(request);
     }
-    public void showOnMapComponent(Coord moscone, Form Parent){
-        Form map = new Form("Map");
-        map.setLayout(new BorderLayout());
-        map.setScrollable(false);
-        final MapComponent mc = new MapComponent();
 
-        try {
-            //get the current location from the Location API
-            //Location loc = LocationManager.getLocationManager().getCurrentLocation();
 
-            //Coord lastLocation = new Coord(loc.getLatitude(), loc.getLongtitude());
-            Coord lastLocation = moscone;
-            Image i = Image.createImage("/marker_mini.png");
-            PointsLayer pl = new PointsLayer();
-            pl.setPointIcon(i);
-            PointLayer p = new PointLayer(lastLocation, "You Are Here", i);
-            p.setDisplayName(true);
-            pl.addPoint(p);
-            mc.addLayer(pl);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        mc.zoomToLayers();
-
-        map.addComponent(BorderLayout.CENTER, mc);
-
-        map.show();
-    }
     public void showOnMap(Coord moscone, Form parent) {
         //Form mapForm = new Form("Maps", new LayeredLayout());
         Form mapForm = new Form("Select Location", new BorderLayout());
         MapContainer mc = new MapContainer(MAP_API_KEY);
-        Log.p("MapContainer Created");
+        //Log.p("MapContainer Created");
             Button mosconeButton = new Button("Done");
             mosconeButton.addActionListener(new ActionListener() {
                 @Override
@@ -415,14 +387,14 @@ public class LocationEditor extends BaseEditorImpl {
             //Container markers = new Container();
             //markers.setLayout(new MapLayout(mc, markers));
             //mapForm.add(markers);
-            Log.p("Current Location " + moscone.toString());
+            //Log.p("Current Location " + moscone.toString());
             Vector vm = new Vector<MapObject>();
             //Coord moscone = new Coord(37.7831, -122.401558);
             //Coord moscone = new Coord(location);
             String locationTxt = getFormattedAddress(moscone);
             //System.out.println(locationTxt);
 
-            Log.p("formated location address " + locationTxt);
+            //Log.p("formated location address " + locationTxt);
             //FontImage.setMaterialIcon(mosconeButton, FontImage.MATERIAL_PLACE);
             //markers.add(moscone, mosconeButton);
             Image markerImg = FontImage.createMaterial(FontImage.MATERIAL_PLACE, mosconeButton.getStyle());
@@ -431,7 +403,7 @@ public class LocationEditor extends BaseEditorImpl {
                     moscone, locationTxt, "", e3 -> {
                         ToastBar.showMessage(locationTxt, FontImage.MATERIAL_PLACE);
                     });
-            Log.p(o.toString());
+            //Log.p(o.toString());
             vm.add(o);
             mc.addTapListener(e -> {
                 if (tapDisabled) {
@@ -483,12 +455,12 @@ public class LocationEditor extends BaseEditorImpl {
             mapForm.add(new Label("Loading, please wait...."));
         }
         mapForm.add(BorderLayout.CENTER,mc).add(BorderLayout.NORTH,mosconeButton);
-        Log.p("Now showing map");
+        //Log.p("Now showing map");
         mapForm.show();
     }
 
     public void setCurrentPosition() {
-        ////////log.p("Set current position");
+        //////////Log.p("Set current position");
         //InfiniteProgress ip = new InfiniteProgress();
         //Dialog ipDlg = ip.showInfiniteBlocking();
         Location location = LocationManager.getLocationManager().getCurrentLocationSync(30000);
@@ -507,9 +479,9 @@ public class LocationEditor extends BaseEditorImpl {
         locationField = location;
         Double loc1 = location.getLatitude();
         Double loc2 = location.getLongitude();
-        Log.p("Latitude: " + loc1);
-        Log.p("Longitude: " + loc2);
-        Log.p("Current Address " + textField.getText());
+        //Log.p("Latitude: " + loc1);
+        //Log.p("Longitude: " + loc2);
+        //Log.p("Current Address " + textField.getText());
     }
 
 }

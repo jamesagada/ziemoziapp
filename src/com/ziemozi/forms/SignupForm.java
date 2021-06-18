@@ -295,7 +295,7 @@ public class SignupForm extends Form {
                     UIController.showSignup());       
          repeat.setText("Retry Signup");
         Button done = s.createNextButton(e -> {
-            ////////log.p("Verifying user " + currentUser.getPropertyIndex().toString());
+            //////////Log.p("Verifying user " + currentUser.getPropertyIndex().toString());
             Dialog d = new InfiniteProgress().showInfiniteBlocking();
             if(ServerAPI.verifyUser(confirm.getText(), !phone, currentUser.phone.get())) {
                 ServerAPI.logout();

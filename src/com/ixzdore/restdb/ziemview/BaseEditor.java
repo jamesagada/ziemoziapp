@@ -51,21 +51,21 @@ public interface BaseEditor{
     //
     //the serviceAttribute being edited
    
-    public Container edit(ServiceAttribute attr) ;
-    public Container view(ServiceAttribute attr);//edit or view from service attribute
-    public Container view(RequestParameter req); //
-    public Container edit(RequestParameter req); //edit from request parameter
-    public void createRequestParameter(ServiceAttributeType serviceType);
-    public void createRequestParameter();
-    public void checkWatch();
-    public RequestParameter getRequestParameter();//retrieve the request parameter for this attribute
-    public void  executeWatch(BaseEditorImpl b);
-    public void updateList();//if it is a list, update the list with new information.
-    public void setEditorConstraints();
-    public ServiceAttribute getServiceAttribute();
-    public void setupOptions(Object o);
-    public void setValue(Object v);
-    public void setRelevance(Object v);
-    public void setUpOptions();
-    public void setSummary();
+    Container edit(ServiceAttribute attr) ;
+    Container view(ServiceAttribute attr);//edit or view from service attribute
+    Container view(RequestParameter req); //
+    Container edit(RequestParameter req); //edit from request parameter
+    void createRequestParameter(ServiceAttributeType serviceType);
+    void createRequestParameter();
+    void checkWatch();
+    RequestParameter getRequestParameter();//retrieve the request parameter for this attribute
+    void  executeWatch(BaseEditorImpl b);
+    void updateList();//if it is a list, update the list with new information.
+    void setEditorConstraints();
+    ServiceAttribute getServiceAttribute();
+    void setupOptions(Object o);
+    void setValue(Object v);
+    void setRelevance(Object v);
+    void setUpOptions();
+    void setSummary();
 }

@@ -46,8 +46,8 @@ public class ContactForm extends Form {
     }
 
     private Container createContactItem(ServiceContact p) {
-        //////////log.p("User " + u.fullName());
-        //////////log.p("User Json " + u.getPropertyIndex().toString());
+        ////////////Log.p("User " + u.fullName());
+        ////////////Log.p("User Json " + u.getPropertyIndex().toString());
         Container titleArea = createTitle(p);
         Component body;
         String style = null;
@@ -110,9 +110,9 @@ public class ContactForm extends Form {
                 titleArea, body, createPostStats(p), buttonBar);
     }
      private static Container createTitle(ServiceContact p) {
-        //////////log.p("\n\n Request \n" + p.getPropertyIndex().toString());
-        //////////log.p(u.getPropertyIndex().toString());
-        //////////log.p(u.fullName());
+        ////////////Log.p("\n\n Request \n" + p.getPropertyIndex().toString());
+        ////////////Log.p(u.getPropertyIndex().toString());
+        ////////////Log.p(u.fullName());
         p.refresh();
         Button avatar = new Button("", p.getAvatar(6.5f), "CleanButton");
         Button name = new Button(p.name.get(), "PostTitle");
@@ -123,7 +123,7 @@ public class ContactForm extends Form {
             String sd = s.substring(0, s.indexOf("T"));
             //2018-07-27T11:49:47.014Z
             sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");        
-            ////////log.p("\n\n" + sd + "\n\n");
+            //////////Log.p("\n\n" + sd + "\n\n");
             d = sdf.parse(s);
         } catch (ParseException ex) {
             //we will figure this out later.          
@@ -141,7 +141,7 @@ public class ContactForm extends Form {
         return titleArea;
     }
     private static Container createPostStats(ServiceContact p) {
-        ////////log.p("Creating Stats for " + p.getPropertyIndex().toString());
+        //////////Log.p("Creating Stats for " + p.getPropertyIndex().toString());
         Container stats = new Container(new BorderLayout(), 
                 "PaddedContainer");
         if(p.likes.get() != null  ) {

@@ -5,26 +5,18 @@
  */
 package com.ixzdore.restdb.ziemobject;
 
-import com.codename1.io.CharArrayReader;
-import com.codename1.io.JSONParser;
-import com.codename1.io.Log;
 import com.codename1.io.Storage;
 import com.codename1.io.Util;
 import com.codename1.properties.BooleanProperty;
-import com.codename1.properties.IntProperty;
 import com.codename1.properties.ListProperty;
 import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBusinessObject;
 import com.codename1.properties.PropertyIndex;
-import com.codename1.ui.Image;
 import com.codename1.util.StringUtil;
-import com.ziemozi.server.ServerAPI;
 import com.ziemozi.server.local.localAPI;
-import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 
@@ -259,17 +251,17 @@ public class ServiceAttribute implements PropertyBusinessObject {
     public void refreshAttribute() {
         
         ServiceAttribute a = localAPI.getServiceAttribute(this._id.get());
-        //////////log.p("Options List Refreshed is " + this.option_list.get()); 
-        //////log.p("Refreshing this attribute \n" + this.getPropertyIndex().toString());
-        //////log.p("Refreshing with this \n" + a.getPropertyIndex().toString());        
+        ////////////Log.p("Options List Refreshed is " + this.option_list.get());
+        ////////Log.p("Refreshing this attribute \n" + this.getPropertyIndex().toString());
+        ////////Log.p("Refreshing with this \n" + a.getPropertyIndex().toString());
         this.getPropertyIndex().populateFromMap(a.getPropertyIndex().toMapRepresentation());
          refreshTypeOfAttribute();
         refreshWatchAttribute();               
-        //////log.p("Type  " + this.getPropertyIndex().toJSON());
+        ////////Log.p("Type  " + this.getPropertyIndex().toJSON());
     }
 public void refreshTypeOfAttribute(){
         ArrayList<ServiceAttributeType> aa = localAPI.getAttributeTypeFor(this._id.get());
-        ////log.p("Attribute Types For " + this._id.get() + " has  "+ aa.size() +"\n");
+        //////Log.p("Attribute Types For " + this._id.get() + " has  "+ aa.size() +"\n");
         if (aa != null ) {
             type_of_attribute.clear();
             type_of_attribute.addAll(aa);
@@ -277,17 +269,17 @@ public void refreshTypeOfAttribute(){
 }
 public void refreshWatchAttribute(){
         ArrayList<ServiceAttribute> ww = localAPI.getWatchAttributeFor(this._id.get());
-        ////////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        //////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if ((ww != null )&&(ww.size() > 0)) {
-            ////////////log.p(ww.size());
-            //////////log.p(this.name.get() + " is Watching " + ww.get(0).name.get());
+            //////////////Log.p(ww.size());
+            ////////////Log.p(this.name.get() + " is Watching " + ww.get(0).name.get());
             watch_this_attribute.clear();
             watch_this_attribute.addAll(ww);
         }else{
             watch_this_attribute.clear();
         }    
 }
-    String getSummary(String value) {
+    String getSummary(String value, final Boolean functional) {
         //what we do is to take the summary_template and
         //merge with the value. If there is no template
         // then we just take the label or the help_text and
@@ -298,14 +290,18 @@ public void refreshWatchAttribute(){
             if ( template.indexOf("NULL") >= 0 ) template = null;
         }
         String pVal = "" + value;
-        ////////////log.p("\n Summary Template  " + template);
+        //////////////Log.p("\n Summary Template  " + template);
         //if ((template == null)||(template.length() < 2)) template = this.help_text.get();
         //if ((template == null)||(template.length() < 2))template = this.description.get();
         //if ((template == null)||(template.length() < 2)) template = this.display_label.get();
 
-        if ((template == null)||(template.length() < 2)) template = this.description.get();
-        //////////log.p("Formating " + pVal);
-        ////////////log.p("\n Summary Template  " + template);        
+        if (!functional) {
+            if ((template == null)||(template.length() < 2)) template = this.description.get();
+        }else {
+            if ((template == null)||(template.length() < 2)) template = this.name.get();
+        }
+        ////////////Log.p("Formating " + pVal);
+        //////////////Log.p("\n Summary Template  " + template);
         if (template !=null) {
             //We need to rewrite this so that
             //the summarization will depend also on the type of attribute
@@ -317,7 +313,7 @@ public void refreshWatchAttribute(){
             //And we have no introspection so we will have to create a ZiemObjectFactory
             if ((this.surveyjs_type.get() != null ) && !(this.surveyjs_type.get().contains("NULL") )){
                 //it means the value is of this type and we need to load it into a list of that type
-                //log.p("SurveyJS Type " + this.surveyjs_type.get());
+                ////Log.p("SurveyJS Type " + this.surveyjs_type.get());
                 Class<? extends PropertyBusinessObject> po = ZiemObjectFactory.getObjectFor(this.surveyjs_type.get());
                 //now go ahead and get a list or a single object
                 if (po != null ) {
@@ -345,7 +341,7 @@ public void refreshWatchAttribute(){
                         }else {
                             //its just one object
 
-                            //log.p("Set property object from " + pVal);
+                            ////Log.p("Set property object from " + pVal);
                             if(pVal.indexOf("{") > 0)   {                         
                                 pb.getPropertyIndex().fromJSON(pVal);
                                 //we need to have a field called summary whose getting
@@ -356,7 +352,7 @@ public void refreshWatchAttribute(){
                     } 
                     catch (Exception ex) 
                     {
-                    //////log.p(ex.getMessage());
+                    ////////Log.p(ex.getMessage());
                     }
                     
                 }
@@ -368,8 +364,8 @@ public void refreshWatchAttribute(){
             //how do we handle when we have multiple items
             //we have to split the values 
             this.refreshTypeOfAttribute();
-            ////log.p("ServiceAttribute to get summary for-->" + this.name.get());
-            //////log.p(this.getPropertyIndex().toString());
+            //////Log.p("ServiceAttribute to get summary for-->" + this.name.get());
+            ////////Log.p(this.getPropertyIndex().toString());
             String base_type = "text";
             if (this.type_of_attribute.size() > 0) {
  
@@ -386,9 +382,9 @@ public void refreshWatchAttribute(){
                     while (i < vals.length) {
                         String idx = "$v$"+i;
                     if (template.indexOf(idx) > 0) {
-//                        //////////log.p("\n Template is " + template + " and value is " + value);
+//                        ////////////Log.p("\n Template is " + template + " and value is " + value);
                         template = StringUtil.replaceAll(template, idx, vals[i]);
-//                        //////////log.p("\n Converted template to " + template);
+//                        ////////////Log.p("\n Converted template to " + template);
                     } else {
                         template = template + " \n " + vals[i]  ;
                     }
@@ -404,8 +400,8 @@ public void refreshWatchAttribute(){
                     template="";
                     while (i < vals.length) {      
                         if (vals[i] != null )  {
-                            //////log.p("Image " + vals[i]);
-                            //////log.p("Index of http " + vals[i].indexOf("http"));
+                            ////////Log.p("Image " + vals[i]);
+                            ////////Log.p("Index of http " + vals[i].indexOf("http"));
                             if (vals[i].indexOf("http") >= 0) {
                                 String idx = "$v$"+i;
                                 String img = " <img src=" + '"' + vals[i] + '"' + "/> ";                    
@@ -441,9 +437,9 @@ public void refreshWatchAttribute(){
                 default: // Optional
                 // treat as text
             }
-                    //////log.p("\n Base typ is " + base_type); 
+                    ////////Log.p("\n Base typ is " + base_type);
         }
-        //////log.p("\n Updated Template " + template);
+        ////////Log.p("\n Updated Template " + template);
 
         return template;
     }

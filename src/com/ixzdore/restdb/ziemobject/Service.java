@@ -98,7 +98,7 @@ public class Service implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<String> aa = localAPI.getServiceIcon(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             logo.clear();
             logo.addAll(aa);
@@ -112,7 +112,7 @@ public class Service implements PropertyBusinessObject {
         //comments.clear();
         service_attributes.set(new ArrayList<ServiceAttribute>());
         ArrayList<ServiceAttribute> aa = localAPI.getServiceAttributeForService(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             //service_attributes.clear();
             service_attributes.addAll(aa);
@@ -126,7 +126,7 @@ public class Service implements PropertyBusinessObject {
         //comments.clear();
         //category.set(new ArrayList<Category>());
         ArrayList<Category> aa = localAPI.getServiceCategory(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             category.clear();
             category.addAll(aa);
@@ -139,7 +139,7 @@ public class Service implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<Provider> aa = localAPI.getServiceProvider(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             providers.clear();
             providers.addAll(aa);
@@ -152,7 +152,7 @@ public class Service implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<Group> aa = localAPI.getServiceGroup(this._id.get());
-        ////log.p("Groups For " + this._id.get() + " "+ aa.size() +"\n");
+        //////Log.p("Groups For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             groups.clear();
             groups.addAll(aa);
@@ -165,7 +165,7 @@ public class Service implements PropertyBusinessObject {
         //populate the comments
         //comments.clear();
         ArrayList<Service> aa = localAPI.getCommentServicesFor(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             comment_services.clear();
             comment_services.addAll(aa);
@@ -190,7 +190,7 @@ public class Service implements PropertyBusinessObject {
             refreshProviders();
             refreshParent();
             refreshGroups();
-            ////////log.p("\n\n I am refreshed \n\n" + this.getPropertyIndex().toJSON());
+            //////////Log.p("\n\n I am refreshed \n\n" + this.getPropertyIndex().toJSON());
         }
         public String getSurveyJS(){
             String survey ="";

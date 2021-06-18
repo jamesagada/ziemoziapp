@@ -48,7 +48,7 @@ public class SearchForm extends Form {
                             if (sc.ziemozi_user.size() > 0 ) {
                                 ctx.add(sc);
                             }else {
-                                ////log.p(sc.summary.get());
+                                //////Log.p(sc.summary.get());
                             }
                         }
                     }
@@ -78,11 +78,11 @@ private Boolean filterRequest(Request c, String s) {
             Boolean filterin = false;
             List<String> textTerms = StringUtil.tokenize(s, ",");
             String rs = c.summary.get().toLowerCase();
-            //////log.p(rs);
+            ////////Log.p(rs);
             for (String t : textTerms) {
-                ////log.p(t);
+                //////Log.p(t);
                 if (rs.lastIndexOf(t.toLowerCase()) > 0) {
-                    ////log.p("found match for " + t);
+                    //////Log.p("found match for " + t);
                     filterin = true;
                     break;
                 }
@@ -93,7 +93,7 @@ private Boolean filterRequest(Request c, String s) {
     
     public SearchForm() {
         super(new BorderLayout());
-        ////////log.p("\n\n Searching initiated \n\n");
+        //////////Log.p("\n\n Searching initiated \n\n");
 
         showOnMap = new Button("Map");
         searchField.setUIID("SmallLabel");
@@ -163,7 +163,7 @@ private Boolean filterRequest(Request c, String s) {
         MultiButton mb = new MultiButton(p.service.get(0).description.get());
         String summary = p.summary.get();       
         mb.setTextLine2(p.plain_summary());
-        ////////log.p(p.plain_summary());
+        //////////Log.p(p.plain_summary());
         //if ( )
         p.refreshUser();
         if (p.ziemozi_user.size() > 0 ) {

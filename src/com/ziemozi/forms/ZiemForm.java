@@ -51,7 +51,7 @@ public class ZiemForm extends Form {
         //ZiemView zv = new ZiemView();
         ZiemViewTab zv = new ZiemViewTab();        
         //zv.showPanels=false;
-        ////////log.p("Selector is " + m.get("selector"));
+        //////////Log.p("Selector is " + m.get("selector"));
         ArrayList<Service> services = ServerAPI.serviceList(m.get("selector"));
         //if there is no entry, then add the default service or return a component that says there
         //is no service to show or just show back or do nothing

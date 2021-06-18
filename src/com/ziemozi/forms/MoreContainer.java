@@ -119,7 +119,7 @@ public class MoreContainer extends Container {
                     Dialog ip = new InfiniteProgress().showInfiniteBlocking();
                     ServerAPI.logout();
                     me.setTextLine1(null);
-                    ////log.p("Showing login screen");
+                    //////Log.p("Showing login screen");
                     ip.dispose();
                     new LoginForm().show();
                 }

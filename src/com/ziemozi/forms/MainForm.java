@@ -24,13 +24,13 @@ import com.ixzdore.restdb.ziemobject.Service;
 
 public class MainForm extends Form {
 
-    private Tabs mainUI = new Tabs();
-    private NewsfeedContainer newsfeed = new NewsfeedContainer();
-    private NotificationsContainer notifications
+    private final Tabs mainUI = new Tabs();
+    private final NewsfeedContainer newsfeed = new NewsfeedContainer();
+    private final NotificationsContainer notifications
             = new NotificationsContainer();
-    private ContactsContainer contacts = new ContactsContainer();
-    private ContactsfeedContainer contactfeed = new ContactsfeedContainer();
-    private ProvidersFeedContainer providerfeed = new ProvidersFeedContainer();
+    private final ContactsContainer contacts = new ContactsContainer();
+    private final ContactsfeedContainer contactfeed = new ContactsfeedContainer();
+    private final ProvidersFeedContainer providerfeed = new ProvidersFeedContainer();
 
     public MainForm() {
         super("", new BorderLayout());
@@ -39,8 +39,8 @@ public class MainForm extends Form {
 //        mainUI.addTab("", MATERIAL_WEB, 5f, rssContainer());        
         FloatingActionButton fab
                 = FloatingActionButton.createFAB(MATERIAL_IMPORT_CONTACTS);
-        Container friends = fab.bindFabToContainer(new FriendsContainer());
-        fab.addActionListener(e -> uploadContacts());
+        ////Container friends = fab.bindFabToContainer(new FriendsContainer());
+        //fab.addActionListener(e -> uploadContacts());
         mainUI.addTab("Providers", MATERIAL_STORE_MALL_DIRECTORY, 5f,
                 providerfeed);
         mainUI.addTab("Contacts", MATERIAL_PEOPLE_OUTLINE, 5f,
@@ -67,16 +67,16 @@ public class MainForm extends Form {
     public void search() {
         //this will handle search. Such that when we we click on search
         //it will determine that we are in search and go to the appropriate search form.
-        //////log.p("Selected " + mainUI.getSelectedComponent());
+        ////////Log.p("Selected " + mainUI.getSelectedComponent());
         if ((mainUI.getSelectedComponent() == contacts) || (mainUI.getSelectedComponent() == contactfeed)) {
-            //////log.p("Searching Contacts");
+            ////////Log.p("Searching Contacts");
             new SearchContacts().show();
         } else if ((mainUI.getSelectedComponent() == providerfeed)) {
-            //////log.p("Searching CProviders");
+            ////////Log.p("Searching CProviders");
             new SearchProviders().show();
         }else
         {
-            //////log.p("Searching Requests");
+            ////////Log.p("Searching Requests");
             SearchForm f = new SearchForm();
             f.show();
         }
@@ -84,17 +84,17 @@ public class MainForm extends Form {
    public void report() {
         //this will handle search. Such that when we we click on search
         //it will determine that we are in search and go to the appropriate search form.
-        //////log.p("Selected " + mainUI.getSelectedComponent());
+        ////////Log.p("Selected " + mainUI.getSelectedComponent());
         if ((mainUI.getSelectedComponent() == contacts) || (mainUI.getSelectedComponent() == contactfeed)) {
-            //////log.p("Searching Contacts");
+            ////////Log.p("Searching Contacts");
             new SearchContacts().show();
         } else if ((mainUI.getSelectedComponent() == providerfeed)) {
-            //////log.p("Searching CProviders");
+            ////////Log.p("Searching CProviders");
             //create 
             new SearchProviders().show();
         }else
         {
-            //////log.p("Searching Requests");
+            ////////Log.p("Searching Requests");
             SearchForm f = new SearchForm();
             f.show();
         }
@@ -130,7 +130,7 @@ public class MainForm extends Form {
         ToastBar.showMessage("Updates available. Click here to refresh...",
                 MATERIAL_UPDATE, l);
     }
-
+/*
     private void uploadContacts() {
         startThread(() -> {
             Contact[] cnt = Display.getInstance().
@@ -138,7 +138,7 @@ public class MainForm extends Form {
             ServerAPI.uploadContacts(cnt);
         }, "ContactUploader").start();
     }
-
+*/
     private Container rssContainer() {
         Container rss = new Container(new BorderLayout());
 

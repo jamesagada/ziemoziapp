@@ -7,6 +7,7 @@ package com.ixzdore.restdb.ziemview;
 
 import com.codename1.components.SpanLabel;
 import com.codename1.io.FileSystemStorage;
+import com.codename1.io.JSONParser;
 import com.codename1.io.Log;
 import com.codename1.io.Util;
 import com.codename1.l10n.ParseException;
@@ -23,6 +24,8 @@ import com.codename1.ui.PickerComponent;
 import com.codename1.ui.TextField;
 import com.codename1.ui.events.ActionEvent;
 import com.codename1.ui.events.ActionListener;
+import com.codename1.util.regex.StringReader;
+import com.ixzdore.restdb.ziemobject.Request;
 import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
@@ -31,12 +34,13 @@ import com.codename1.ui.layouts.GridLayout;
 import com.codename1.ui.spinner.DateSpinner;
 import com.codename1.ui.spinner.Picker;
 import com.codename1.util.StringUtil;
+import com.ziemozi.server.ServerAPI;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
- 
-
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -105,7 +109,7 @@ public class SingleSelectionEditor extends BaseEditorImpl {
 //        "A Dance With Dragons", "The Winds of Winter", "A Dream of Spring");
 stringPicker.setSelectedString(s);
         Picker p =  stringPicker;
-        //////////log.p("\n PickerCompnent Visibility " + booleanPicker.getUIID());
+        ////////////Log.p("\n PickerCompnent Visibility " + booleanPicker.getUIID());
        // p.setSelectedString(attr.default_value.get());
         requestParameter.value.set(textField.getText());        
         p.addActionListener(new ActionListener() {
@@ -151,14 +155,14 @@ stringPicker.setSelectedString(s);
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -168,12 +172,12 @@ stringPicker.setSelectedString(s);
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
         editContainer.add(headerContainer).add(booleanPicker);
         editContainer.revalidate();
@@ -190,8 +194,6 @@ stringPicker.setSelectedString(s);
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -283,7 +285,7 @@ stringPicker.setSelectedString(s);
                         this.serviceAttribute._parent_id
                         ;
                 //cheeck if there is any file like this already and if it is not too lod
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 if (!FileSystemStorage.getInstance()
                         .exists(FileSystemStorage.getInstance().getAppHomePath()+"/" 
                                 + fileName)) 
@@ -304,7 +306,7 @@ stringPicker.setSelectedString(s);
                                     , true);                        
                     }
                 }
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);                
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 try {
                     //read the contents of the file to options
                     options = Util.readToString(FileSystemStorage.getInstance().
@@ -319,7 +321,7 @@ stringPicker.setSelectedString(s);
         optionList = StringUtil.replaceAll(optionList, "\n", "");
          optionList = StringUtil.replaceAll(optionList, "*", ",");           
         //convert options to a string array
-        ////log.p("Options List " + optionList);
+        //////Log.p("Options List " + optionList);
         Object[] opa = StringUtil.tokenize(optionList, ",").toArray();
         optionArray = new String[opa.length];
         for (int i = 0; i < opa.length; i++) {
@@ -327,5 +329,15 @@ stringPicker.setSelectedString(s);
             ////System.out.println("\nOption in OptionList " + opa[i]);
         }
     }
- 
+ private String getSelectionData(){
+        //we trigger this only when any of the fields it is watching changes
+        //so we set all the fields it is watching
+    String  url=actionUrl;
+    ZiemViewTab z = (ZiemViewTab) selfRef.getClientProperty("ziemview");
+    Request rq=z.getRequest();
+    String body=rq.getPropertyIndex().toJSON();
+    //it will be more efficient to download the references amd lkthemuplcally
+    String op = ServerAPI.postTo(url,body);
+     return op;
+    }
 }

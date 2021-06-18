@@ -94,10 +94,10 @@ public final Container sensorDataList = new Container();
             magnetic.registerListener(new SensorListener() {
                 public void onSensorChanged(long timeStamp, float x, float y, float z) {
                     //do your stuff here...
-                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + Long.toString(timeStamp) + '"';
-                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + Float.toString(x) + '"';
-                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + Float.toString(y) + '"';
-                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + Float.toString(z) + '"';
+                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + timeStamp + '"';
+                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + x + '"';
+                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + y + '"';
+                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + z + '"';
                     sensorData = "{" + '"' + "magnetic" + '"' + ":" + sensorData + "},";
                     sensorData = sensorData + senseLocation() + "}";
                     if (textField.getText().contains("{")) {
@@ -118,7 +118,7 @@ public final Container sensorDataList = new Container();
                     });
                     sensorDataList.add(sensorButton);
                     editContainer.revalidate();
-                    ////////log.p(textField.getText());                    
+                    //////////Log.p(textField.getText());
                 }
             });
         }
@@ -128,10 +128,10 @@ public final Container sensorDataList = new Container();
             accelerometer.registerListener(new SensorListener() {
                 public void onSensorChanged(long timeStamp, float x, float y, float z) {
                     //do your stuff here...
-                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + Long.toString(timeStamp) + '"';
-                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + Float.toString(x) + '"';
-                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + Float.toString(y) + '"';
-                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + Float.toString(z) + '"';
+                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + timeStamp + '"';
+                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + x + '"';
+                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + y + '"';
+                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + z + '"';
                     sensorData = "{" + '"' + "accelerometer" + '"' + ":" + sensorData + "},";
                     sensorData = sensorData + senseLocation() + "}";
                     if (textField.getText().contains("{")) {
@@ -152,7 +152,7 @@ public final Container sensorDataList = new Container();
                     });
                     sensorDataList.add(sensorButton);                    
                     editContainer.revalidate();
-                    ////////log.p(textField.getText());                    
+                    //////////Log.p(textField.getText());
                 }
             });
         }
@@ -161,10 +161,10 @@ public final Container sensorDataList = new Container();
             gyroscope.registerListener(new SensorListener() {
                 public void onSensorChanged(long timeStamp, float x, float y, float z) {
                     //do your stuff here...
-                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + Long.toString(timeStamp) + '"';
-                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + Float.toString(x) + '"';
-                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + Float.toString(y) + '"';
-                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + Float.toString(z) + '"';
+                    String sensorData = "{" + '"' + "timestamp" + '"' + ":" + '"' + timeStamp + '"';
+                    sensorData = sensorData + "," + '"' + "x-axis" + '"' + ":" + '"' + x + '"';
+                    sensorData = sensorData + "," + '"' + "y-axis" + '"' + ":" + '"' + y + '"';
+                    sensorData = sensorData + "," + '"' + "z-axis" + '"' + ":" + '"' + z + '"';
                     sensorData = "{" + '"' + "gyroscope" + '"' + ":" + sensorData + "},";
                     sensorData = sensorData + senseLocation() + "}";
                     if (textField.getText().contains("{")) {
@@ -185,14 +185,14 @@ public final Container sensorDataList = new Container();
                     });
                     sensorDataList.add(sensorButton);
                     editContainer.revalidate();
-                    ////////log.p(textField.getText());                    
+                    //////////Log.p(textField.getText());
                 }
             });
         }
         if ((gyroscope == null ) || (accelerometer == null ) || (magnetic == null)) {
             //if there is no gyroscope then we have to actually a timer that 
             //reads the gps every second and update
-            //////log.p("Setup location timer");
+            ////////Log.p("Setup location timer");
             //UITimer.timer(100, true, () -> { 
                 updateLocation();
             //}).schedule(3000, true, Display.getInstance().getCurrent());;
@@ -209,7 +209,7 @@ public final Container sensorDataList = new Container();
 //                ToastBar.showInfoMessage("Syncing messages ...");
       
 
-        //////log.p("Updating Location");
+        ////////Log.p("Updating Location");
               textField.setText(textField.getText() + " " + senseLocation() +"}");
                     requestParameter.value.set(textField.getText());
                     MultiButton sensorButton = new MultiButton();
@@ -224,7 +224,7 @@ public final Container sensorDataList = new Container();
                     });
                     sensorDataList.add(sensorButton);                    
                     editContainer.revalidate();       
-                   //////log.p(textField.getText());      
+                   ////////Log.p(textField.getText());
              }
           };
         t.schedule(ta,1000,100000);  
@@ -234,17 +234,17 @@ public final Container sensorDataList = new Container();
         LocationManager loc = LocationManager.getLocationManager();
         Location currentLocation = loc.getCurrentLocationSync(1L);
         String locData = "{" + '"' + "timestamp" + '"' + ":" + '"'
-                + Long.toString(currentLocation.getTimeStamp()) + '"';
+                + currentLocation.getTimeStamp() + '"';
         locData = locData + "," + '"' + "longitude" + '"' + ":" + '"'
-                + Double.toString(currentLocation.getLongitude()) + '"';
+                + currentLocation.getLongitude() + '"';
         locData = locData + "," + '"' + "latitude" + '"' + ":" + '"'
-                + Double.toString(currentLocation.getLatitude()) + '"';
+                + currentLocation.getLatitude() + '"';
         locData = locData + "," + '"' + "direction" + '"' + ":" + '"'
-                + Float.toString(currentLocation.getDirection()) + '"';
+                + currentLocation.getDirection() + '"';
         locData = locData + "," + '"' + "altitude" + '"' + ":" + '"'
-                + Double.toString(currentLocation.getAltitude()) + '"';
+                + currentLocation.getAltitude() + '"';
         locData = locData + "," + '"' + "velocity" + '"' + ":" + '"'
-                + Float.toString(currentLocation.getVelocity()) + '"';
+                + currentLocation.getVelocity() + '"';
         locData = "{" + '"' + "location" + '"' + ":" + locData + "}";
 
         return locData;
@@ -288,13 +288,13 @@ public final Container sensorDataList = new Container();
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -304,12 +304,12 @@ public final Container sensorDataList = new Container();
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
 
@@ -327,8 +327,6 @@ public final Container sensorDataList = new Container();
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

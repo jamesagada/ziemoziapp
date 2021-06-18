@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserForm extends Form {
-    private User user;
-    private InfiniteContainer ic = new InfiniteContainer() {
+    private final User user;
+    private final InfiniteContainer ic = new InfiniteContainer() {
         @Override
         public Component[] fetchComponents(int index, int amount) {
             ArrayList<Component> components = new ArrayList<>();

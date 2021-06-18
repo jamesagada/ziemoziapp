@@ -176,7 +176,7 @@ public class PropertyBusinessObjectUI {
      * @return a UI container that can be used to edit the business object
      */
     public Container createEditUI(PropertyBusinessObject bo, boolean autoCommit) {
-        //////log.p(bo.getPropertyIndex().toString());
+        ////////Log.p(bo.getPropertyIndex().toString());
         Container cnt;
         if (Display.getInstance().isTablet()) {
             TableLayout tl = new TableLayout(1, 2);
@@ -193,16 +193,16 @@ public class PropertyBusinessObjectUI {
             //for each property oblect, we need to determine the type and make it into a ServiceAttribute
             //question is what if the property is a list property
             //then we need to determine what the property is really
-            //////log.p(b.getName());
+            ////////Log.p(b.getName());
             ServiceAttribute sa = makeServiceAttributeFromProperty(b);
-            //////log.p("Before Setting Value \n" + bo.getPropertyIndex().toString());
-            ////////log.p("BO business object \n" + bo.getPropertyIndex().);
+            ////////Log.p("Before Setting Value \n" + bo.getPropertyIndex().toString());
+            //////////Log.p("BO business object \n" + bo.getPropertyIndex().);
             //HashMap m = (HashMap) bo.getPropertyIndex().toMapRepresentation();       
             String r = getValueOfProperty(bo, b);
-            //////log.p("Value " + r);
+            ////////Log.p("Value " + r);
             sa.default_value.set(getValueOfProperty(bo, b));
             businessObjectDefinition.service_attributes.add(sa);
-            //////////log.p(businessObjectDefinition.getPropertyIndex().toString());
+            ////////////Log.p(businessObjectDefinition.getPropertyIndex().toString());
             RequestParameter rp = makeRequestParameterFromProperty(sa, b);
             businessObject.request_parameters.add(rp);
         }
@@ -210,7 +210,7 @@ public class PropertyBusinessObjectUI {
         businessObjectDefinition.description.set(bo.getPropertyIndex().getName());
         // businessObject.service.set(businessObjectDefinition);
         businessObject.service.add(businessObjectDefinition);
-        ////////log.p("Object To Display" + businessObjectDefinition.getPropertyIndex().toString());
+        //////////Log.p("Object To Display" + businessObjectDefinition.getPropertyIndex().toString());
         ZiemView zv = new ZiemView();
         zv.request = businessObject;
         zv.showPanels = false;
@@ -243,7 +243,7 @@ public class PropertyBusinessObjectUI {
                 makeServiceAttributeTypeFor(
                         b));
         makeAttributeOptions(sa, b);
-        ////////log.p("PBOView Service Attribute" + sa.getPropertyIndex().toString());
+        //////////Log.p("PBOView Service Attribute" + sa.getPropertyIndex().toString());
         return sa;
     }
 
@@ -269,13 +269,13 @@ public class PropertyBusinessObjectUI {
             if (p.getClientProperty("ziem-type") != null) {
                 //we have a ziem-type property
                 typeName = (String) p.getClientProperty("ziem-type");
-                ////////log.p("ziem-type is " + typeName);
+                //////////Log.p("ziem-type is " + typeName);
             } else {
                 //retrieve the last 
                 String bType = typeName;
                 String[] tt = Util.split(typeName, ".");
                 typeName = tt[tt.length - 1];
-                //////log.p("Decoded type " + typeName);
+                ////////Log.p("Decoded type " + typeName);
                 //We 
                 if (typeName.indexOf("long") >= 0) {
                     typeName = "Number";
@@ -305,11 +305,11 @@ public class PropertyBusinessObjectUI {
 
             switch (t) {
                 case TextArea.NUMERIC:
-                    ////////log.p("Numeric");
+                    //////////Log.p("Numeric");
                     typeName = "Number";
                     break;
                 case TextArea.DECIMAL:
-                    ////////log.p("Numeric");
+                    //////////Log.p("Numeric");
                     typeName = "Number";
                 case TextArea.PASSWORD:
                     ////System.out.println("PassWord");
@@ -324,22 +324,22 @@ public class PropertyBusinessObjectUI {
         if (p.getClientProperty("ziem-type") != null) {
             //we have a ziem-type property
             typeName = (String) p.getClientProperty("ziem-type");
-            ////////log.p("ziem-type is " + typeName);
+            //////////Log.p("ziem-type is " + typeName);
         }
 
         st.name.set(typeName);
         st.description.set(typeName);
         st.surveyjs_type.set(objectType);
-        ////////log.p(p.getName() +" " + typeName);
-        ////////log.p(typeName);
-        // ////////log.p("PBOView Service Attribute Type" + st.getPropertyIndex().toString());
+        //////////Log.p(p.getName() +" " + typeName);
+        //////////Log.p(typeName);
+        // //////////Log.p("PBOView Service Attribute Type" + st.getPropertyIndex().toString());
 
         return st;
     }
 
     private void makeAttributeOptions(ServiceAttribute sa, PropertyBase b) {
         //we setup the rest of the attributes 
-        //////log.p(b.getName());
+        ////////Log.p(b.getName());
         HashMap options = (HashMap) b.getClientProperty("ziem-property-options");
 
         if (options != null) {
@@ -367,18 +367,18 @@ public class PropertyBusinessObjectUI {
     private String getValueOfProperty(PropertyBusinessObject bo, PropertyBase b) {
         //we need to determine what the value of the property is given the property
         String pValue = "";
-        ////////log.p("BO business object \n" + bo.getPropertyIndex().);
+        //////////Log.p("BO business object \n" + bo.getPropertyIndex().);
         //bo.getPropertyIndex().
-        //////log.p("BO From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
+        ////////Log.p("BO From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
         //HashMap m = (HashMap) bo.getPropertyIndex().toMapRepresentation();
         PropertyIndex m = bo.getPropertyIndex();
-        //////log.p("BO From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
-        //////log.p("BO Type From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
+        ////////Log.p("BO From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
+        ////////Log.p("BO Type From propertyindex \n" + bo.getPropertyIndex().get(b.getName().toString()));
         if (m.get(b.getName()) != null) {
             Class c = b.getGenericType();
             if (c == null) {
-                //////log.p("Class property " + m.get(b.getName()));
-                //////log.p("Cannonical " + b.getClass().getCanonicalName());
+                ////////Log.p("Class property " + m.get(b.getName()));
+                ////////Log.p("Cannonical " + b.getClass().getCanonicalName());
                 //if the type is a list then we have to 
                 pValue = m.get(b.getName()).toString();
                 //if (b.getClass().getCanonicalName().contains("List")) {
@@ -400,8 +400,8 @@ public class PropertyBusinessObjectUI {
                 pValue = String.valueOf(m.get(b.getName()));
             }
             //what if it is a list, how will it be represented?
-            //////log.p("Getting Value of " + c.getName());
-            //////log.p(b.getClass().getName());
+            ////////Log.p("Getting Value of " + c.getName());
+            ////////Log.p(b.getClass().getName());
             if (c.getName().indexOf("ixzdore") >= 0) {
                 //this is a reference and in this case a multilist
                 //the question then is how does a multilist display
@@ -435,7 +435,7 @@ public void updatePropertyBusinessObject(Container cnt, PropertyBusinessObject p
             Request request = zv.getRequest();
             if (request != null) {
                 //we now have to match the po to the request object.
-                //////////log.p("Saved " + request.getPropertyIndex().toString());
+                ////////////Log.p("Saved " + request.getPropertyIndex().toString());
                 //we have to extract value from the request and put it in the 
                 //propertybusinessobject
                 Object[] rps = request.request_parameters.asList().toArray();
@@ -457,9 +457,9 @@ public void updatePropertyBusinessObject(Container cnt, PropertyBusinessObject p
         HashMap m = (HashMap) po.getPropertyIndex().toMapRepresentation();
         HashMap p = (HashMap) rp.getPropertyIndex().toMapRepresentation();
 
-        // ////////log.p(rp.getPropertyIndex().toString());
+        // //////////Log.p(rp.getPropertyIndex().toString());
         String parameter = rp.service_attribute.get(0).name.get();// name of the parameter
-        // ////////log.p(parameter);
+        // //////////Log.p(parameter);
         String value = rp.value.get();
         //we need to convert the value based on the type of the property
         //for instance image, date, long, numeric
@@ -470,15 +470,15 @@ public void updatePropertyBusinessObject(Container cnt, PropertyBusinessObject p
             }
         }
         po.getPropertyIndex().populateFromMap(m);
-        // ////////log.p("Assigned PropertyBusinessObject \n" + po.getPropertyIndex().toString());
+        // //////////Log.p("Assigned PropertyBusinessObject \n" + po.getPropertyIndex().toString());
 
     }
 
     private String getObjectSelectionList(PropertyBase p) {
 
         String objectList = "";
-        //////log.p("property base type " + p.getClass().getCanonicalName());
-        ////log.p("Property Value " + p.toString());
+        ////////Log.p("property base type " + p.getClass().getCanonicalName());
+        //////Log.p("Property Value " + p.toString());
          
         if (!p.toString().equalsIgnoreCase("NULL") ){
         ListProperty l = (ListProperty) p;
@@ -486,14 +486,14 @@ public void updatePropertyBusinessObject(Container cnt, PropertyBusinessObject p
             //if there is an object then we need to convert it to a po
             PropertyBusinessObject po = (PropertyBusinessObject) o;
             objectList = po.getPropertyIndex().toJSON() + "," + objectList;
-            //////log.p("Objectlist " + objectList);
+            ////////Log.p("Objectlist " + objectList);
         }
         if (objectList.lastIndexOf(",") > 0) {
             objectList = "[" + objectList.substring(0, objectList.lastIndexOf(",")) + "]";
         } else {
             objectList = "[" + objectList + "]";
         }
-        //////log.p("Objectlist " + objectList);
+        ////////Log.p("Objectlist " + objectList);
         }else {
             //if it is null, we need to just maake a list of all posssbile
             //we need to be sure that we can get the list of the items

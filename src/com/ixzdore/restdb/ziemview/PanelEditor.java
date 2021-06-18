@@ -10,7 +10,7 @@ import com.codename1.io.CharArrayReader;
 import com.codename1.io.FileSystemStorage;
 import com.codename1.io.JSONParser;
 import com.codename1.io.Log;
-import static com.codename1.io.Log.p;
+//import static com.codename1.io.//Log.p;
 import com.codename1.io.Util;
 import com.codename1.l10n.ParseException;
 import com.codename1.l10n.SimpleDateFormat;
@@ -113,31 +113,31 @@ public class PanelEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                             c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
            removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString()); 
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                selfref.setVisible(false);
                
-                ////////log.p("Remove this component \n"  + selfref);
-                ////////log.p("Container " + editContainer.getParent().getParent());
-                ////////log.p("Parent Container " + editContainer.getParent().getParent().getParent());
+                //////////Log.p("Remove this component \n"  + selfref);
+                //////////Log.p("Container " + editContainer.getParent().getParent());
+                //////////Log.p("Parent Container " + editContainer.getParent().getParent().getParent());
                 editContainer.getParent().getParent().removeComponent(selfref);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
                 editContainer.getParent().getParent().getParent().revalidate();                
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });        
@@ -148,12 +148,12 @@ public class PanelEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
         editContainer.add(headerContainer).add(panelContainer);
         editContainer.revalidate();
         editContainer.repaint();
@@ -169,8 +169,6 @@ public class PanelEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -211,26 +209,26 @@ public class PanelEditor extends BaseEditorImpl {
 
     public RequestParameter getFrom() {
         //we have to go through all the components and return the requestparameters to gether
-        //Log.p("Getting RequestParameter");
+        ////Log.p("Getting RequestParameter");
         String value="[";
         List<Component> content = panelContainer.getChildrenAsList(true);
             for (Component c : content) {
-                //////////log.p("\n\nComponent to extract " + c.getName());
+                ////////////Log.p("\n\nComponent to extract " + c.getName());
                 String v="";
                 AttributeEditor a = (AttributeEditor) c;                
                 RequestParameter r = null;
-                r = (RequestParameter) a.getAttributeValue();               
+                r = a.getAttributeValue();
                 if ((r != null) && (r.service_attribute.size() > 0)) {
                     ServiceAttribute s = r.service_attribute.get(0);
                     if (s != null) {
                         if ( value.length() > 2) value = value +","; 
                         value = value  + "{" + "'" + s.display_label.get() + "':'" + r.value.get() + "'}";
-                        //Log.p(value);
+                        ////Log.p(value);
                     }
                 }
             }
         value = value + "]";
-        //Log.p(value);
+        ////Log.p(value);
         this.requestParameter.value.set(value);
         return this.requestParameter;
     }
@@ -273,18 +271,18 @@ public class PanelEditor extends BaseEditorImpl {
         //
         //we get the service 
         //so first thing is to parse the optionlist
-//Log.p("OptionList is " + optionList);
+////Log.p("OptionList is " + optionList);
 JSONParser json = new JSONParser();
 try {
     Reader r = new CharArrayReader(optionList.toCharArray());
     Map<String, Object> data = json.parseJSON(r);
     java.util.List<Map<String, Object>> content = (java.util.List<Map<String, Object>>)data.get("root");
-    //Log.p(content.toString());
+    ////Log.p(content.toString());
     for(Map<String, Object> obj : content) {
-       // Log.p(obj.toString());
+       // //Log.p(obj.toString());
         String service = (String)obj.get("service");
         String name = (String)obj.get("name"); 
-        //Log.p(name + " " + service);
+        ////Log.p(name + " " + service);
         if (( name != null ) && (service != null ) ) panelContainer.add(getAttributeComponent(service,name));
     }
 } catch(IOException err) {
@@ -298,7 +296,7 @@ panelContainer.revalidate();
         //given service name and attribute name find it 
         Component attr = null;
         ServiceAttribute s = localAPI.getServiceAttributeByNameAndService(service,name);
-       // Log.p("Service Attribute " + s.getPropertyIndex().toJSON());
+       // //Log.p("Service Attribute " + s.getPropertyIndex().toJSON());
         if (s != null){
                      attr = new AttributeEditor(s, true);
         }

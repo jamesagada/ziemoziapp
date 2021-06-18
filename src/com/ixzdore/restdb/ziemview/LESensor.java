@@ -64,11 +64,11 @@ public class LESensor extends BaseEditorImpl {
     public final SpanLabel textView = new SpanLabel(); //to be used for view
     public final Container headerContainer = new Container();
     private Bluetooth bt;
-    private Container devicesCnt = new Container();
+    private final Container devicesCnt = new Container();
     private Map devices = new HashMap();
 
     public LESensor() {
-        //////log.p("LESensor");
+        ////////Log.p("LESensor");
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         devicesCnt.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
@@ -78,7 +78,7 @@ public class LESensor extends BaseEditorImpl {
             //devices.clear();
             devices = new HashMap();
             bt = new Bluetooth();
-            //////log.p("Enable Ble");
+            ////////Log.p("Enable Ble");
             try {
                 if (!bt.isEnabled()) {
                     bt.enable();
@@ -87,18 +87,18 @@ public class LESensor extends BaseEditorImpl {
                     bt.requestPermission();
                 }
             } catch (Exception ex) {
-                //////log.p(ex.getMessage());
+                ////////Log.p(ex.getMessage());
             }
             //initialize bluetooth
-            //////log.p("Initialize");
+            ////////Log.p("Initialize");
             try {
                 bt.initialize(true, false, "bluetoothleplugin");
             } catch (Exception ex) {
-               //////log.p(ex.getMessage());
+               ////////Log.p(ex.getMessage());
             }
             //
 
-            //////log.p("Scan for bluetooth");
+            ////////Log.p("Scan for bluetooth");
             try {
 
                 bt.startScan(new ActionListener() {
@@ -119,13 +119,13 @@ public class LESensor extends BaseEditorImpl {
                                 }
                             }
                         } catch (JSONException ex) {
-              //////log.p(ex.getMessage());
+              ////////Log.p(ex.getMessage());
                         }
                     }
                 }, null, true, Bluetooth.SCAN_MODE_LOW_POWER, Bluetooth.MATCH_MODE_STICKY,
                         Bluetooth.MATCH_NUM_MAX_ADVERTISEMENT, Bluetooth.CALLBACK_TYPE_ALL_MATCHES);
             } catch (Exception ex) {
-              //////log.p(ex.getMessage());
+              ////////Log.p(ex.getMessage());
             }
         });
     }
@@ -140,7 +140,7 @@ public class LESensor extends BaseEditorImpl {
             try {
                 detail.setText(obj.toString(1));
             }catch(Exception e){
-                //////log.p(e.getMessage());
+                ////////Log.p(e.getMessage());
             }
             MultiButton mb = new MultiButton(obj.getString("name"));
             mb.setTextLine2(address);
@@ -195,13 +195,13 @@ public class LESensor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -211,17 +211,17 @@ public class LESensor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
-        //////log.p("Setting up edit container");
+        ////////Log.p("Setting up edit container");
         editContainer.add(headerContainer).add(scanCode).add(devicesCnt);
-        //////log.p("Refreshing View");
+        ////////Log.p("Refreshing View");
         editContainer.revalidate();
         return editContainer;
     }
@@ -235,8 +235,6 @@ public class LESensor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

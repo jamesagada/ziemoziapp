@@ -94,7 +94,7 @@ public class BooleanEditor extends BaseEditorImpl {
         p.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                //////log.p(" Boolean " + attr.name.get() + " is " + booleanPicker.getPicker().getSelectedString() );
+                ////////Log.p(" Boolean " + attr.name.get() + " is " + booleanPicker.getPicker().getSelectedString() );
                 requestParameter.value.set(booleanPicker.getPicker().getSelectedString());               
                 //requestParameter.value.set(textField.getText());
                 //System.out.println("Attribute " + attr.display_label.get() + " is "
@@ -136,24 +136,24 @@ public class BooleanEditor extends BaseEditorImpl {
            addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // //////log.p(editContainer.getParent().getParent().toString());                
+               // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
         //editContainer.add(helpButton).add(booleanPicker);
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
         editContainer.add(headerContainer).add(booleanPicker);
         editContainer.revalidate();
         return editContainer;
@@ -168,8 +168,6 @@ public class BooleanEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

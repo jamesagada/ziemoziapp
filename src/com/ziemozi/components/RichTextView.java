@@ -18,8 +18,8 @@ import java.io.IOException;
 
 public class RichTextView extends Container {
     private String text;
-    private float fontSize = 2.6f;
-    private EventDispatcher listeners = new EventDispatcher();
+    private final float fontSize = 2.6f;
+    private final EventDispatcher listeners = new EventDispatcher();
     
     private Font currentFont;
     private int currentColor = 0;
@@ -156,8 +156,8 @@ public class RichTextView extends Container {
         @Override
         protected void attribute(
                 String tag, String attributeName, String value) {
-            if(tag.toLowerCase().equals("a") && 
-                    attributeName.toLowerCase().equals("href")) {
+            if(tag.equalsIgnoreCase("a") &&
+                    attributeName.equalsIgnoreCase("href")) {
                 currentLink = value;
             }
         }

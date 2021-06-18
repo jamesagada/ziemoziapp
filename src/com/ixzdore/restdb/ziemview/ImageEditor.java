@@ -133,7 +133,7 @@ public class ImageEditor extends BaseEditorImpl {
                 textField.setText(this.requestParameter.value.get());
             }
         }
-        ////log.p("Image Set");
+        //////Log.p("Image Set");
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         //pickImage.setText(attr.display_label.get());
@@ -182,25 +182,25 @@ public class ImageEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // //////log.p(editContainer.getParent().getParent().toString());                
+                // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                                             c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
         removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // //////log.p(editContainer.getParent().getParent().toString());                
+                // ////////Log.p(editContainer.getParent().getParent().toString());
                 editContainer.getParent().getParent().removeComponent(selfref);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -212,12 +212,12 @@ public class ImageEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
         editContainer.add(BorderLayout.NORTH, headerContainer);
@@ -237,8 +237,6 @@ public class ImageEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter() {
@@ -307,7 +305,7 @@ public class ImageEditor extends BaseEditorImpl {
     }
 
     public void setImage(String filePath, ScaleImageLabel iv) {
-        ////log.p("Checking Image");
+        //////Log.p("Checking Image");
         if ((filePath == null) || (filePath.length() < 1)) {
             //ToastBar.showInfoMessage("No Image Selected");
             iv.setIcon(FontImage.createMaterial
@@ -356,7 +354,7 @@ public class ImageEditor extends BaseEditorImpl {
         }
         if (existsInStorage(filename)) {
             try (InputStream is
-                    = createStorageInputStream(filename);) {
+                    = createStorageInputStream(filename)) {
                 return Image.createImage(is);
             } catch (IOException err) {
                 Log.e(err);

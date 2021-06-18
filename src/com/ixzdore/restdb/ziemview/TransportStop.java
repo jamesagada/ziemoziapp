@@ -43,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+//import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -93,21 +94,21 @@ public class TransportStop extends BaseEditorImpl {
         // we just create the field
         //textLabel.setText(_id);
         setCurrentPosition();
-        ////////log.p("Address coming to edit is " + textField.getText());
+        //////////Log.p("Address coming to edit is " + textField.getText());
         if (this.requestParameter == null) {
             createRequestParameter(attr.type_of_attribute.get(0));
             setCurrentPosition();
-            ////////log.p("Address for null requestParameter is " + textField.getText());
+            //////////Log.p("Address for null requestParameter is " + textField.getText());
         } else {
             //requestParameter exists
             //so we now set the value attribute to the value of the component
-            ////////log.p("Request Parameter Value is " + requestParameter.value.get());
+            //////////Log.p("Request Parameter Value is " + requestParameter.value.get());
             if (this.requestParameter.value.get() != null) {
                 textField.setText(this.requestParameter.value.get());
             }
-            ////////log.p("Address for non null requestParmeter value is " + textField.getText());
+            //////////Log.p("Address for non null requestParmeter value is " + textField.getText());
         }
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
@@ -116,14 +117,14 @@ public class TransportStop extends BaseEditorImpl {
        // textField.setColumns(20);
        // textField.setScrollVisible(true);
         //setEditorConstraints();
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 requestParameter.value.set(textField.getText());
                 ////System.out.println("Attribute " + attr.display_label.get() + " is "
                  //       + requestParameter.getPropertyIndex().toJSON());
-                       ////////log.p("Address is " + textField.getText());  
+                       //////////Log.p("Address is " + textField.getText());
                 if (textField.getText().length() > 0) {
                     try {
                         
@@ -134,7 +135,7 @@ public class TransportStop extends BaseEditorImpl {
                         locationField.setLatitude(c.getLatitude());
                         locationField.setLongitude(c.getLongitude());
                         }
-                        ////////log.p("Co-ordinates is " + c.toString());
+                        //////////Log.p("Co-ordinates is " + c.toString());
                     }catch(Exception e){
                         e.printStackTrace();
                         ToastBar.showErrorMessage("Something went wrong");
@@ -146,7 +147,7 @@ public class TransportStop extends BaseEditorImpl {
 
         //System.out.println("Attribute to edit is " + attr.getPropertyIndex().toJSON());
         // textField.setText(attr.default_value.get().toString());
-        ////////log.p("Address is " + textField.getText());
+        //////////Log.p("Address is " + textField.getText());
         helpButton.getStyle().setAlignment(LEFT);
         helpButton.addActionListener(new ActionListener() {
             @Override
@@ -162,13 +163,13 @@ public class TransportStop extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -178,12 +179,12 @@ public class TransportStop extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(showMap).add(textField);
@@ -200,8 +201,6 @@ public class TransportStop extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -274,7 +273,8 @@ public class TransportStop extends BaseEditorImpl {
             request.addArgument("latlng", coord.getLatitude() + "," + coord.getLongitude());
 
             NetworkManager.getInstance().addToQueueAndWait(request);
-            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()), "UTF-8"));
+            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()),
+                    "UTF-8"));
             if (response.get("results") != null) {
                 ArrayList results = (ArrayList) response.get("results");
                 if (results.size() > 0) {
@@ -292,7 +292,8 @@ public class TransportStop extends BaseEditorImpl {
             @Override
             protected void readResponse(InputStream input) throws IOException {
                 String ret = "";
-                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input, "UTF-8"));
+                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input,
+                        "UTF-8"));
                 if (response.get("results") != null) {
                     ArrayList results = (ArrayList) response.get("results");
                     if (results.size() > 0) {
@@ -317,7 +318,8 @@ public class TransportStop extends BaseEditorImpl {
             request.addArgument("address", address);
 
             NetworkManager.getInstance().addToQueueAndWait(request);
-            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()), "UTF-8"));
+            Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(new ByteArrayInputStream(request.getResponseData()),
+                    "UTF-8"));
             if (response.get("results") != null) {
                 ArrayList results = (ArrayList) response.get("results");
                 if (results.size() > 0) {
@@ -338,7 +340,8 @@ public class TransportStop extends BaseEditorImpl {
             @Override
             protected void readResponse(InputStream input) throws IOException {
                 Coord ret = null;
-                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input, "UTF-8"));
+                Map<String, Object> response = new JSONParser().parseJSON(new InputStreamReader(input,
+                        "UTF-8"));
                 if (response.get("results") != null) {
                     ArrayList results = (ArrayList) response.get("results");
                     if (results.size() > 0) {
@@ -446,7 +449,7 @@ public class TransportStop extends BaseEditorImpl {
     }
 
     public void setCurrentPosition() {
-        ////////log.p("Set current position");
+        //////////Log.p("Set current position");
         InfiniteProgress ip = new InfiniteProgress();
         Dialog ipDlg = ip.showInfiniteBlocking();
         Location location = LocationManager.getLocationManager().getCurrentLocationSync(30000);
@@ -465,9 +468,9 @@ public class TransportStop extends BaseEditorImpl {
         locationField = location;
         Double loc1 = location.getLatitude();
         Double loc2 = location.getLongitude();
-        ////////log.p("Latitude: " + loc1);
-        ////////log.p("Longitude: " + loc2);
-        ////////log.p("Current Address " + textField.getText());
+        //////////Log.p("Latitude: " + loc1);
+        //////////Log.p("Longitude: " + loc2);
+        //////////Log.p("Current Address " + textField.getText());
     }
 
 }

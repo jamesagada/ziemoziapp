@@ -52,7 +52,7 @@ public class BaseEditorImpl extends Component implements BaseEditor{
     public boolean editorMode = true;
     public final Button helpButton = helpButton();
     public final Button requiredButton = new Button("*");
-    public final Button addAnotherButton = new Button("+");
+    public final Button addAnotherButton = anotherButton();
     public final Button removeButton = new Button("-");
     public FieldWatcher fieldWatcher = new FieldWatcher();
     public FieldBroadcast fieldBroadcast = new FieldBroadcast();
@@ -61,14 +61,15 @@ public class BaseEditorImpl extends Component implements BaseEditor{
     public Container edit(ServiceAttribute attr) {
         requestParameter.value.set(attr.default_value.get());
         return null;
-    };
+    }
 
     @Override
     public Container view(ServiceAttribute attr) {
         editorMode=false;
          this.serviceAttribute = attr;       
         return edit(this.serviceAttribute);
-    };  
+    }
+
     @Override
     public void setRelevance(Object relevance){
         editContainer.setEnabled(Boolean.parseBoolean(relevance.toString()));
@@ -127,14 +128,20 @@ public class BaseEditorImpl extends Component implements BaseEditor{
     public Button helpButton(){
         //create a help button
         Button h = new Button();
+        h.setUIID("SmallLabel");
         h.setIcon(FontImage.createMaterial(FontImage.MATERIAL_HELP,
                 h.getSelectedStyle()));
+        h.getStyle().setAlignment(LEFT);
         return h;
     }
     public Button anotherButton(){    //create add button
         Button h = new Button();
-        h.setIcon(FontImage.createMaterial(FontImage.MATERIAL_ADD_CIRCLE_OUTLINE,
+        h.setUIID("SmallLabel");
+        h.setIcon(FontImage.createMaterial(FontImage.MATERIAL_ADD_CIRCLE,
                 h.getSelectedStyle()));
+        h.setTextPosition(RIGHT);
+        h.getStyle().setAlignment(RIGHT);
+        h.setText(" ");
         return h;
     }    
     public Button removeButton(){    //create add button

@@ -147,14 +147,14 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // ////////log.p(editContainer.getParent().getParent().toString());                
+                // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -164,12 +164,12 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             headerContainer.add(addAnotherButton);
         }
 
@@ -187,8 +187,6 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -276,7 +274,7 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
                 String fileName = "options-" + this.serviceAttribute._id.get() + "_"
                         + this.serviceAttribute._parent_id;
                 //cheeck if there is any file like this already and if it is not too lod
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 if (!FileSystemStorage.getInstance()
                         .exists(FileSystemStorage.getInstance().getAppHomePath() + "/"
                                 + fileName)) {
@@ -296,7 +294,7 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
                                 true);
                     }
                 }
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);                
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 try {
                     //read the contents of the file to options
                     options = Util.readToString(FileSystemStorage.getInstance().
@@ -332,8 +330,8 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
 
             if (objType != null) {
                 //try and lookup the obj class with a factory 
-                //////log.p("Object type is " + objType);
-                //////log.p("MultiObjectList is " + optionList);
+                ////////Log.p("Object type is " + objType);
+                ////////Log.p("MultiObjectList is " + optionList);
                 Object cClass = objectFactory.get(objType);
                 if (cClass != null) {
                     try {
@@ -343,7 +341,7 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
 
                         pba.addAll(pbos);
                     } catch (Exception e) {
-                        //////log.p(e.getMessage());
+                        ////////Log.p(e.getMessage());
                     }
                 }
             }
@@ -354,7 +352,7 @@ public class ObjectListAndAddEditor extends BaseEditorImpl {
                 String name = "" + px.getPropertyIndex().get("name").toString();
                 String description = "" + px.getPropertyIndex().get("description").toString();
                 String value = "" + px.getPropertyIndex().get("value");
-                //////log.p("Multi object desc " + description);
+                ////////Log.p("Multi object desc " + description);
                 data.add(createListEntry(name, description + " " + value, px));
             }
         }

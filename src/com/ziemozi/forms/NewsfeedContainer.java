@@ -7,11 +7,10 @@ import com.codename1.components.SpanLabel;
 import com.codename1.components.ToastBar;
 import com.codename1.components.xmlview.DefaultXMLViewKit;
 import com.codename1.components.xmlview.XMLView;
+import com.codename1.io.Util;
+import com.codename1.l10n.DateFormatPatterns;
 import com.codename1.ui.plaf.Border;
-import com.codename1.ui.plaf.RoundBorder;
-import com.ziemozi.components.RichTextView;
-import com.ixzdore.restdb.ziemobject.Post;
-import com.ixzdore.restdb.ziemobject.User_bak;
+import com.codename1.util.DateUtil;
 import com.ziemozi.server.ServerAPI;
 import com.codename1.io.Log;
 import com.codename1.media.Media;
@@ -21,7 +20,6 @@ import static com.codename1.ui.CN.*;
 import com.codename1.ui.CheckBox;
 import com.codename1.ui.Component;
 import com.codename1.ui.Container;
-import com.codename1.ui.Display;
 import com.codename1.ui.FontImage;
 import com.codename1.ui.Form;
 import com.codename1.ui.Image;
@@ -69,14 +67,14 @@ public class NewsfeedContainer extends InfiniteContainer {
             rs = xmlw.toXML(elem);
             rs = StringUtil.replaceAll(rs, "<p />", "");
         }
-        //////log.p("Checked XML \n" + rs);
+        ////////Log.p("Checked XML \n" + rs);
         return rs;
     }
 
     @Override
     public Component[] fetchComponents(int index, int amount) {
-        // ////////log.p("\n\nindex is " + index);
-        // ////////log.p("\n\namount is " + amount);
+        // //////////Log.p("\n\nindex is " + index);
+        // //////////Log.p("\n\namount is " + amount);
         ArrayList<Component> components = new ArrayList<>();
          response = localAPI.newsfeed(0, amount + 9999, false);
         if (index == 0) {
@@ -85,7 +83,7 @@ public class NewsfeedContainer extends InfiniteContainer {
         }
 
         if ((response == null) || response.isEmpty()) {
-            ////////log.p("No Requests to show \n");
+            //////////Log.p("No Requests to show \n");
             if (index == 0) {
                 return UIUtils.toArray(components);
             }
@@ -104,10 +102,10 @@ public class NewsfeedContainer extends InfiniteContainer {
                 Request p = response.get(offset);
                 p.refreshUser();
                 if (p.ziemozi_user.size() > 0) {
-                    ////////log.p("users attached to response " + p.ziemozi_user.size());
+                    //////////Log.p("users attached to response " + p.ziemozi_user.size());
                     int lastuser = p.ziemozi_user.size() - 1; // this is a hack
                     //lastuser = 0;
-                    ////////log.p("User From Request " + p.ziemozi_user.get(lastuser).getPropertyIndex().toString());
+                    //////////Log.p("User From Request " + p.ziemozi_user.get(lastuser).getPropertyIndex().toString());
                     User pu = p.ziemozi_user.get(lastuser);
                     components.add(createSimpleNewsItem(pu, p));
                     components.add(UIUtils.createHalfSpace());
@@ -118,12 +116,12 @@ public class NewsfeedContainer extends InfiniteContainer {
     }
 
     private static Container createNewsTitle(User u, Request p) {
-        //////////log.p("\n\n Request \n" + p.getPropertyIndex().toString());
-        //////////log.p(u.getPropertyIndex().toString());
-        //////////log.p(u.fullName());
-        Log.p("Bfore Refreshing " + p.service.get(0).name.get());
+        ////////////Log.p("\n\n Request \n" + p.getPropertyIndex().toString());
+        ////////////Log.p(u.getPropertyIndex().toString());
+        ////////////Log.p(u.fullName());
+        //Log.p("Bfore Refreshing " + p.service.get(0).name.get());
         //p.refreshService();
-        Log.p(p.service.get(0).name.get());
+        //Log.p(p.service.get(0).name.get());
         String ds = p.service.get(0).description.get();
         Button avatar = new Button("", u.getAvatar(6.5f), "CleanButton");
         Button name = new Button(u.fullName(), "PostTitle");
@@ -135,7 +133,7 @@ public class NewsfeedContainer extends InfiniteContainer {
             String sd = s.substring(0, s.indexOf("T"));
             //2018-07-27T11:49:47.014Z
             sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            ////////log.p("\n\n" + sd + "\n\n");
+            //////////Log.p("\n\n" + sd + "\n\n");
             d = sdf.parse(s);
         } catch (ParseException ex) {
             //we will figure this out later.          
@@ -160,9 +158,9 @@ public class NewsfeedContainer extends InfiniteContainer {
      * @return
      */
     private static Container createSimpleNewsTitle(User u, Request p) {
-        //////////log.p("\n\n Request \n" + p.getPropertyIndex().toString());
-        //////////log.p(u.getPropertyIndex().toString());
-        //////////log.p(u.fullName());
+        ////////////Log.p("\n\n Request \n" + p.getPropertyIndex().toString());
+        ////////////Log.p(u.getPropertyIndex().toString());
+        ////////////Log.p(u.fullName());
         p.refreshService();
         Button avatar = new Button("", u.getAvatar(6.5f), "CleanButton");
         Button name = new Button(u.fullName(), "PostTitle");
@@ -173,7 +171,7 @@ public class NewsfeedContainer extends InfiniteContainer {
             String sd = s.substring(0, s.indexOf("T"));
             //2018-07-27T11:49:47.014Z
             sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            ////////log.p("\n\n" + sd + "\n\n");
+            //////////Log.p("\n\n" + sd + "\n\n");
             d = sdf.parse(s);
         } catch (ParseException ex) {
             //we will figure this out later.          
@@ -192,8 +190,8 @@ public class NewsfeedContainer extends InfiniteContainer {
     }
 
     public static Container createNewsItem(User u, Request p) {
-        //////////log.p("User " + u.fullName());
-        //////////log.p("User Json " + u.getPropertyIndex().toString());
+        ////////////Log.p("User " + u.fullName());
+        ////////////Log.p("User Json " + u.getPropertyIndex().toString());
         Container titleArea = createNewsTitle(u, p);
         Component body;
         String style = null;
@@ -207,7 +205,7 @@ public class NewsfeedContainer extends InfiniteContainer {
             summary = StringUtil.replaceAll(p.summary.get(),
                     " <carousel>   <img src=\"\"/>  </carousel>",
                     "");
-            ////////log.p("Adjusted " + summary);
+            //////////Log.p("Adjusted " + summary);
         }
         if (summary.length() > 0) {
             p.summary.set(summary);
@@ -289,8 +287,8 @@ public class NewsfeedContainer extends InfiniteContainer {
      *
      */
     public static Container createSimpleNewsItem(User u, Request p) {
-        //////////log.p("User " + u.fullName());
-        //////////log.p("User Json " + u.getPropertyIndex().toString());
+        ////////////Log.p("User " + u.fullName());
+        ////////////Log.p("User Json " + u.getPropertyIndex().toString());
         Container titleArea = createNewsTitle(u, p);
         Component body;
         String style = null;
@@ -299,14 +297,14 @@ public class NewsfeedContainer extends InfiniteContainer {
         //}
         String summary = p.summary.get() + "";
         summary = p.simpleRequestSummary();
-        Log.p(summary);
+        //Log.p(summary);
         if ((summary.indexOf("http") < 0)
                 || (summary.indexOf("file:") < 0)) {
             //find the portion that contains carrousel
             summary = StringUtil.replaceAll(summary,
                     " <carousel>   <img src=\"\"/>  </carousel>",
                     "");
-            ////////log.p("Adjusted " + summary);
+            //////////Log.p("Adjusted " + summary);
         }
         //if (summary.length() > 0) {
         //    p.summary.set(summary);
@@ -415,7 +413,7 @@ public class NewsfeedContainer extends InfiniteContainer {
     }
 
     private static Container createPostStats(Request p) {
-        ////////log.p("Creating Stats for " + p.getPropertyIndex().toString());
+        //////////Log.p("Creating Stats for " + p.getPropertyIndex().toString());
         Container stats = new Container(new BorderLayout(),
                 "PaddedContainer");
         if (p.likes.size() > 0) {
@@ -426,22 +424,76 @@ public class NewsfeedContainer extends InfiniteContainer {
             stats.add(WEST, BoxLayout.encloseX(thumbUp, count));
         }
         //children will be the size of the comments children.
-//        ////////log.p("\n\nNumber of comments = " + "0" + p._children.asList().size());
+//        //////////Log.p("\n\nNumber of comments = " + "0" + p._children.asList().size());
         p.refreshComments();
         int t = p.comments.asList().size();
 //        List<Request> r = p.comments.asList();
 //        for (Request rr:r){
-//            ////////log.p("Comment " + rr.getPropertyIndex().toJSON());
+//            //////////Log.p("Comment " + rr.getPropertyIndex().toJSON());
 //        }
         if (p.comments != null) {
             if (p.comments.asList().size() > 0) {
                 stats.add(EAST, new Label(t + " comments",
                         "SmallLabel"));
+                stats.add(BOTTOM, new Label(getStatus(p.comments.asList()),"SmallLabel"));
+                stats.getAllStyles().setBgColor(0xFFFFFF);
+                stats.getAllStyles().setBgTransparency(255);
             }
         }
         return stats;
     }
 
+    private static String getStatus(final List<Request> asList) {
+        String status ="";
+        //we need to find the latest status in the comments
+        //so we go throgh the
+        Request status_request = new Request();
+
+        for(Request r:asList){
+            if (r.summary.get().contains("Acknowledge")){
+                //Log.p("Request Comment Date " + r._created.get());
+                //Log.p(" Converted" + dateFrom(r._created.get()).toString());
+
+                if (status_request._created.get() == null ) status_request=r;
+                if (DateUtil.compare(dateFrom(status_request._created.get()),
+                        dateFrom((r._created.get()))) < 0) {
+                    status_request = r;
+                }
+            }
+        }
+
+        //String[] statuses = status_request.summary.get().split("</p");
+        String[] statuses = Util.split(status_request.summary.get(),"</p");
+        for (String s:statuses){
+            if ((s.toUpperCase().contains("WALLET")) ||
+                    s.toUpperCase().contains("STATUS")||
+                    s.toUpperCase().contains("TRANSACTION")||
+                    s.toUpperCase().contains("ERROR")||
+                    s.toUpperCase().contains("BALANCE")||
+                    s.toUpperCase().contains("CLOSED")){
+                status=s;
+                break;
+            }
+        }
+        status= StringUtil.replaceAll(status,"<p>","");
+        status= StringUtil.replaceAll(status,"<","");
+        status= StringUtil.replaceAll(status,">","");
+        return status;
+
+    }
+private static Date dateFrom(String dateString){
+        //Log.p("Converting " + dateString);
+        Date date=new Date();
+    try {
+
+        date= new SimpleDateFormat ( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                .parse ( dateString );
+    } catch ( ParseException e ) {
+        //return Exceptions.handle (Date.class, "Not a valid JSON date", e);
+        //Log.p(e.getMessage());
+    }
+   return date;
+}
     private static Container createWelcomeBar() {
         //Button avatar = new Button(ServerAPI.me().getAvatar(6.5f), "Label");
         TextArea welcome = new TextArea();

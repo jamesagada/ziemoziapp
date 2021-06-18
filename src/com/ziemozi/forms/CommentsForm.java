@@ -2,6 +2,7 @@ package com.ziemozi.forms;
 
 import com.codename1.components.InfiniteProgress;
 import com.codename1.components.MultiButton;
+import com.codename1.components.SpanButton;
 import com.codename1.components.ToastBar;
 import com.codename1.components.xmlview.DefaultXMLViewKit;
 import com.codename1.components.xmlview.XMLView;
@@ -33,11 +34,11 @@ import com.ixzdore.restdb.ziemview.ZiemViewTab;
 import java.util.List;
 
 public class CommentsForm extends Form {
-    private TextField commentField = new TextField(); 
-    private Container comments = new Container(BoxLayout.y());
+    private final TextField commentField = new TextField();
+    private final Container comments = new Container(BoxLayout.y());
     private String replyCommentId;
-    private Component commentEditor;
-    private Form previous;
+    private final Component commentEditor;
+    private final Form previous;
     public CommentsForm(Request p, Request replyingTo) {
         super(p.title(), new BorderLayout());
         //we need to give requests title so we can refere to it
@@ -50,10 +51,10 @@ public class CommentsForm extends Form {
         //we can therefore just create a comment 
         //from the comment service definition
         //so we actually just edit the comment service
-                ////////log.p("\n\n" +
+                //////////Log.p("\n\n" +
 //                "Request on \nn" +
   //              p.getPropertyIndex().toJSON());
-        ////////log.p("\n\n" +
+        //////////Log.p("\n\n" +
     //            "Commenting on \nn" +
       //          replyingTo.getPropertyIndex().toJSON());
         ZiemViewTab zv = new ZiemViewTab();
@@ -73,6 +74,7 @@ public class CommentsForm extends Form {
         previous = getCurrentForm();
         getToolbar().addMaterialCommandToLeftBar("", 
             MATERIAL_ARROW_BACK, e -> previous.showBack());
+        addComment(p);
        for(Request cmt : p.comments.asList()) {
            addComment(cmt);
        }
@@ -125,7 +127,7 @@ public class CommentsForm extends Form {
                     getClientProperty("child");
                 if(chld == null) {
                     chld = BoxLayout.encloseY(c);
-                    chld.getAllStyles().setPaddingLeft(convertToPixels(3));
+                    chld.getAllStyles().setPaddingLeft(convertToPixels(5));
                     parent.putClientProperty("child", chld);
                     int pos = comments.getComponentIndex(parent);
                     comments.addComponent(pos + 1, chld);
@@ -144,31 +146,47 @@ public class CommentsForm extends Form {
         cm.refreshService();
         cm.refreshUser();
         MultiButton cb = new MultiButton(cm.service.get(0).description.get());
-        //////log.p("Comment type " + cm.service.get(0).description.get());
-        ////log.p(cm.getPropertyIndex().toString());
-        ////log.p("Comment user is " + cm.ziemozi_user.get(0).getPropertyIndex().toString());
+        SpanButton sb = new SpanButton();
+        ////////Log.p("Comment type " + cm.service.get(0).description.get());
+        //////Log.p(cm.getPropertyIndex().toString());
+        //////Log.p("Comment user is " + cm.ziemozi_user.get(0).getPropertyIndex().toString());
+
         List<User> u = cm.ziemozi_user.asList();
+        //Log.p("comment users " + u.size());
         for (User x:u){
-            ////log.p(x.getPropertyIndex().toString());
+            //////Log.p(x.getPropertyIndex().toString());
+            Image icon = getAvatarImage(x.avatar.get());
+            cb.setIcon(icon);
+            sb.setIcon(icon);
+        }
+        if(u.size() < 1){
+            cb.setIcon(getAvatarImage(null));
+            sb.setIcon(getAvatarImage(null));
         }
         cb.setTextLine1(cm.service.get(0).name.get());
         String s = cm.plain_summary();
-        ////log.p("Plain Summary from " + cm.summary.get() + " is " + s);
+        cb.setTextLine2(s);
+        sb.setText(s);
+        //////Log.p("Plain Summary from " + cm.summary.get() + " is " + s);
+        /*
         if (s.length() > 80 ) {
             cb.setTextLine2(s.substring(0,80));
             cb.setTextLine3(s.substring(81));
         }else {
-            cb.setTextLine2(s.substring(0,s.length()));
+            cb.setTextLine2(s);
             //cb.setTextLine3(s.substring(s.length()/2));
          
         }
+         */
         //TextArea c = new TextArea(cm.plain_summary());
-        cb.addActionListener(e -> new PostForm(cm).show());;
+        cb.addActionListener(e -> new PostForm(cm).show());
+        sb.addActionListener(e -> new PostForm(cm).show());
         //XMLView c = new XMLView();
         //new DefaultXMLViewKit().install(c); 
         //c.setXML(cm.summary.get());
         //c.setEditable(false);
         //c.setFocusable(false);
+        /*
         Label avatar = new Label();
         cb.setUIID("SmallLabel");
         if (u.size() > 0 ){
@@ -177,7 +195,12 @@ public class CommentsForm extends Form {
         }else{
             avatar = new Label(getAvatarImage(cm.ziemozi_user.get(1).avatar.get()));           
         }}
+
+
         Container content = BorderLayout.centerEastWest(cb, null, avatar);
+        */
+        Container content=BorderLayout.centerEastWest(cb,null,null);
+        //Container content=BorderLayout.centerEastWest(sb,null,null);
         if(cm._id.get() != null && cm._parent_id.get() == null) {
             Button reply = new Button("reply", "SmallBlueLabel");
             content.add(SOUTH, FlowLayout.encloseRight(reply));
@@ -199,7 +222,7 @@ public class CommentsForm extends Form {
     
     private Image getAvatarImage(String userId) {
         int size = convertToPixels(5);
-        ////////log.p("Avatar " + userId);
+        //////////Log.p("Avatar " + userId);
         if (userId == null || userId.isEmpty()) {
             userId="https://img.icons8.com/color/48/000000/human-head.png";
         }

@@ -76,7 +76,7 @@ public class RankEditor extends BaseEditorImpl{
                 textField.setText(this.requestParameter.value.get());
             starRank.setProgress(Integer.parseInt(textField.getText()));                
             }else {
-                ////////log.p(attr.getPropertyIndex().toString());
+                //////////Log.p(attr.getPropertyIndex().toString());
             textField.setText(attr.default_value.get());     
             starRank.setProgress(Integer.parseInt(textField.getText()));            
             }
@@ -90,7 +90,7 @@ public class RankEditor extends BaseEditorImpl{
             @Override
             public void actionPerformed(ActionEvent evt) {
                 requestParameter.value.set(String.valueOf(starRank.getProgress()));
-                //////log.p(" Rank is " + starRank.getProgress());
+                ////////Log.p(" Rank is " + starRank.getProgress());
               }
             
         });
@@ -111,14 +111,14 @@ public class RankEditor extends BaseEditorImpl{
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -128,12 +128,12 @@ public class RankEditor extends BaseEditorImpl{
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(sliderContainer);
@@ -149,7 +149,7 @@ public class RankEditor extends BaseEditorImpl{
         editContainer.add(textLabel).add(textField);
         editContainer.revalidate();
         return editContainer;
-     };  
+     }
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -212,7 +212,7 @@ public class RankEditor extends BaseEditorImpl{
         }
         //set the maximum size and minimum size
         String max = this.serviceAttribute.maximum_size.get();
-        //////log.p("Max Size " + max);
+        ////////Log.p("Max Size " + max);
         if (max.indexOf(".") >= 0) max = max.substring(0,max.indexOf("."));
         try {
             textField.setMaxSize(Integer.parseInt(max));

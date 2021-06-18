@@ -51,13 +51,13 @@ import java.util.List;
 
 
 public class ProvidersFeedContainer extends InfiniteContainer {
-
-        @Override
+    ArrayList<Provider> providers = new ArrayList<Provider>();
+    @Override
         public Component[] fetchComponents(int index, int amount) {
-            ////////log.p(searchField.getText());
-            //////log.p("Providers Feed");
+            //////////Log.p(searchField.getText());
+            ////////Log.p("Providers Feed");
             List<Component> response = new ArrayList<>(); 
-            ArrayList<Provider> providers = new ArrayList<Provider>();            
+
         if(index == 0) {
             response.add(createWelcomeBar());
             response.add(UIUtils.createSpace());                
@@ -83,13 +83,13 @@ public class ProvidersFeedContainer extends InfiniteContainer {
             }
             return UIUtils.toArray(response);
         
-        } ;
+        }
 
     private Component createEntry(Provider p) {
         if (p != null) {
-            //////log.p("Provider name " + p.name.get());
+            ////////Log.p("Provider name " + p.name.get());
             //if (p.services.size() > 0) {
-                //////log.p("Creating Entry for " + p.summary());
+                ////////Log.p("Creating Entry for " + p.summary());
                 p.refresh();
                 
                 MultiButton mb = new MultiButton(p.name.get());
@@ -98,7 +98,7 @@ public class ProvidersFeedContainer extends InfiniteContainer {
                 mb.setTextLine1(p.name.get());
                 mb.setTextLine2("Service Rated At " + p.rating.get() + " stars");
                 //mb.setTextLine3(p.extendedDescription());
-                ////////log.p(p.plain_summary());
+                //////////Log.p(p.plain_summary());
                 //if ( )
 
                 mb.setIcon(p.getAvatar(8));

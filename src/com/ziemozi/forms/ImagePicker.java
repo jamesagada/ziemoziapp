@@ -65,7 +65,7 @@ public class ImagePicker {
                 fileName = s;
                 if(sl.endsWith("jpeg") || sl.endsWith("jpg") || 
                     sl.endsWith("png")) {
-                    try(InputStream i = openFileInputStream(s);) {
+                    try(InputStream i = openFileInputStream(s)) {
                         img = EncodedImage.create(i, (int)getFileLength(s));
                         onImage.onSucess(img);
                     }

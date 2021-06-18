@@ -23,19 +23,13 @@ import com.codename1.io.Util;
 import com.codename1.io.rest.RequestBuilder;
 import com.codename1.io.rest.Response;
 import com.codename1.io.rest.Rest;
-import com.codename1.io.services.CachedData;
-import com.codename1.io.services.CachedDataService;
 import com.codename1.location.Location;
 import com.codename1.location.LocationManager;
-import com.codename1.properties.Property;
-import com.codename1.properties.PropertyBase;
 import com.codename1.properties.PropertyBusinessObject;
 //import com.codename1.properties.SQLMap;
 import static com.codename1.ui.CN.*;
 import com.codename1.ui.Display;
 import com.codename1.ui.Form;
-import com.codename1.ui.events.ActionEvent;
-import com.codename1.ui.events.ActionListener;
 import com.codename1.util.Callback;
 import com.codename1.util.StringUtil;
 import com.codename1.util.SuccessCallback;
@@ -51,22 +45,14 @@ import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
 import com.ixzdore.restdb.ziemobject.ServiceContact;
 import com.ixzdore.restdb.ziemobject.UserPreference;
-import com.ziemozi.forms.ImagePicker;
-import static com.ziemozi.server.ServerAPI.dbProvider;
-import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.Vector;
 
 ////import java.util.logging.Level;
@@ -81,14 +67,14 @@ public class localAPI {
     public static String AUTHY = "3IMDN8qW1tTuLdI7h8FMgjaw9YdVVQFe";
     public static final String authyUrl = "https://api.authy.com/protected/json/phones/verification/check";
     private static String token;
-    private static String sosService = "SOS";
-    private static String rateService = "RateService";
-    private static String amFineService = "IAMFINE";
-    private static int aroundMeDistance = 10;//Distance in km to consider as around me
-    private static String configPath = "/config.sql";
-    private static String dbname = "ziemozi";
+    private static final String sosService = "SOS";
+    private static final String rateService = "RateService";
+    private static final String amFineService = "IAMFINE";
+    private static final int aroundMeDistance = 10;//Distance in km to consider as around me
+    private static final String configPath = "/config.sql";
+    private static final String dbname = "ziemozi";
 
-    private static Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+    private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
             "cloud_name", "okwui",
             "api_key", "839478323249426",
             "api_secret", "2sKLEGlDj_qwtJGHsifS9fZ_m8I"));
@@ -140,13 +126,13 @@ public class localAPI {
         //ServerAPI.refreshMe();
         boolean loggedIn = false;
         if (me != null) {
-            ////////////////////log.p(me.getPropertyIndex().toString());
+            //////////////////////Log.p(me.getPropertyIndex().toString());
             if ((me.authtoken.get() != null) && (me.firstName.get() != null)) {
                 loggedIn = true;
             }
         }
         token = Preferences.get("authtoken", null);
-        //////////////////////log.p("token " + token);
+        ////////////////////////Log.p("token " + token);
         return loggedIn;
     }
 
@@ -157,7 +143,7 @@ public class localAPI {
         String fetchUrl = "{\"phone\": \""
                 + u.phone.get() + "\" ," + "\"password\": \"" + u.password.get() + "\" }";
 
-        ////////////////////log.p(fetchUrl);
+        //////////////////////Log.p(fetchUrl);
         User s = null;
 
         ArrayList<User> users = genericZiemSearch("ziemozi-users",
@@ -185,15 +171,15 @@ public class localAPI {
 
     private static void signupOrLogin(String url, User u,
             final Callback<User> callback) {
-        ////////////////////log.p(u.getPropertyIndex().toString());
-        ////////////////////log.p("URL " + url);
+        //////////////////////Log.p(u.getPropertyIndex().toString());
+        //////////////////////Log.p("URL " + url);
         post(url).
                 body(u.getPropertyIndex().toJSON()).
                 getAsJsonMap(new Callback<Response<Map>>() {
                     @Override
                     public void onSucess(Response<Map> value) {
-                        ////////////////////log.p("Response Code " + value.getResponseCode());
-                        ////////////////////log.p(value.getResponseData().toString());
+                        //////////////////////Log.p("Response Code " + value.getResponseCode());
+                        //////////////////////Log.p(value.getResponseData().toString());
                         if (value.getResponseCode() != 201) {
                             callback.onError(u, null, value.
                                     getResponseCode(),
@@ -208,7 +194,7 @@ public class localAPI {
                                 get());
                         token = me.authtoken.get();
                         me.getPropertyIndex().storeJSON("me.json");
-                        ////////////////////log.p(me.getPropertyIndex().toString());
+                        //////////////////////Log.p(me.getPropertyIndex().toString());
                         callback.onSucess(me);
                         callSerially(() -> registerPush());
                     }
@@ -227,15 +213,15 @@ public class localAPI {
             me = new User();
             me.getPropertyIndex().loadJSON("me.json");
         }
-        ////////////////////log.p("Refreshing Me " + me.getPropertyIndex().toString());
+        //////////////////////Log.p("Refreshing Me " + me.getPropertyIndex().toString());
         Response<Map> map = get("ziemozi-users/" + me._id.get()).getAsJsonMap();
-        ////////////////////log.p("Refreshing user " + map.getResponseData().toString());
-        ////////////////////log.p("Refreshing User " + map.getResponseCode());
+        //////////////////////Log.p("Refreshing user " + map.getResponseData().toString());
+        //////////////////////Log.p("Refreshing User " + map.getResponseCode());
         if (map.getResponseCode() == 200) {
             me = new User();
             me.getPropertyIndex().
                     populateFromMap(map.getResponseData());
-            ////////////////////log.p("Refreshed me " + me.getPropertyIndex().toString());
+            //////////////////////Log.p("Refreshed me " + me.getPropertyIndex().toString());
             me.getPropertyIndex().storeJSON("me.json");
             me.authtoken.set(Preferences.get("authtoken", ""));
             token = me.authtoken.get();
@@ -251,7 +237,7 @@ public class localAPI {
                 queryParam("verification_code", code).
                 queryParam("country_code", "234").
                 queryParam("phone_number", phone).getAsJsonMap();
-        ////////////////////log.p("Verify Result " + s.getResponseData());
+        //////////////////////Log.p("Verify Result " + s.getResponseData());
         return "true".equals(s.getResponseData().get("success"));
     }
 
@@ -260,10 +246,10 @@ public class localAPI {
         //check if the image file has http, if it does not have
         //then use cloudinary to save the image first
         //before proceeding
-        ////////////////////log.p("Refresh user " + u.getPropertyIndex().toString());
-        ////////////////////log.p("Me is " + me.getPropertyIndex().toString());
+        //////////////////////Log.p("Refresh user " + u.getPropertyIndex().toString());
+        //////////////////////Log.p("Me is " + me.getPropertyIndex().toString());
         boolean posted = true;
-        ////////////////////log.p("Avatar " + u.avatar.get());
+        //////////////////////Log.p("Avatar " + u.avatar.get());
         if (u.avatar.get().indexOf("file:") >= 0) {
 
             try {
@@ -271,9 +257,9 @@ public class localAPI {
                         upload(u.avatar.get(), ObjectUtils.emptyMap());
                 String uploadUrl = uploadResult.get("url").toString();
                 u.avatar.set(uploadUrl);
-                ////////////////////log.p("Avatar url " + uploadUrl);
+                //////////////////////Log.p("Avatar url " + uploadUrl);
             } catch (Exception e) {
-                ////////////////////log.p("Image upload failed \n" + e.getMessage());
+                //////////////////////Log.p("Image upload failed \n" + e.getMessage());
                 ToastBar.showErrorMessage("Failed to upload profile image");
                 posted = false;
             }
@@ -282,13 +268,13 @@ public class localAPI {
         //Map uMap = u.getPropertyIndex().toMapRepresentation();
         //uMap.remove("_id"); // remove id field so the update can happen properly
         //u.getPropertyIndex().populateFromMap(uMap);
-        ////////////////////log.p("Refresjing User Id " + me._id.get());
-        ////////////////////log.p("Refreshing with " + u.getPropertyIndex().toString());
+        //////////////////////Log.p("Refresjing User Id " + me._id.get());
+        //////////////////////Log.p("Refreshing with " + u.getPropertyIndex().toString());
         Response<String> s = patch("ziemozi-users/" + me._id.get()).
                 body(u.getPropertyIndex().toJSON()).getAsString();
-        //////////////////////log.p(u.getPropertyIndex().toJSON());
-        ////////////////////log.p("User Patch Response Code " + s.getResponseCode());
-        ////////////////////log.p("User Patch Response " + s.getResponseData());
+        ////////////////////////Log.p(u.getPropertyIndex().toJSON());
+        //////////////////////Log.p("User Patch Response Code " + s.getResponseCode());
+        //////////////////////Log.p("User Patch Response " + s.getResponseData());
         //u.getPropertyIndex().storeJSON("me.json");
         localAPI.refreshMe();
         return (posted && (s.getResponseCode() == 201));
@@ -454,8 +440,8 @@ public class localAPI {
     }
 
     private static List<Request> processRequestResponse(Response<Map> response) {
-        ////////////////////log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
-        ////////////////////log.p("\n\nRequest Response data \n" + response.getResponseData());
+        //////////////////////Log.p("\n\nRequest ResponseCode \n" + response.getResponseCode());
+        //////////////////////Log.p("\n\nRequest Response data \n" + response.getResponseData());
         if (response.getResponseCode() == 200) {
             List<Map> l = (List<Map>) response.getResponseData().get("root");
             List<Request> responseList = new ArrayList<>();
@@ -482,13 +468,14 @@ public class localAPI {
                 = genericZiemSearch("servicecontact",
                         ServiceContact.class,
                         "", page, size, "", "");
+        Log.p("Contact " + news.size());
         return news;
     }
 
     public static ArrayList<Request> privacyCheckRequests(ArrayList<Request> toCheck) {
         //we cycle through  the list and drop the objects for which the privacy parameter is there
         //and it is set to false
-        ////log.p("Start Filtering  " + new Date().toString());
+        //////Log.p("Start Filtering  " + new Date().toString());
         ArrayList filtered = new ArrayList<Request>();
         if (localAPI.me() == null) {
             return filtered;
@@ -502,21 +489,22 @@ public class localAPI {
             if ( p.ziemozi_user.size() > 0 )  u_string = p.ziemozi_user.get(0).getPropertyIndex().toString();
             String ptoString = p.getPropertyIndex().toString() + " " + u_string;
             if (!isPrivate(p)) {
-
+                //Log.p("Not Private" );
                 filtered.add(p);
             } else {
-
+                //Log.p("Is Private" );
                 if ((ptoString.contains(localAPI.me()._id.get()))
                         && (ptoString.contains(localAPI.me().authtoken.get()))
                         && (ptoString.contains(localAPI.me().phone.get()))) {
                     //filter this in
+                    //Log.p("For this " + localAPI.me().phone.get() );
                     filtered.add(p);
                 }
             }
         }
-        ////log.p("Done filtering " +  new Date().toString());
+        //////Log.p("Done filtering " +  new Date().toString());
         //now filter for group membership
-        //Log.p("Checking For Group Membership " + filtered.size());
+        ////Log.p("Checking For Group Membership " + filtered.size());
         User u = localAPI.me();
         u.refreshGroups();
         ArrayList<Request> s_filtered = new ArrayList<Request>();
@@ -525,17 +513,17 @@ public class localAPI {
             Request r = (Request) z;
             r.refreshService();
             List<Service> sz = r.service.asList();
-            //Log.p("Request " + r._id.get() + "has " + sz.size() + " services");
+            ////Log.p("Request " + r._id.get() + "has " + sz.size() + " services");
             for (Service s : sz) {
-                ////log.p("Check for service " + s.name.get());
+                //////Log.p("Check for service " + s.name.get());
                 s.refreshGroups();
                 if (checkUserAccess(u, s)) {
                     s_filtered.add(r);
                 }
             }
         }
-        ////log.p("Done checking for group " + new Date().toString());
-        //Log.p("After filtering we have  " + s_filtered.size());        
+        //////Log.p("Done checking for group " + new Date().toString());
+        ////Log.p("After filtering we have  " + s_filtered.size());
         return s_filtered;
     }
 
@@ -544,12 +532,12 @@ public class localAPI {
         //u.refreshGroups();
         
         for (Group g : u.groups.asList()) {
-            //Log.p(g.name.get());
+            ////Log.p(g.name.get());
             for (Group sg:z.groups.asList()) {
-                //////log.p("Checking against " + sg.name.get());
-                //Log.p(g._id.get() + "against " + sg._id.get());
+                ////////Log.p("Checking against " + sg.name.get());
+                ////Log.p(g._id.get() + "against " + sg._id.get());
                 if (g._id.get().equalsIgnoreCase(sg._id.get())) {
-                    //Log.p("Found A Match");
+                    ////Log.p("Found A Match");
                     return_value = true;
                 }
             }
@@ -561,14 +549,14 @@ public class localAPI {
         //to determine if it is private
         //look at the summary and extract the private  setting
         Boolean isprivate = false;
-        //////////log.p(p.summary.get());
+        ////////////Log.p(p.summary.get());
         List l = StringUtil.tokenize(p.summary.get(), "<p>");
-        ////log.p("Number of tokens in request summary is " + l.size());
+        //////Log.p("Number of tokens in request summary is " + l.size());
         for (Object s : l) {
             String ss = s.toString();
-            ////log.p(s.toString());
-            if (ss.contains("Private")) {
-                ////log.p(ss);            
+            //Log.p(s.toString());
+            if (ss.contains("Private") || ss.contains("private") || ss.contains("rivate")) {
+                //Log.p(ss);
                 if (ss.contains("true")
                         || ss.contains("yes") 
                         || ss.contains("Yes") || ss.contains("YES")) {
@@ -576,6 +564,8 @@ public class localAPI {
                 }
             }
         }
+        //Log.p("Is private "+ isprivate);
+
         return isprivate;
     }
 
@@ -585,7 +575,7 @@ public class localAPI {
                         Request.class,
                         "", page, size, "", "");
 //        for (Request r:news){
-//            ////////////////////log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
+//            //////////////////////Log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
 //        }
         /**
          * return processRequestResponse( get("requests"). queryParam("page", ""
@@ -607,20 +597,20 @@ public class localAPI {
                         Request.class,
                         "", page, size, "", "");
 //        for (Request r:news){
-//            ////////////////////log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
+//            //////////////////////Log.p("\nNews user " + r.ziemozi_user.get(0)._id.get() + " " + r.ziemozi_user.get(0).fullName());
 //        }
         /**
          * return processRequestResponse( get("requests"). queryParam("page", ""
          * + page). queryParam("size", "" + size).getAsJsonMap());
          */
-        //Log.p("Number of requests in feed " + news.size());
+        ////Log.p("Number of requests in feed " + news.size());
         ArrayList rnews = new ArrayList();
         for (Request r : news) {
             if ((r._parent_id.get() == null) || (r._parent_id.get().indexOf("NULL") >= 0)) {
                 rnews.add(r);
             }
         }
-        //Log.p("Number of proper requests in feed " + rnews.size());
+        ////Log.p("Number of proper requests in feed " + rnews.size());
         return privacyCheckRequests(rnews);
     }
 
@@ -659,7 +649,7 @@ public class localAPI {
 
     public static boolean postRequest(Request pd) {
 
-        //////////////////////log.p("\n " + pd.getPropertyIndex().toJSON());
+        ////////////////////////Log.p("\n " + pd.getPropertyIndex().toJSON());
         //we want to save locally first
         //but this means we will not have the _id. we can only have the id
         //so we save the request and the request parameters but we use the id as the unique
@@ -675,7 +665,7 @@ public class localAPI {
             //r.getPropertyIndex().populateFromMap(l);
             //r.getPropertyIndex().loadJSON("postRequestParameter");
             r.getPropertyIndex().populateFromMap(res.getResponseData());
-            //////////////////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+            ////////////////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
             pd._id.set(r._id.get());
         }
 
@@ -727,7 +717,7 @@ public class localAPI {
             for (Map m : l) {
                 try {
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
+                            = (PropertyBusinessObject)type.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
                     responseList.add((T) pb);
                 } catch (Exception err) {
@@ -788,8 +778,8 @@ public class localAPI {
         String hint = "";
         String filter = "";
         String query = "";
-        //////////////////log.p("Type of Selector: " + p.getClass().getCanonicalName());
-        ////////////////////log.p("\nFilter is: " + filter);
+        ////////////////////Log.p("Type of Selector: " + p.getClass().getCanonicalName());
+        //////////////////////Log.p("\nFilter is: " + filter);
         if (p.getClass().getCanonicalName().indexOf("Provider") >= 0) {
             Provider pr = (Provider) p;
             pr.refresh();
@@ -799,36 +789,36 @@ public class localAPI {
         ArrayList<Service> services = genericZiemSearch(url,
                 Service.class,
                 query, page, size, hint, filter);
-        //////////log.p("Found " + services.size() + "services");
+        ////////////Log.p("Found " + services.size() + "services");
         for (Service s : services) {
             s.refresh();
-            //////////log.p(" Service " + s.getPropertyIndex().toString());
+            ////////////Log.p(" Service " + s.getPropertyIndex().toString());
             if (p.getClass().getCanonicalName().indexOf("Category") >= 0) {
                 Category c = (Category) p;
-                //////////log.p("This is the service being checked " + s.name.get());
+                ////////////Log.p("This is the service being checked " + s.name.get());
                 List<Category> cl = s.category.asList();
                 if (cl.size() > 0) {
-                    ////////////log.p("Number of categories for service " + cl.size());
-                    ////////////log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
+                    //////////////Log.p("Number of categories for service " + cl.size());
+                    //////////////Log.p("\nService Category: \n" + s.category.get(0).getPropertyIndex().toString() +"\n" );
                     for (Category cc : cl) {
-                        ////////////log.p("\nCategory attached to service" + cc._id.get() + " " + cc.name.get());
-                        ////////////log.p("\nCategory to match " + c._id.get() + " " + c.name.get());
+                        //////////////Log.p("\nCategory attached to service" + cc._id.get() + " " + cc.name.get());
+                        //////////////Log.p("\nCategory to match " + c._id.get() + " " + c.name.get());
                         if (cc._id.get() != null) {
                             if (cc._id.get().equalsIgnoreCase(c._id.get())) {
-                                //////////log.p("Matched Category " + cc._id.get());
+                                ////////////Log.p("Matched Category " + cc._id.get());
                                 serviceList.add(s);
-                                //////////log.p("Services in Category " + serviceList.size());
+                                ////////////Log.p("Services in Category " + serviceList.size());
                             }
                         } else {
-                            //////////log.p("Null id " + cc.getPropertyIndex().toString(true));
-                            //////////log.p("Service " + s.getPropertyIndex().toString(true));
+                            ////////////Log.p("Null id " + cc.getPropertyIndex().toString(true));
+                            ////////////Log.p("Service " + s.getPropertyIndex().toString(true));
                         }
                     }
                 }
             }
             if (p.getClass().getCanonicalName().indexOf("Provider") >= 0) {
                 Provider pr = (Provider) p;
-                //////////////////log.p("Provider " + pr.name.get() + " " + pr._id.get());
+                ////////////////////Log.p("Provider " + pr.name.get() + " " + pr._id.get());
                 //pr.refresh();
                 //serviceList.addAll(pr.services.asList());
 
@@ -836,7 +826,7 @@ public class localAPI {
                 List<Provider> pl = s.providers.asList();
                 if (pl.size() > 0) {
                     for (Provider pp : pl) {
-                        //////////log.p("Service Provider to compare  " + pp.name.get() + " " + pp._id.get());
+                        ////////////Log.p("Service Provider to compare  " + pp.name.get() + " " + pp._id.get());
                         if (pp._id.get() != null) {
                             if (pp._id.get().equalsIgnoreCase(pr._id.get())) {
                                 serviceList.add(s);
@@ -880,10 +870,10 @@ public class localAPI {
         } else {
             //in this case we know which one it is. so most likely
             //it is either Categories,Providers,ServiceGroup
-            //////////////////////log.p("Parent " + parent.toString());
-            //////////////////////log.p("Is Categories " + parent.toString().indexOf("Categories"));
-            //////////////////////log.p("Is Providers " + parent.toString().indexOf("Providers"));
-            //////////////////////log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));            
+            ////////////////////////Log.p("Parent " + parent.toString());
+            ////////////////////////Log.p("Is Categories " + parent.toString().indexOf("Categories"));
+            ////////////////////////Log.p("Is Providers " + parent.toString().indexOf("Providers"));
+            ////////////////////////Log.p("Is ServiceGroup " + parent.toString().indexOf("ServiceGroup"));
             if (parent.toString().indexOf("Categories") >= 0) {
                 //categories
                 v = new Vector();
@@ -934,12 +924,12 @@ public class localAPI {
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Category> responseList = new ArrayList<>();
             for (Map m : l) {
-                ////////////////////log.p("Category Map\n ");
+                //////////////////////Log.p("Category Map\n ");
                 showMap(m);
                 Category p = new Category();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////////////////log.p(p.getPropertyIndex().toString());                
+                ////////////////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -955,7 +945,7 @@ public class localAPI {
                 Provider p = new Provider();
                 p.getPropertyIndex().populateFromMap(m);
                 responseList.add(p);
-                //////////////////////log.p(p.getPropertyIndex().toString());
+                ////////////////////////Log.p(p.getPropertyIndex().toString());
             }
             return responseList;
         }
@@ -964,7 +954,7 @@ public class localAPI {
 
     private static ArrayList<Service> processServiceDefintionResponse(Response<Map> response) {
         if (response.getResponseCode() == 200) {
-            //////////////////////log.p(response.toString());
+            ////////////////////////Log.p(response.toString());
             ArrayList<Map> l = (ArrayList<Map>) response.getResponseData().get("root");
             ArrayList<Service> responseList = new ArrayList<>();
             for (Map m : l) {
@@ -981,7 +971,7 @@ public class localAPI {
             Class<? extends PropertyBusinessObject> type,
             String text, int page, int size, String hint, String filter) {
         ArrayList<T> responseList = new ArrayList<>();
-        //////////////////////log.p("Query " + text);
+        ////////////////////////Log.p("Query " + text);
         //{"$orderby": "{" ,"_created": "-1" }}
         // String fetchUrl = "{\"$orderby\":"
         //       + "{" + "\"_created\": " + "-1" + " }}";
@@ -999,13 +989,13 @@ public class localAPI {
             query = query + " " + "ORDER BY _created DESC ";
         }
         query = query + " LIMIT " + page + "," + size + ";";
-        //////log.p(query);
+        ////////Log.p(query);
         //HashMap mquery = new HashMap();
         //mquery.put("ORDER BY", "_created");
         //mquery.put("LIMIT", size );
         //mquery.put("OFFSET", page );
         //mquery.putAll(t);
-        //////////////////////log.p("\nMapped Query\n" + testQuery(mquery));
+        ////////////////////////Log.p("\nMapped Query\n" + testQuery(mquery));
 
         try {
             Database db = Database.openOrCreate(dbname);
@@ -1027,7 +1017,7 @@ public class localAPI {
                 for (int iter = 0; iter < columns; iter++) {
                     String columnName = cur.getColumnName(iter);
                     String columnValue = cur.getRow().getString(iter);
-                    //////log.p(columnName + " is " + columnValue);
+                    ////////Log.p(columnName + " is " + columnValue);
                     mRow.put(columnName, columnValue);
                     //                               currentRowArray[iter] = currentRow.getString(iter);
                 }
@@ -1038,25 +1028,25 @@ public class localAPI {
 
             cur.close();
             db.close();
-            //////////////////log.p("Generic Search Found " + url + " " + l.size() + " records");
+            ////////////////////Log.p("Generic Search Found " + url + " " + l.size() + " records");
 
             for (Map m : l) {
                 try {
                     showMap(m);
                     PropertyBusinessObject pb
-                            = (PropertyBusinessObject) type.newInstance();
+                            = (PropertyBusinessObject)type.newInstance();
                     pb.getPropertyIndex().populateFromMap(m);
                     //
-                    //////////////////////log.p(pb.getPropertyIndex().toString());
+                    ////////////////////////Log.p(pb.getPropertyIndex().toString());
                     responseList.add((T) pb);
                 } catch (Exception err) {
-                    ////////////////log.p(err.getMessage());
+                    //////////////////Log.p(err.getMessage());
                 }
             }
             // cur.close();
 
         } catch (Exception ex) {
-            ////////////////log.p(ex.getMessage());
+            //////////////////Log.p(ex.getMessage());
         }
 
         return responseList;
@@ -1094,30 +1084,30 @@ public class localAPI {
     public static Boolean postRequestParameter(RequestParameter pd) {
         // String key = post("request_parameter").body(pd.getPropertyIndex().toJSON()).
         //       getAsString().getResponseData();
-        // ////////////////////log.p("Saving Request PArameter ..\n");
+        // //////////////////////Log.p("Saving Request PArameter ..\n");
         //  HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         // Storage.getInstance().writeObject("postRequestParameter", key);
         //  RequestParameter r = new RequestParameter();
         //  r.getPropertyIndex().populateFromMap(l);
-        //  ////////////////////log.p("RP Save Response \n" + r.getPropertyIndex().toString());
+        //  //////////////////////Log.p("RP Save Response \n" + r.getPropertyIndex().toString());
         //  pd._id.set(r._id.get());
         //  return r._id.get() != null;  
 //        String key = post("request-parameters").body(pd.getPropertyIndex().toJSON()).
         //              getAsString().getResponseData();
-        ////////////////////log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
+        //////////////////////Log.p("\n Saving Request Parameter " + pd.getPropertyIndex().toJSON(), Log.DEBUG);
         Response<Map> res = post("request-parameters").body(pd.getPropertyIndex()
                 .toJSON()).getAsJsonMap();
         //HashMap l = (HashMap) post("request_parameter").body(pd.getPropertyIndex().toJSON()).getAsJsonMap().getResponseData();
         //  Storage.getInstance().writeObject("postRequestParameter", key);
 
-        //    ////////////////////log.p("\n RequestParameter response data is \n" + key);
+        //    //////////////////////Log.p("\n RequestParameter response data is \n" + key);
         //try {
         //    JSONParser j = new JSONParser();
         //    Reader r = new InputStreamReader(
         //             Storage.getInstance().createInputStream("postRequestParameter"));
         //    Map<String,Object> l = j.parseJSON(r ) ;                  
         // } catch (Exception ex) {
-        //     ////////////////////log.p(ex.getMessage());
+        //     //////////////////////Log.p(ex.getMessage());
         // }
         //Display.getInstance().getResourceAsStream(getClass(), "/anapioficeandfire.json"), "UTF-8")) {
         //Map<String, Object> data = json.parseJSON(r);
@@ -1127,7 +1117,7 @@ public class localAPI {
         //r.getPropertyIndex().populateFromMap(l);
         //r.getPropertyIndex().loadJSON("postRequestParameter");
         r.getPropertyIndex().populateFromMap(res.getResponseData());
-        //////////////////////log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
+        ////////////////////////Log.p("RequestParameter retrieved " + r.getPropertyIndex().toString());
         pd._id.set(r._id.get());
         return r._id.get() != null;
     }
@@ -1141,7 +1131,7 @@ public class localAPI {
     }
 
     public static List<Request> searchRequests(String text, int page, int amount) {
-        ////////////////////log.p("Searching For " + text);
+        //////////////////////Log.p("Searching For " + text);
         //    https://mydb-fafc.restdb.io/rest/people?q={}&h={"$orderby": {"name": 1, "age": -1}}
         ArrayList<Request> results = new ArrayList<Request>();
         ArrayList<Request> requests = new ArrayList<Request>();
@@ -1179,20 +1169,20 @@ public class localAPI {
 
     public static void showMap(Map m) {
         for (Object k : m.keySet()) {
-            //////log.p(k.toString() + " -- " + m.get(k).toString());
+            ////////Log.p(k.toString() + " -- " + m.get(k).toString());
         }
     }
 
     public static void showMapp(Map m) {
         for (Object k : m.keySet()) {
-            //////////log.p(k.toString() + " -- " + m.get(k).toString());
+            ////////////Log.p(k.toString() + " -- " + m.get(k).toString());
         }
     }
 
     public static Service getService(String _id) {
         Service s = new Service();
         Response<Map> map = get("service-definition/" + _id).getAsJsonMap();
-        ////////////////////log.p("Response " + map.getResponseData());
+        //////////////////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -1201,10 +1191,10 @@ public class localAPI {
     }
 
     public static ServiceAttributeType getServiceAttributeType(String _id) {
-        ////////////////////log.p("Get Service Attribute Type " + _id);
+        //////////////////////Log.p("Get Service Attribute Type " + _id);
         ServiceAttributeType s = new ServiceAttributeType();
         Response<Map> map = get("service-attribute-type/" + _id).getAsJsonMap();
-        ////////////////////log.p("Response " + map.getResponseData());
+        //////////////////////Log.p("Response " + map.getResponseData());
         if (map.getResponseCode() == 200) {
             s.getPropertyIndex().
                     populateFromMap(map.getResponseData());
@@ -1241,36 +1231,37 @@ public class localAPI {
                 String[] imageList = Util.split(r.value.get(), "||");
                 for (String img : imageList) {
                     //for each image, save and append back to value
-                    ////////////////////log.p("Image to save " + img);
+                    //////////////////////Log.p("Image to save " + img);
                     if (!img.isEmpty()) {
                         try {
                             Map uploadResult = cloudinary.uploader().
                                     upload(img, ObjectUtils.emptyMap());
                             String uploadUrl = uploadResult.get("url").toString();
-                            ////////////////////log.p("Image is saved as " + uploadUrl);
+                            //////////////////////Log.p("Image is saved as " + uploadUrl);
                             if (value.length() < 2) {
                                 value = uploadUrl;
                             } else {
                                 value = value + " || " + uploadUrl;
                             }
                         } catch (Exception e) {
-                            ////////////////////log.p("Image upload failed \n" + e.getMessage());
+                            //////////////////////Log.p("Image upload failed \n" + e.getMessage());
                             posted = false;
                         }
                     }
                 }
                 r.value.set(value);
-                r.summarize();
-            };
+                r.summarize(false);
+            }
 
             jsonRequestParameter = jsonRequestParameter + r.getPropertyIndex().toJSON() + ",";
         }
-        String summedSummary = rq.requestSummary(summedRp);
+        String summedSummary = rq.requestSummary(summedRp,false);
         rq.summary.set(summedSummary);
+        rq.f_summary.set(rq.requestSummary(summedRp,true));
 
         jsonRequestParameter = jsonRequestParameter.substring(0,
                 jsonRequestParameter.lastIndexOf("}") + 1) + "\n]";
-        ////////////////////log.p(jsonRequestParameter);
+        //////////////////////Log.p(jsonRequestParameter);
         Response res = post("request-parameters").body(
                 jsonRequestParameter).getAsString();
 
@@ -1278,19 +1269,19 @@ public class localAPI {
                 == 201 || res.getResponseCode() == 200) {
             posted = true;
         }
-        ////////////////////log.p("\n bulk parameter save response" + res.getResponseData().toString());
+        //////////////////////Log.p("\n bulk parameter save response" + res.getResponseData().toString());
 
         res = patch("requests/" + rq._id.get()).body(rq).getAsString();
-        ////////////////////log.p(res.getResponseCode() + "\n" + res.getResponseData());
+        //////////////////////Log.p(res.getResponseCode() + "\n" + res.getResponseData());
         return posted;
     }
 
     public static ServiceAttribute getServiceAttribute(String post) {
-        ////////////////////log.p("Get Service Attributexx " + _id);
+        //////////////////////Log.p("Get Service Attributexx " + _id);
         ServiceAttribute a = new ServiceAttribute();
         String fetchUrl = "{_id:"
                 + post + "}";
-        ////////////////log.p("Fetching Attribute " + fetchUrl);
+        //////////////////Log.p("Fetching Attribute " + fetchUrl);
         ArrayList<ServiceAttribute> l = genericZiemSearch("serviceattribute",
                 ServiceAttribute.class,
                 fetchUrl, 0, 1, "", "");
@@ -1302,10 +1293,10 @@ public class localAPI {
     }
 
     public static void updateRequestSummary(Request aThis) {
-        ////////////////////log.p("Updating this request " + aThis._id.get());
+        //////////////////////Log.p("Updating this request " + aThis._id.get());
         Response res = patch("requests/" + aThis._id.get()).
                 body(aThis.getPropertyIndex().toJSON()).getAsString();
-        ////////////////////log.p(res.getResponseData().toString());
+        //////////////////////Log.p(res.getResponseData().toString());
 //        
     }
 
@@ -1321,7 +1312,7 @@ public class localAPI {
         String fetchUrl = "{\"name\": \""
                 + sosService + "\" }";
 
-        ////////////////////log.p(fetchUrl);
+        //////////////////////Log.p(fetchUrl);
         ArrayList<Service> services = genericZiemSearch("service",
                 Service.class,
                 fetchUrl, 0, 10, "", "");
@@ -1336,7 +1327,7 @@ public class localAPI {
         String fetchUrl = "{\"name\": \""
                 + amFineService + "\" }";
 
-        ////////////////////log.p(fetchUrl);
+        //////////////////////Log.p(fetchUrl);
         ArrayList<Service> services = genericZiemSearch("service",
                 Service.class,
                 fetchUrl, 0, 10, "", "");
@@ -1381,10 +1372,10 @@ public class localAPI {
         HashMap m = new HashMap();
         List fields = StringUtil.tokenize(text, ",");
         for (Object f : fields) {
-            ////////////////////log.p("\n\n" + f.toString()+" \n");
+            //////////////////////Log.p("\n\n" + f.toString()+" \n");
             String s = f.toString();
             int eqsign = s.indexOf(sep);
-            ////////////////////log.p("\n Eq sign at " + eqsign );
+            //////////////////////Log.p("\n Eq sign at " + eqsign );
             if (eqsign >= 0) {
                 String fieldname = s.substring(eqsign + 1).trim();
                 String fieldvalue = s.substring(0, eqsign).trim();
@@ -1435,7 +1426,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1443,24 +1434,24 @@ public class localAPI {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        Log.p(userString);
+        //Log.p(userString);
         if (userString.indexOf("{") >= 0) {
-            //////////log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
+            ////////////Log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                // ////////log.p("Parsed ==>\n" + m.toString());
+                // //////////Log.p("Parsed ==>\n" + m.toString());
                 User cs = new User();
-                Log.p(m.getClass().getName());
+                //Log.p(m.getClass().getName());
                 cs.getPropertyIndex().populateFromMap(m);
-                //////////log.p("From Service \n" + cs.getPropertyIndex().toJSON());
+                ////////////Log.p("From Service \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
-        //////////////log.p(post);
+        ////////////////Log.p(post);
         /*
         if (userString.indexOf("}") > 0) {
             userString = StringUtil.replaceAll(userString, "}{", "},{");
-            //////////log.p("UserString " + userString);
+            ////////////Log.p("UserString " + userString);
             User cc = new User();
             Random r = new Random(64088);
             String ts = r.nextInt() + "us" + r.nextInt();
@@ -1493,7 +1484,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1502,13 +1493,13 @@ public class localAPI {
             ex.printStackTrace();
         }
         if (userString.indexOf("{") >= 0) {
-            //////////log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
+            ////////////Log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                //////////log.p("Parsed ==>\n" + m.toString());
+                ////////////Log.p("Parsed ==>\n" + m.toString());
                 Service cs = new Service();
                 cs.getPropertyIndex().populateFromMap(m);
-                //////////log.p("From Service \n" + cs.getPropertyIndex().toJSON());
+                ////////////Log.p("From Service \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
@@ -1537,11 +1528,11 @@ public class localAPI {
             Reader r = new StringReader(str);
             data = json.parseJSON(r);
         } catch (IOException ex) {
-            Log.p("Parsing Failed " + ex.getMessage());
+            //Log.p("Parsing Failed " + ex.getMessage());
         }
-        Log.p("Parsed Data \n" + data.toString());
+        //Log.p("Parsed Data \n" + data.toString());
         java.util.List<Map<String, Object>> content = (java.util.List<Map<String, Object>>) data.get("root");
-        //////////log.p("Parse result is " + content.toString());
+        ////////////Log.p("Parse result is " + content.toString());
         return content;
     }
 
@@ -1564,7 +1555,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1572,15 +1563,15 @@ public class localAPI {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        ////////////////log.p(userString);
+        //////////////////Log.p(userString);
         if (userString.indexOf("{") >= 0) {
-            //////////log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
+            ////////////Log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                // ////////log.p("Parsed ==>\n" + m.toString());
+                // //////////Log.p("Parsed ==>\n" + m.toString());
                 Service cs = new Service();
                 cs.getPropertyIndex().populateFromMap(m);
-                //////////log.p("From Service \n" + cs.getPropertyIndex().toJSON());
+                ////////////Log.p("From Service \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
@@ -1612,7 +1603,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 l.add(userString);
                 next = c.next();
             }
@@ -1638,7 +1629,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 l.add(userString);
                 next = c.next();
             }
@@ -1664,7 +1655,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1672,15 +1663,15 @@ public class localAPI {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        //////////log.p("Comment For Service text \n" + userString);
+        ////////////Log.p("Comment For Service text \n" + userString);
         if (userString.indexOf("{") >= 0) {
-            ////////log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
+            //////////Log.p("This is the service to be refreshed from \n" + userString + "\n for request " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                ////////log.p("Parsed ==>\n" + m.toString());
+                //////////Log.p("Parsed ==>\n" + m.toString());
                 Service cs = new Service();
                 cs.getPropertyIndex().populateFromMap(m);
-                ////////log.p("From Service \n" + cs.getPropertyIndex().toJSON());
+                //////////Log.p("From Service \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
@@ -1713,7 +1704,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1723,14 +1714,14 @@ public class localAPI {
         }
         // we have to process the string ourself
         if (userString.indexOf("{") >= 0) {
-            //////////log.p("This is the serviceattribute to be refreshed from \n" + userString
+            ////////////Log.p("This is the serviceattribute to be refreshed from \n" + userString
             //        + "\n for  " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                //////////log.p("Parsed ==>\n" + m.toString());
+                ////////////Log.p("Parsed ==>\n" + m.toString());
                 ServiceAttribute cs = new ServiceAttribute();
                 cs.getPropertyIndex().populateFromMap(m);
-                //////////log.p("From ServiceAttribute \n" + cs.getPropertyIndex().toJSON());
+                ////////////Log.p("From ServiceAttribute \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
@@ -1762,7 +1753,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 l.add(userString);
                 next = c.next();
             }
@@ -1788,7 +1779,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1810,7 +1801,7 @@ public class localAPI {
             //userString.replaceAll("}{", "},{");
             
             userString = StringUtil.replaceAll(userString, "}{", "},{");
-        ////////log.p(userString);    
+        //////////Log.p(userString);
         Category cc = new Category();
         Random r = new Random(648800);
         String ts = "scat"+r.nextInt();
@@ -1837,7 +1828,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -1877,13 +1868,13 @@ public class localAPI {
             db = Database.openOrCreate(dbname);
             c = db.executeQuery("select type_of_attribute from serviceattribute where _id = "
                     + "'" + post + "'");
-            //////////log.p("select type_of_attribute from serviceattribute where _id = "
+            ////////////Log.p("select type_of_attribute from serviceattribute where _id = "
             //       + "'" + post + "'");
             Boolean next = c.next();
 
             while (next) {
                 userString = c.getRow().getString(0);
-                //////////log.p("Attribute type \n" + userString);
+                ////////////Log.p("Attribute type \n" + userString);
                 next = c.next();
             }
             c.close();
@@ -1928,7 +1919,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -2014,7 +2005,7 @@ public class localAPI {
                 Database db = Display.getInstance().openOrCreate("ziemozi");
                 com.ixzdore.properties.SQLMap sm = SQLMap.create(db);
 //            db.beginTransaction();
-                ////////////log.p("Saving " + p.size() + "Records");
+                //////////////Log.p("Saving " + p.size() + "Records");
                 sm.bulkInsert(pp);
 //            sm.setVerbose(true);
 //            sm.createTable(p);
@@ -2026,7 +2017,7 @@ public class localAPI {
             } catch (Exception e) {
                 //e.printStackTrace();
                 saved = false;
-                Log.p("\n\n" + e.getMessage());
+                //Log.p("\n\n" + e.getMessage());
                 //Log.sendLogAsync();           
             }
             //if for some reason we did not save any batch we still continue
@@ -2084,12 +2075,12 @@ public class localAPI {
                 /*
            Class pc = p.getClass();
            String pname = pc.getCanonicalName();
-                      ////////////////log.p(pname);
+                      //////////////////Log.p(pname);
            int nc = pname.lastIndexOf(".");
            pname = pname.substring(nc+1).toUpperCase();
                  */
                 String stmnt = "DELETE FROM " + p.getPropertyIndex().getName() + " WHERE _id = '" + _id + "'";
-                ////////////////log.p(stmnt);
+                //////////////////Log.p(stmnt);
                 db.execute(stmnt);
 
             }
@@ -2101,7 +2092,7 @@ public class localAPI {
             db.close();
             db = null;
         } catch (Exception e) {
-            ////////////////log.p(e.getMessage());
+            //////////////////Log.p(e.getMessage());
             e.printStackTrace();
             Log.sendLogAsync();
         }
@@ -2116,7 +2107,7 @@ public class localAPI {
         //DAOProvider dbProvider = new DAOProvider(db, 1);        
         DAO<Map> requestDAO = null;
         try {
-            ////////////////log.p("\n\nSaving to local\n\n" + p.getPropertyIndex().toJSON());
+            //////////////////Log.p("\n\nSaving to local\n\n" + p.getPropertyIndex().toJSON());
             //
             db = Database.openOrCreate(dbname);
             DAOProvider dbProvider = new DAOProvider(db, 1);
@@ -2124,16 +2115,16 @@ public class localAPI {
             // for(Request r:requests){
             Map o = requestDAO.newObject();
             Map m = r.getPropertyIndex().toMapRepresentation();
-            ////////////////log.p("\n\n Map of request to save \n\n");
+            //////////////////Log.p("\n\n Map of request to save \n\n");
             showMap(m);
-            //////////////////log.p("\nFrom\n");showMap(m);
-            ////////////////////log.p("\nTo\n");showMap(o);
-            ////////////////log.p("\n\n Map of new request\n\n");
+            ////////////////////Log.p("\nFrom\n");showMap(m);
+            //////////////////////Log.p("\nTo\n");showMap(o);
+            //////////////////Log.p("\n\n Map of new request\n\n");
             showMap(o);
             requestDAO.unmap(o, m);
-            ////////////////log.p("\n\n Map of new request mapped \n\n");
+            //////////////////Log.p("\n\n Map of new request mapped \n\n");
             showMap(o);
-            //////////////////log.p("\nMapped\n");showMap(o);
+            ////////////////////Log.p("\nMapped\n");showMap(o);
             requestDAO.save(o);
             // List<Map> cat = requestDAO.fetchAll(); 
             // for (Map ml:cat){
@@ -2144,7 +2135,7 @@ public class localAPI {
             db.close();
 
         } catch (Exception e) {
-            //////////////////log.p("Request load had an exception");
+            ////////////////////Log.p("Request load had an exception");
             e.printStackTrace();
         }
         return saved;
@@ -2156,24 +2147,25 @@ public class localAPI {
     public static void saveRequestsToServer() {
         //lets load from database and see if we can reconstruct the 
         //request
-        //////log.p("Saving Requests to Server");
+        ////////Log.p("Saving Requests to Server");
 
         //List<Request> newsfeed = newsfeed(0, 9999);
         List<Request> newsfeed = genericZiemSearch("request",
                 Request.class,
                 "", 0, 9999, "", "");
-        // ////log.p("Requests to check " + newsfeed.size());
+        // //////Log.p("Requests to check " + newsfeed.size());
         for (Request r : newsfeed) {
-            // ////log.p(r._id.get());
+            // //////Log.p(r._id.get());
             if (r._id.get().indexOf("local_") >= 0) {
                 r.refreshUser();
                 r.refreshService();
                 r.refreshRequestParameters();
-                //////////////////log.p("\n\nService \n\n" + r.service.get(0).getPropertyIndex().toJSON());
+                ////////////////////Log.p("\n\nService \n\n" + r.service.get(0).getPropertyIndex().toJSON());
+                Log.p(""+r.service.size());
                 r.service.get(0).refresh();
                 //r.service.get(0).service_attributes.clear();
                 //r.service.get(0).comment_services.clear();                
-                //////////log.p("\n\nService in request to be saved \n\n" + r.service.get(0).getPropertyIndex().toJSON());
+                ////////////Log.p("\n\nService in request to be saved \n\n" + r.service.get(0).getPropertyIndex().toJSON());
                 //r.refreshComments();
                 //r.comments.clear();
 //                r.provider.set(null);
@@ -2181,25 +2173,25 @@ public class localAPI {
                 //r.provider.add(new Provider());
                 //if (r.parent.get() == null ) r.parent.set(new Request());
                 //r._id.set(null);
-                ////////////////log.p("Request to save in plain string " + r.getPropertyIndex().toString());
-                ////////////////log.p(" Request to save as json " + r.getPropertyIndex().toJSON());
+                //////////////////Log.p("Request to save in plain string " + r.getPropertyIndex().toString());
+                //////////////////Log.p(" Request to save as json " + r.getPropertyIndex().toJSON());
 
                 String localId = r._id.get();
                 r._id.set(null);
-
+                r.summary.set("") ;
                 Boolean saved = ServerAPI.postRequest(r);
-                Log.p("Saved Request " + r._id.get()+ saved);
+                //Log.p("Saved Request " + r._id.get()+ saved);
                 if (saved) {
                     ArrayList<RequestParameter> summedRp = r.batchRequestParameters();
                     for (RequestParameter rp : summedRp) {
-                        //////////////////log.p("Parent Id " + r._id.get());
+                        ////////////////////Log.p("Parent Id " + r._id.get());
                         rp._parent_id.set(r._id.get());
                         //rp._parent_field.set("request_parameters");
                         //rp._parent_def.set("request");
                         //   post = rp.save();
                     }
                     saved = ServerAPI.saveRequestParameters(summedRp, r);
-                    //////log.p("Saved RequestParameters " + saved);
+                    ////////Log.p("Saved RequestParameters " + saved);
                 }
                 //postREquest updates the request._id. But we need to be able
                 //to also save the request parameters
@@ -2210,7 +2202,7 @@ public class localAPI {
                 if (saved) {
                     String stmnt = "DELETE FROM REQUEST WHERE _id = " + "'" + localId + "'";
                     String stmntp = " DELETE FROM REQUESTPARAMETER WHERE _parent_id = " + "'" + localId + "'";
-                    ////////////////log.p(stmnt);
+                    //////////////////Log.p(stmnt);
                     try {
                         Database db = Database.openOrCreate(dbname);
                         db.execute(stmnt);
@@ -2218,7 +2210,7 @@ public class localAPI {
                         db.close();
                         db = null;
                     } catch (Exception e) {
-                        ////////////////log.p("Delete Failed ");
+                        //////////////////Log.p("Delete Failed ");
                         e.printStackTrace();
                         Log.sendLogAsync();
 
@@ -2243,7 +2235,7 @@ public class localAPI {
 
             while (next) {
                 userString = c.getRow().getString(0);
-                ////////////////////log.p(userString);
+                //////////////////////Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -2252,15 +2244,15 @@ public class localAPI {
             ex.printStackTrace();
             Log.sendLogAsync();
         }
-        ////////////////log.p(userString);
+        //////////////////Log.p(userString);
         if (userString.indexOf("{") >= 0) {
-            ////////log.p("This is the Request Parameter  \n" + userString + "\n for request " + post);
+            //////////Log.p("This is the Request Parameter  \n" + userString + "\n for request " + post);
             List<Map<String, Object>> ps = parseString(userString);
             for (Map<String, Object> m : ps) {
-                ////////log.p("Parsed ==>\n" + m.toString());
+                //////////Log.p("Parsed ==>\n" + m.toString());
                 RequestParameter cs = new RequestParameter();
                 cs.getPropertyIndex().populateFromMap(m);
-                ////////log.p("From Request Parameter \n" + cs.getPropertyIndex().toJSON());
+                //////////Log.p("From Request Parameter \n" + cs.getPropertyIndex().toJSON());
                 l.add(cs);
             }
         }
@@ -2275,7 +2267,7 @@ public class localAPI {
         l.addAll(k);
         Storage.getInstance().deleteStorageFile(ts);    
         }catch(Exception e){
-            ////////////////log.p(e.getMessage());
+            //////////////////Log.p(e.getMessage());
             e.printStackTrace();
                             Log.sendLogAsync();
             
@@ -2299,10 +2291,10 @@ public class localAPI {
                     + "'" + post + "'");
 
             Boolean next = c.next();
-            Log.p("Found service attribute for requestparameter "+  post+  " " + next);
+            //Log.p("Found service attribute for requestparameter "+  post+  " " + next);
             while (next) {
                 userString = c.getRow().getString(0);
-                Log.p(userString);
+                //Log.p(userString);
                 next = c.next();
             }
             c.close();
@@ -2671,7 +2663,7 @@ public class localAPI {
             query = query + " " + "ORDER BY _created DESC ";
         }
         query = query + " LIMIT " + page + "," + size + ";";
-        Log.p(query);
+       //Log.p(query);
         //HashMap mquery = new HashMap();
         //mquery.put("ORDER BY", "_created");
         //mquery.put("LIMIT", size );
@@ -2730,7 +2722,7 @@ public class localAPI {
             // cur.close();
 
         } catch (Exception ex) {
-            Log.p(ex.getMessage());
+           //Log.p(ex.getMessage());
         }
 
         return responseList;

@@ -36,7 +36,7 @@ public class NewPostForm extends Form {
     private static final String[] POST_STYLES = { 
         "Label", "PostStyleHearts", "PostStyleHands", "PostStyleBlack", 
         "PostStyleRed", "PostStylePurple" };
-    private TextArea post = new TextArea(3, 80);
+    private final TextArea post = new TextArea(3, 80);
     private String postStyleValue;
     private String attachment;
     private String mime;

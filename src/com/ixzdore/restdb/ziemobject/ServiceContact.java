@@ -147,7 +147,7 @@ public class ServiceContact implements PropertyBusinessObject{
         rank.setLabel("Rating");
     }
  public String summary(){
-     ////log.p(this.getPropertyIndex().toString(true));
+     //////Log.p(this.getPropertyIndex().toString(true));
      String s = "";
      //format the service contact details for display in a richview component
       String hdr = "<?xml version=\"1.0\" encoding=\"windows-1252\"?>\n" +
@@ -278,7 +278,7 @@ public class ServiceContact implements PropertyBusinessObject{
     }
 
     public Image getAvatar(float imageSize) {
-        ////////log.p("User getting Avatar from " + avatar.get());
+        //////////Log.p("User getting Avatar from " + avatar.get());
         String filename = "contact-"+name.get();
         int size = convertToPixels(imageSize);
         Image temp = getAvatarMask(size);
@@ -294,9 +294,9 @@ public class ServiceContact implements PropertyBusinessObject{
             avatarImg = ((FontImage) avatarImg).toImage();
         }
         avatarImg = avatarImg.applyMask(mask);
-        //////log.p("ServiceContact logo" + logo.toString());
+        ////////Log.p("ServiceContact logo" + logo.toString());
         if ((logo.size() > 0) ) {
-            //////log.p("Logo " + logo.get(0).toString());
+            ////////Log.p("Logo " + logo.get(0).toString());
             
            //if   (logo.get(0).indexOf("http") >= 0 )
             return URLImage.createToStorage(

@@ -211,13 +211,13 @@ public class AudioEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // //////log.p(editContainer.getParent().getParent().toString());                
+                // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -227,12 +227,12 @@ public class AudioEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             imageControls.add(addAnotherButton);
         }
 
@@ -256,8 +256,6 @@ public class AudioEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -334,7 +332,7 @@ public class AudioEditor extends BaseEditorImpl {
     }
 
     private void setVideo(String video, MediaPlayer mp) {
-        ////log.p("Video to play " + video);
+        //////Log.p("Video to play " + video);
         //mp.setDataSource("");
         String hpath = FileSystemStorage.getInstance().getAppHomePath() + "video";
         try {
@@ -350,7 +348,7 @@ public class AudioEditor extends BaseEditorImpl {
             mediaP.prepare();
             mediaP.play();
             //mp = new MediaPlayer(mediaP);
-            //////log.p("Ready to play");
+            ////////Log.p("Ready to play");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -358,7 +356,7 @@ public class AudioEditor extends BaseEditorImpl {
         }
     }
     private void setAudio(String video, MediaPlayer mp) {
-        ////log.p("Video to play " + video);
+        //////Log.p("Video to play " + video);
         //mp.setDataSource("");
         String hpath = FileSystemStorage.getInstance().getAppHomePath() + "video";
         try {
@@ -374,7 +372,7 @@ public class AudioEditor extends BaseEditorImpl {
             mediaP.prepare();
             mediaP.play();
             //mp = new MediaPlayer(mediaP);
-            //////log.p("Ready to play");
+            ////////Log.p("Ready to play");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -40,7 +40,7 @@ public class UIController {
        splash.getAllStyles().setBgImage(bgImage);      
        splash.add(CENTER,new InfiniteProgress());
        Display.getInstance().callSerially(()->{
-           ////log.p("Initiatilizing local database");
+           //////Log.p("Initiatilizing local database");
        ServerAPI.initDb();
        });
         //splash.setUIID("SplashForm");
@@ -104,7 +104,7 @@ public class UIController {
     }
 
     private static void afterSplash() {
-    //    ToastBar.showInfoMessage("Syncing with Server ..");
+   //ToastBar.showInfoMessage("Syncing with Server ..");
 
        
         Timer t = new Timer();
@@ -112,10 +112,10 @@ public class UIController {
 
              public void run() 
              {
-                                 // //log.p("Syncing definitions ");
+                                 // ////Log.p("Syncing definitions ");
                //ToastBar.showInfoMessage("Syncing messages ...");
-               localAPI.saveRequestsToServer();                 
-                ServerAPI.loadRequests();
+               localAPI.saveRequestsToServer();
+               ServerAPI.loadRequests();
              }
           };
           TimerTask tb = new TimerTask(){
@@ -123,12 +123,12 @@ public class UIController {
              public void run() 
              {
 //                 ToastBar.showInfoMessage("Syncing definitions and setups ...");
-                 ////log.p("Syncing definitions ");
+                 //////Log.p("Syncing definitions ");
                 ServerAPI.loadDefinitions();
              }
           };
 
-        t.schedule(ta,900,1200);  
-        t.schedule(tb, 900,900);
+        t.schedule(ta,1000,5000);
+        t.schedule(tb, 5000,36000);
        }
 }

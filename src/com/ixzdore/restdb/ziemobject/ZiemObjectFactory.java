@@ -15,7 +15,7 @@ import com.ixzdore.restdb.ziemobject.ServiceContact;
  * names since we cannot use introspection in codenameone
  */
 public class ZiemObjectFactory {
-    private static HashMap<String, Class<? extends PropertyBusinessObject>> ziemObject = new 
+    private static final HashMap<String, Class<? extends PropertyBusinessObject>> ziemObject = new
         HashMap<String, Class<? extends PropertyBusinessObject>>();
     private static void init(){
         ziemObject.clear();

@@ -60,7 +60,7 @@ public class Category implements PropertyBusinessObject{
         //populate the comments
         //comments.clear();
         ArrayList<String> aa = localAPI.getCategoryIcon(this._id.get());
-        //////////log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
+        ////////////Log.p("Comments For " + this._id.get() + " "+ aa.size() +"\n");
         if (aa != null ) {
             icon.clear();
             icon.addAll(aa);

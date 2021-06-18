@@ -83,7 +83,7 @@ public class BatchRequestForm extends Form {
         chooseAndProcess.add(chooseService());
         chooseAndProcess.add(proceedOrCancel());
         chooseAndProcess.revalidate();
-        //////log.p(chooseAndProcess.toString());
+        ////////Log.p(chooseAndProcess.toString());
         sSelector.setLayout(new BoxLayout(BoxLayout.Y_AXIS));        
         sSelector.add(chooseAndProcess);
         sSelector.add(status);        
@@ -203,7 +203,7 @@ public class BatchRequestForm extends Form {
         stringPicker.setText("Choose Service");
         stringPicker.setType(Display.PICKER_TYPE_STRINGS);
         stringPicker.setStrings(serviceNames());
-        String s=serviceNames()[0].toString();
+        String s= serviceNames()[0];
         stringPicker.setSelectedString(s);
         Picker p = stringPicker;
         p.addActionListener(new ActionListener() {
@@ -214,7 +214,7 @@ public class BatchRequestForm extends Form {
         });
         x.add(servicePicker);
         x.revalidate();
-        //////log.p(x.toString());
+        ////////Log.p(x.toString());
         return x;
     }
 
@@ -234,14 +234,14 @@ public class BatchRequestForm extends Form {
         for (Service s : servicelist) {
             serviceString = serviceString + s.name.get() + ",";
         }
-        //////log.p("Services " + serviceString);
+        ////////Log.p("Services " + serviceString);
         Object[] sa = StringUtil.tokenize(serviceString, ",").toArray();
         String[] optionArray = new String[sa.length +1];
         optionArray[0]="Choose A Service";
         for (int i = 1; i < sa.length+1; i++) {
             optionArray[i] = (String) sa[i-1];
             ////System.out.println("\nOption in OptionList " + opa[i]);
-            ////////log.p(sa[i-1].toString());
+            //////////Log.p(sa[i-1].toString());
         }
         return optionArray;
     }
@@ -265,19 +265,19 @@ public class BatchRequestForm extends Form {
             while (k < tm.getColumnCount()){
               String value = tm.getValueAt(i, k).toString();
               String field = tm.getValueAt(0,k).toString();
-              //////log.p(field + " -- " + value);
+              ////////Log.p(field + " -- " + value);
               for (RequestParameter rp:rq.request_parameters){
                   if (rp.service_attribute.get(0).name.get().equalsIgnoreCase(field)) {
                       rp.value.set(value);
-                      //////log.p("Matching " + rp.service_attribute.get(0).name.get() + "--" + value); 
+                      ////////Log.p("Matching " + rp.service_attribute.get(0).name.get() + "--" + value);
                   }                  
               }
               k++;
             }
             rq.saveLocalNoSync();
-            ////log.p("Saved " + rq.summary.get());
+            //////Log.p("Saved " + rq.summary.get());
             i++;
-            String message = "Processed " + String.valueOf(i) + " out of " + String.valueOf(records) + "records.";
+            String message = "Processed " + i + " out of " + records + "records.";
             status.setText(message);
             bForm.revalidate();
             //ToastBar.getInstance().setVisible(false);

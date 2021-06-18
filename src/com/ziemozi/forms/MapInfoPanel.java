@@ -201,8 +201,7 @@ private void initStarRankStyle(Style s, Image star) {
                 //        .setBgColor(0x0)
                 //        .setBorder(Border.createEmpty())
                 //        .setBgTransparency((byte)0);
-               
-                        ;
+
                 dlg.show(0, 0, 0, dw * 3/4);
                 
                 updateMapPosition();

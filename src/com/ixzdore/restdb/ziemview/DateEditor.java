@@ -50,6 +50,7 @@ public class DateEditor extends BaseEditorImpl {
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         //editContainer.setLayout(new GridLayout(2));
+        //textField.setUIID("SmallLabel");
         editContainer.getAllStyles().setPaddingBottom(5);
  //       editContainer.getAllStyles().setBorder(Border.createEtchedLowered());
         datePicker.getPicker().setDate(new Date());
@@ -96,7 +97,7 @@ public class DateEditor extends BaseEditorImpl {
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
-        helpButton.setUIID("Label");
+        helpButton.setUIID("SmallLabel");
 
         setEditorConstraints();
         textField.addActionListener(new ActionListener() {
@@ -125,14 +126,14 @@ public class DateEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // //////log.p(editContainer.getParent().getParent().toString());                
+               // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                                                         c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
@@ -142,12 +143,12 @@ public class DateEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
 
  
         editContainer.add(headerContainer).add(datePicker);
@@ -164,8 +165,6 @@ public class DateEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {

@@ -50,17 +50,18 @@ import java.util.List;
 
 
 public class ContactsfeedContainer extends InfiniteContainer {
-
-        @Override
+    ArrayList<ServiceContact> contacts = new ArrayList<ServiceContact>();
+    @Override
         public Component[] fetchComponents(int index, int amount) {
-             List<Component> response = new ArrayList<>(); 
-            ArrayList<ServiceContact> contacts = new ArrayList<ServiceContact>();            
+            Log.p("Index " + index);
+             List<Component> response = new ArrayList<>();
         if(index == 0) {
             response.add(createWelcomeBar());
             response.add(UIUtils.createSpace());                
                 //we are just starting so load it all up
                 contacts = localAPI.searchContacts(
                         "", 0, amount + 9999);
+                Log.p("Contacts " + contacts.size());
  
             }
             if ((contacts == null) || (contacts.size() < 1)) {
@@ -80,13 +81,13 @@ public class ContactsfeedContainer extends InfiniteContainer {
             }
             return UIUtils.toArray(response);
         
-        } ;
+        }
 
     private Component createEntry(ServiceContact p) {
         if (p != null) {
-            //////log.p("Service Contact name " + p.name.get());
+            ////////Log.p("Service Contact name " + p.name.get());
             //if (p.services.size() > 0) {
-                //////log.p("Creating Entry for " + p.summary());
+                ////////Log.p("Creating Entry for " + p.summary());
                 p.refresh();
                 
                 MultiButton mb = new MultiButton(p.name.get());
@@ -95,7 +96,7 @@ public class ContactsfeedContainer extends InfiniteContainer {
                 mb.setTextLine1(p.name.get());
                 mb.setTextLine2(p.fullAddress());
                 mb.setTextLine3(p.extendedDescription());
-                ////////log.p(p.plain_summary());
+                //////////Log.p(p.plain_summary());
                 //if ( )
 
                 mb.setIcon(p.getAvatar(8));

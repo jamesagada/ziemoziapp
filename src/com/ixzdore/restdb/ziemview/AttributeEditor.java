@@ -51,11 +51,11 @@ public class AttributeEditor extends Container {
         ServiceAttributeType st;
         this.attribute = serviceAttribute;
         
-        //////log.p("Setting up to show attribute " + attribute._id.get() + attribute.name.get());
+        ////////Log.p("Setting up to show attribute " + attribute._id.get() + attribute.name.get());
         //List at = serviceAttribute.type_of_attribute.asList();
-        ////////////log.p("\nService Attribute " + serviceAttribute.getPropertyIndex().toJSON());
-        //////////////log.p("This is attribute type " + at.get(0));
-        //////////////log.p(at.get(0).getClass().getName());
+        //////////////Log.p("\nService Attribute " + serviceAttribute.getPropertyIndex().toJSON());
+        ////////////////Log.p("This is attribute type " + at.get(0));
+        ////////////////Log.p(at.get(0).getClass().getName());
         //if (at.get(0).getClass().getName().indexOf("ServiceAttributeType") > 0) {
             //the type is serviceAttributeType
         //    st = (ServiceAttributeType)at.get(0);
@@ -63,15 +63,15 @@ public class AttributeEditor extends Container {
         //st = new ServiceAttributeType();
         //st.getPropertyIndex().populateFromMap((Map) at);
         //}
-        //////log.p("Service Attribute To Show " + serviceAttribute.getPropertyIndex().toString());
+        ////////Log.p("Service Attribute To Show " + serviceAttribute.getPropertyIndex().toString());
         if (serviceAttribute.type_of_attribute.size() <= 0)serviceAttribute.refreshAttribute();
-        Log.p("Service Attribute To Show " + serviceAttribute.getPropertyIndex().toString());
+        //Log.p("Service Attribute To Show " + serviceAttribute.getPropertyIndex().toString());
         Object so = serviceAttribute.type_of_attribute.get(0);
         if (so.getClass().getCanonicalName().indexOf("String") > 0 ) {
             //this is a string and not a service type
             //we need to get the service type
             //so we ask the serviceAttribute to load the service type
-            //////log.p("String Attribute Type " + so.toString());
+            ////////Log.p("String Attribute Type " + so.toString());
             //serviceAttribute.refreshAttribute();
             //if this fails then what? the attribute type is unknow and we should actually return
             serviceAttribute.refreshTypeOfAttribute();
@@ -83,16 +83,16 @@ public class AttributeEditor extends Container {
         attributeType = st;
 
         ////System.out.println("Attribute Type to be edited --> " + attributeType.getPropertyIndex().toJSON());
-        //////log.p("Attribute Type Name is " + attributeType.name.get());
+        ////////Log.p("Attribute Type Name is " + attributeType.name.get());
         //BaseEditorImpl cmpClass = editorFactory.get(attributeType.name.get());
         BaseEditorImpl cmpClass = null;
         Object cClass = editorClassFactory.get(attributeType.name.get());
             try {
                  cmpClass = (BaseEditorImpl)((Class)cClass).newInstance();
             } catch (Exception e){
-                //////log.p(e.getMessage());
+                ////////Log.p(e.getMessage());
             }
-           // ////log.p(cClass.getClass().getCanonicalName());
+           // //////Log.p(cClass.getClass().getCanonicalName());
         if (cmpClass != null) {
             //cmp class will have all the attributes of the type
             //so we will have a base component
@@ -117,34 +117,34 @@ public class AttributeEditor extends Container {
         RequestParameter r = null;
         
         int i = 0;
-        ////////log.p("Component Count " + this.getComponentCount());
+        //////////Log.p("Component Count " + this.getComponentCount());
         while (i < this.getComponentCount()) {
             Component c = this.getComponentAt(i);
           if ( c.getClientProperty("attribute") != null ){
  //                      BaseEditorImpl b = (BaseEditorImpl) this.getComponentAt(i).getClientProperty("editor");
  //          
-            ////////log.p("component " + c.getName());
+            //////////Log.p("component " + c.getName());
           }
-            ////////////log.p("AttributeEditor.getAttributeValue" + this.getComponentAt(i).getClass().getCanonicalName());
+            //////////////Log.p("AttributeEditor.getAttributeValue" + this.getComponentAt(i).getClass().getCanonicalName());
             if (this.getComponentAt(i).getClass().getName().endsWith("Container")) {
                 BaseEditorImpl b = (BaseEditorImpl) this.getComponentAt(i).getClientProperty("editor");
                 if (b != null) {
-                    //////////////log.p(" AttributorGetAttributeValue - request parameter " + b.getRequestParameter().getPropertyIndex().toString());
-                    //////////////log.p("AttributeGetAttribute.getAttributeValue - service Attribute " + b.serviceAttribute.getPropertyIndex().toString());
+                    ////////////////Log.p(" AttributorGetAttributeValue - request parameter " + b.getRequestParameter().getPropertyIndex().toString());
+                    ////////////////Log.p("AttributeGetAttribute.getAttributeValue - service Attribute " + b.serviceAttribute.getPropertyIndex().toString());
                     r = b.getRequestParameter();
                     ServiceAttribute s = b.getServiceAttribute();
-                    ////////////log.p("Service Attribute "+ s.getPropertyIndex().toString());
+                    //////////////Log.p("Service Attribute "+ s.getPropertyIndex().toString());
                     r.service_attribute.clear();
                     r.service_attribute.add(s);
                     return r;
                     //ServiceAttribute sa = new ServiceAttribute();
                     //sa.getPropertyIndex().populateFromMap(
                     //        b.serviceAttribute.getPropertyIndex().toMapRepresentation());
-                    //////////////log.p("Service Attribute " + sa.getPropertyIndex().toJSON());
+                    ////////////////Log.p("Service Attribute " + sa.getPropertyIndex().toJSON());
                     
                     //r.service_attribute.set(b.serviceAttribute);
-                    ////////////log.p("Retrieved Request Parameter \n" + r.getPropertyIndex().toJSON());
-                   ////////////log.p("BaseEditor at Component number " + i); 
+                    //////////////Log.p("Retrieved Request Parameter \n" + r.getPropertyIndex().toJSON());
+                   //////////////Log.p("BaseEditor at Component number " + i);
                 }
                 
                 i++;
@@ -188,6 +188,9 @@ public class AttributeEditor extends Container {
         editorClassFactory.put("MultiList",   MultiListEditor.class);   
         editorClassFactory.put("MultiObject",   MultiObjectListEditor.class);         
         editorClassFactory.put("Boolean",   BooleanEditor.class);
+        editorClassFactory.put("Phone",   PhoneNumberEditor.class);
+        editorClassFactory.put("Email",   EmailAddressEditor.class);
+        editorClassFactory.put("Url",   UrlEditor.class);
         editorClassFactory.put("Signature",   SignatureEditor.class);
         editorClassFactory.put("SelectAndNumber",   SelectAndNumberEditor.class);
          editorClassFactory.put("File",  FileEditor.class);  
@@ -198,10 +201,11 @@ public class AttributeEditor extends Container {
         editorClassFactory.put("TransportStop",TransportStop.class);   
                //editorClassFactory.put("Sensor",SensorScanner.class);  
                editorClassFactory.put("Sensor",LESensor.class);  
-               editorClassFactory.put("Browser",BrowserEditor.class);
+               editorClassFactory.put("Browser",BrowserViewer.class);
                editorClassFactory.put("TextAndNumber",TextAndNumberEditor.class);  
                editorClassFactory.put("Panel",PanelEditor.class);
                editorClassFactory.put("Audio",AudioEditor.class);
+               editorClassFactory.put("TableView",TableView.class);
     }
         
 

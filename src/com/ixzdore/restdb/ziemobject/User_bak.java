@@ -101,7 +101,7 @@ public class User_bak implements PropertyBusinessObject {
         String filename = "round-avatar-" + imageSize + "-" + id.get();
         if(existsInStorage(filename)) {
             try(InputStream is = 
-                    createStorageInputStream(filename);) {
+                    createStorageInputStream(filename)) {
                 return Image.createImage(is);
             } catch(IOException err) {
                 Log.e(err);

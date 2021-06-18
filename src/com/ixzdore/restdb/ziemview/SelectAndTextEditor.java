@@ -108,7 +108,7 @@ public class SelectAndTextEditor extends BaseEditorImpl {
 
         stringPicker.setSelectedString(s);
         Picker p = stringPicker;
-        //////////log.p("\n PickerCompnent Visibility " + booleanPicker.getUIID());
+        ////////////Log.p("\n PickerCompnent Visibility " + booleanPicker.getUIID());
         // p.setSelectedString(attr.default_value.get());
 
         p.addActionListener(new ActionListener() {
@@ -153,31 +153,31 @@ public class SelectAndTextEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString());                
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                 Component c= new AttributeEditor(serviceAttribute, true);
                             $(c).addTags("attribute");
                             c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });
            removeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-               // ////////log.p(editContainer.getParent().getParent().toString()); 
+               // //////////Log.p(editContainer.getParent().getParent().toString());
                selfref.setVisible(false);
                
-                ////////log.p("Remove this component \n"  + selfref);
-                ////////log.p("Container " + editContainer.getParent().getParent());
-                ////////log.p("Parent Container " + editContainer.getParent().getParent().getParent());
+                //////////Log.p("Remove this component \n"  + selfref);
+                //////////Log.p("Container " + editContainer.getParent().getParent());
+                //////////Log.p("Parent Container " + editContainer.getParent().getParent().getParent());
                 editContainer.getParent().getParent().removeComponent(selfref);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
                 editContainer.getParent().getParent().getParent().revalidate();                
-                //////////log.p(editContainer.getParent().getParent().toString());
+                ////////////Log.p(editContainer.getParent().getParent().toString());
             }
         
         });        
@@ -188,12 +188,12 @@ public class SelectAndTextEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
         
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
+        if (attr.multiplicity.getBoolean()) headerContainer.add(addAnotherButton);
         selectContainer.add(booleanPicker).add(numberField);
         editContainer.add(headerContainer).add(selectContainer);
         editContainer.revalidate();
@@ -210,8 +210,6 @@ public class SelectAndTextEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -292,7 +290,7 @@ public class SelectAndTextEditor extends BaseEditorImpl {
                         this.serviceAttribute._parent_id
                         ;
                 //cheeck if there is any file like this already and if it is not too lod
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 if (!FileSystemStorage.getInstance()
                         .exists(FileSystemStorage.getInstance().getAppHomePath()+"/" 
                                 + fileName)) 
@@ -313,7 +311,7 @@ public class SelectAndTextEditor extends BaseEditorImpl {
                                     , true);                        
                     }
                 }
-                ////////log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);                
+                //////////Log.p(FileSystemStorage.getInstance().getAppHomePath()+ fileName);
                 try {
                     //read the contents of the file to options
                     options = Util.readToString(FileSystemStorage.getInstance().

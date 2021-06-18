@@ -19,12 +19,17 @@ import com.codename1.media.Media;
 import com.codename1.media.MediaManager;
 import com.codename1.ui.Button;
 import com.codename1.ui.Component;
+
 import static com.codename1.ui.Component.BOTTOM;
 import static com.codename1.ui.Component.LEFT;
 import static com.codename1.ui.ComponentSelector.$;
+import net.informaticalibera.videoediting.OnProgress;
+import net.informaticalibera.videoediting.VideoOptimizer;
+
 import com.codename1.ui.Container;
 import com.codename1.ui.Dialog;
 import com.codename1.ui.Display;
+import com.codename1.ui.EncodedImage;
 import com.codename1.ui.FontImage;
 import com.codename1.ui.Form;
 import com.codename1.ui.Image;
@@ -35,6 +40,7 @@ import com.codename1.ui.events.ActionListener;
 import com.codename1.ui.geom.Dimension;
 import com.codename1.ui.geom.Rectangle;
 import com.codename1.ui.layouts.BorderLayout;
+import com.codename1.util.OnComplete;
 import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
 import com.ixzdore.restdb.ziemobject.ServiceAttributeType;
@@ -43,12 +49,12 @@ import com.codename1.ui.layouts.GridLayout;
 import com.codename1.ui.plaf.Style;
 import com.codename1.ui.plaf.UIManager;
 import com.codename1.util.StringUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- *
  * @author jamesagada
  */
 public class VideoEditor extends BaseEditorImpl {
@@ -66,6 +72,7 @@ public class VideoEditor extends BaseEditorImpl {
     public final String mime_type = "video/mpeg";
     public final Container imageControls;
     public final Container headerContainer = new Container();
+    private static final VideoOptimizer videoOptimizer = new VideoOptimizer();
 
     public VideoEditor() {
 
@@ -150,17 +157,20 @@ public class VideoEditor extends BaseEditorImpl {
                         } catch (Exception e) {
                             s = "";
                         }
-                        ////System.out.println("Selected Video is " + s);
-                        //setVideo(s,mp);                        
+                        //
+                        //
+                        //
+
                         textField.setText(s);
-                        if ((s != "") && (s != null)) {
-                            imageButton.setText("Play");
-                            imageButton.setIcon(FontImage.createMaterial(
-                                    FontImage.MATERIAL_VIDEOCAM, imageButton.getStyle()));
+                        if ((s != "") && (s != null) && isVideo(s)) {
+                            imageButton.setText("Play Video");
+                            showPreview(s, imageButton);
+                            // imageButton.setIcon(FontImage.createMaterial(
+                            //         FontImage.MATERIAL_VIDEOCAM, imageButton.getStyle()));
                         } else {
                             imageButton.setIcon(FontImage.createMaterial(
                                     FontImage.MATERIAL_VIDEOCAM_OFF, imageButton.getStyle()));
-                            imageButton.setText("");
+                            imageButton.setText("No Video To Play");
                         }
                         imageButton.repaint();
                         imageButton.getParent().revalidate();
@@ -181,14 +191,16 @@ public class VideoEditor extends BaseEditorImpl {
                 } catch (Exception e) {
                     s = "";
                 }
-                if ((s != "") && (s != null)) {
+
+                if ((s != "") && (s != null) && isVideo(s)) {
                     imageButton.setText("Play");
+                    showPreview(s, imageButton);
                     imageButton.setIcon(FontImage.createMaterial(
                             FontImage.MATERIAL_VIDEOCAM, imageButton.getStyle()));
                 } else {
                     imageButton.setIcon(FontImage.createMaterial(
                             FontImage.MATERIAL_VIDEOCAM_OFF, imageButton.getStyle()));
-                    imageButton.setText("");
+                    imageButton.setText("No Image");
                 }
                 //imageButton.setText(s);
                 //imageButton.remove();
@@ -206,7 +218,7 @@ public class VideoEditor extends BaseEditorImpl {
                 if (textField.getText().length() > 0) {
 
                     setVideo(textField.getText(), mp);
- 
+
                 }
             }
         });
@@ -221,13 +233,13 @@ public class VideoEditor extends BaseEditorImpl {
         addAnotherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // //////log.p(editContainer.getParent().getParent().toString());                
+                // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
-                ////////log.p(editContainer.getParent().getParent().toString());
+                //////////Log.p(editContainer.getParent().getParent().toString());
             }
 
         });
@@ -237,12 +249,12 @@ public class VideoEditor extends BaseEditorImpl {
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
 
-        if ((Boolean) attr.required.getBoolean()) {
+        if (attr.required.getBoolean()) {
             //editContainer.add(requiredButton);
             helpButton.setText(helpButton.getText() + "*");
             //    textLabel.setText(textLabel.getText()+"*");
         }
-        if ((Boolean) attr.multiplicity.getBoolean()) {
+        if (attr.multiplicity.getBoolean()) {
             imageControls.add(addAnotherButton);
         }
 
@@ -266,8 +278,6 @@ public class VideoEditor extends BaseEditorImpl {
         editContainer.revalidate();
         return editContainer;
     }
-
-    ;  
 
     @Override
     public void createRequestParameter(ServiceAttributeType serviceType) {
@@ -344,27 +354,92 @@ public class VideoEditor extends BaseEditorImpl {
     }
 
     private void setVideo(String video, MediaPlayer mp) {
-        ////log.p("Video to play " + video);
+        //////Log.p("Video to play " + video);
         //mp.setDataSource("");
-        String hpath = FileSystemStorage.getInstance().getAppHomePath() + "video";
-        try {
-            OutputStream o = FileSystemStorage.getInstance().openOutputStream(hpath);
-            InputStream v = FileSystemStorage.getInstance().openInputStream(video);
-            String _mtype =             _mtype = "video/mp4";
-            Util.copy(v, o);
-            o.close();
-            v.close();
-            InputStream iv = FileSystemStorage.getInstance().openInputStream(hpath);
-            mediaP = MediaManager.createMedia(iv, _mtype);
-            mediaP.setNativePlayerMode(true);
-            mediaP.prepare();
-            mediaP.play();
-            //mp = new MediaPlayer(mediaP);
-            //////log.p("Ready to play");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //ToastBar.showInfoMessage("Error showing video OR no video to show");
+        String hpath = FileSystemStorage.getInstance().getAppHomePath() + "video";
+        if (isVideo(hpath)) {
+            try {
+                OutputStream o = FileSystemStorage.getInstance().openOutputStream(hpath);
+                InputStream v = FileSystemStorage.getInstance().openInputStream(video);
+                String _mtype = _mtype = "video/mp4";
+                Util.copy(v, o);
+                o.close();
+                v.close();
+                InputStream iv = FileSystemStorage.getInstance().openInputStream(hpath);
+                mediaP = MediaManager.createMedia(iv, _mtype);
+                mediaP.setNativePlayerMode(true);
+                mediaP.prepare();
+                mediaP.play();
+                //mp = new MediaPlayer(mediaP);
+                ////////Log.p("Ready to play");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                //ToastBar.showInfoMessage("Error showing video OR no video to show");
+            }
         }
     }
+
+    /**
+     * Very fast method to detect if the given file is a supported video
+     * (it relies on VideoOptimizer CN1Lib)
+     *
+     * @param file placed in FileSystemStorage
+     * @return
+     */
+    public static boolean isVideo(String file) {
+        return videoOptimizer.getVideoDuration(file) > 0;
+    }
+
+    /**
+     *
+     */
+    private void showPreview(String video, Label previewLabel) {
+        try {
+            String originalFile = video;
+            String jpegFile = videoOptimizer.getVideoPreview(originalFile);
+            EncodedImage encodedImg = EncodedImage.create(FileSystemStorage.getInstance().openInputStream(jpegFile));
+            previewLabel.getAllStyles().setBackgroundType(Style.BACKGROUND_IMAGE_SCALED_FIT);
+            previewLabel.getAllStyles().setBgImage(encodedImg);
+            previewLabel.repaint();
+        } catch (IOException ex) {
+            Log.e(ex);
+        }
+    }
+
+    private void optimizeVideo(String s) {
+        String originalFile = s;
+        long startTime = System.currentTimeMillis();
+        OnComplete onCompleteCallback = (output) -> {
+            String optimizedFile = (String) output;
+            float originalLength =
+                    Math.round(FileSystemStorage.getInstance().getLength(originalFile) * 10 / (1024 * 1024)) / 10f;
+            float optimizedLength =
+                    Math.round(FileSystemStorage.getInstance().getLength(optimizedFile) * 10 / (1024 * 1024)) / 10f;
+            int originalBitrate = videoOptimizer.getVideoBitrate(originalFile);
+            int optimizedBitrate = videoOptimizer.getVideoBitrate(optimizedFile);
+            Dimension originalSize = videoOptimizer.getVideoSize(originalFile);
+            Dimension optimizedSize = videoOptimizer.getVideoSize(optimizedFile);
+            imageButton.setText("Original: " + originalLength + "MiB, optimized: " + optimizedLength + "MiB" + "\n"
+                    + "Original: " + (originalBitrate / 8 / 1024) + "KiB/s, optimized: " + (optimizedBitrate / 8 / 1024)
+                    + "KiB/s" + "\n"
+                    + "Original: " + originalSize.getWidth() + "x" + originalSize.getHeight() + ", optimized: "
+                    + optimizedSize.getWidth() + "x" + optimizedSize.getHeight() + "\n"
+                    + "Video duration: " + videoOptimizer.getVideoDuration(originalFile) + " s, execution: " + (
+                    (System.currentTimeMillis() - startTime) / 1000) + " s"
+            );
+        };
+        Runnable onFailureCallback = () -> {
+            imageButton.setText("Optimizing failure, see logs.");
+            Log.sendLogAsync();
+        };
+        OnProgress onProgressCallback = (percentage) -> {
+            imageButton.setText("Optimizing, please wait... " + percentage + "%");
+        };
+        videoOptimizer.optimizeVideoForUpload(originalFile,
+                onCompleteCallback, onFailureCallback, onProgressCallback);
+        imageButton.setText("Optimizing, please wait...");
+    }
+
 }

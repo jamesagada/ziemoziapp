@@ -5,6 +5,7 @@
  */
 package com.ixzdore.restdb.ziemobject;
 import com.codename1.properties.IntProperty;
+import com.codename1.properties.ListProperty;
 import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBusinessObject;
 import com.codename1.properties.PropertyIndex;
@@ -13,27 +14,33 @@ import java.util.Date;
 /**
  *
  * @author jamesagada
- * ({
-    "_id",
-    "icon",
-    "description",
-    "name",
-    "_created",
-    "_mock"
-})
+ * Collection properties
+ *
+ * name	type	description
+ * obj['name']	text	name of the route
+ * obj['ad_hoc']	bool	is it an ad_hoc route
+ * obj['distance']	float_number	average distance for this route
+ * obj['duration']	float_number	normal duration of a trip on the route
+ * obj['fares']	fares	Fare to be charged on this route
+ * obj['laststop']	stop	the last stop
+ * obj['startlocation']	stop	starting stop
  */
 public class Route implements PropertyBusinessObject{
     public final Property<String, Route> _id = new Property<>("_id");
-    public final Property<String, Route> first_name = new Property<>("first_name");
+    public final Property<String, Route> name = new Property<>("name");
+    public final Property<String, Route> ad_hoc = new Property<>("ad_hoc");
     public final Property<String, Route> description = new Property<>("description");
-    public final Property<String, Route> balance = new Property<>("balance");
-    public final Property<String, Route> ble_code = new Property<>("ble_code");
-    public final Property<String, Route> qr_code = new Property<>("qr_code");
-    public final Property<String, Route> phone_number = new Property<>("phone_number");
-    public final Property<String, Route> email = new Property<>("email");
-    public final Property<String, Route> last_name = new Property<>("last_name");
-    public final PropertyIndex idx = new PropertyIndex(this, "Wallet",
-            _id, phone_number, balance, email, first_name,last_name, description, ble_code,qr_code);
+    public final Property<String, Route> distance = new Property<>("distance");
+    public final Property<String, Route> duration = new Property<>("duration");
+    public final ListProperty<Fare, Route> fares = new ListProperty<>("fares");
+    public final Property<Stop, Route> laststop = new Property<>("laststop");
+    public final Property<Stop, Route> startLocation = new Property<>("startLocation");
+    public final ListProperty<RouteStops, Route> stops =
+            new ListProperty<>("stops",RouteStops.class);
+    public final Property<String,Route> _created = new Property<>("_created");
+    public final PropertyIndex idx = new PropertyIndex(this, "Route",
+            _id, name, description, distance,
+             duration,fares, laststop, startLocation,ad_hoc,stops,_created);
 
     @Override
     public PropertyIndex getPropertyIndex() {
@@ -41,9 +48,8 @@ public class Route implements PropertyBusinessObject{
  
     }
         public Route(){
-        first_name.setLabel("Name");
-        balance.setLabel("Balance");
-        phone_number.setLabel("Phone");
+        name.setLabel("Name");
         description.setLabel("Description");
+        ad_hoc.setLabel("Ad Hoc?");
     }
 }

@@ -3,6 +3,7 @@ package com.ziemozi.forms;
 import com.codename1.components.InfiniteProgress;
 import com.codename1.components.SpanLabel;
 import com.codename1.components.ToastBar;
+import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.plaf.Border;
 import com.ixzdore.restdb.ziemobject.Post;
 import static com.codename1.ui.CN.getCurrentForm;
@@ -157,7 +158,7 @@ public class ChooseService extends Form {
         ArrayList<Provider> cat = ServerAPI.providers();
         for (Provider ct : cat) {
             ct.refreshIcon();
-            //////////log.p("Provider " + ct.getPropertyIndex().toString());
+            ////////////Log.p("Provider " + ct.getPropertyIndex().toString());
             String mediaUrl = ServerAPI.mediaUrl(ct.icon.get(0));
 
             Button b = new Button(ct.name.get());
@@ -236,16 +237,17 @@ public class ChooseService extends Form {
 
     private Component categories(Category cx) {
         Container cnt = new Container();
-        cnt.setLayout(new GridLayout(3, 3));
+        cnt.setLayout(new GridLayout(4, 3));
+        //cnt.setLayout(new FlowLayout());
         ArrayList<Category> cat = new ArrayList<Category>();
         if (cx == null) {
             cat = ServerAPI.categories(true);
         } else {
-            ////////log.p("finding subcategories for " + cx.name.get());
+            //////////Log.p("finding subcategories for " + cx.name.get());
             cat = ServerAPI.categories(cx);
         }
         for (Category ct : cat) {
-            //////log.p("Is in Menu " + ct.name.get() + " " + ct.inmenu.get());
+            ////////Log.p("Is in Menu " + ct.name.get() + " " + ct.inmenu.get());
             if (ct.inmenu.get().contains("true")) {
                 ct.refreshIcon();
                 String mediaUrl = ServerAPI.mediaUrl(ct.icon.get(0));
@@ -257,7 +259,7 @@ public class ChooseService extends Form {
                 Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
                 FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
                 EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth() * 2, p.getHeight() * 2), false);
-                //////////log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
+                ////////////Log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
                 if ((ct.icon.get(0)) != null) {
                     Image i = URLImage.createToStorage(placeholder, ct.name.get(),
                             mediaUrl);
@@ -273,17 +275,17 @@ public class ChooseService extends Form {
                         Dialog ipd = ip.showInfiniteBlocking();
                         //check if the category is a group category 
                         //a group category has a the isgroup field as true
-                        ////////log.p("Is this a group " + ct.isgroup.get());
+                        //////////Log.p("Is this a group " + ct.isgroup.get());
                         if (!ct.isgroup.get().contains("true")) {
                             ArrayList<Service> s = localAPI.serviceList(ct);
                             ArrayList<Service> ss = new ArrayList<Service>();
-                            ////////log.p("Selected Category " + ct.name.get());
-                            ////log.p("\n " + ct.name.get() + " has " + s.size() + " members");
+                            //////////Log.p("Selected Category " + ct.name.get());
+                            //////Log.p("\n " + ct.name.get() + " has " + s.size() + " members");
                             User u = localAPI.me();
                             u.refreshGroups();
                             for (Service z : s) {
                                 //take user list and check if the user has access.
-                                ////log.p(z.name.get());
+                                //////Log.p(z.name.get());
                                 if (checkUserAccess(u, z)) {
                                     ss.add(z);
                                 }
@@ -317,12 +319,12 @@ public class ChooseService extends Form {
         Boolean return_value = false;
         u.refreshGroups();
         for (Group g : u.groups.asList()) {
-            ////log.p(g.name.get());
+            //////Log.p(g.name.get());
             for (Group sg:z.groups.asList()) {
-                //////log.p("Checking against " + sg.name.get());
-                ////log.p(g._id.get() + "against " + sg._id.get());
+                ////////Log.p("Checking against " + sg.name.get());
+                //////Log.p(g._id.get() + "against " + sg._id.get());
                 if (g._id.get().equalsIgnoreCase(sg._id.get())) {
-                    ////log.p("Found A Match");
+                    //////Log.p("Found A Match");
                     return_value = true;
                 }
             }
@@ -335,7 +337,7 @@ public class ChooseService extends Form {
         cnt.setLayout(new GridLayout(3, 3));
 
         for (Category ct : cx) {
-            //////log.p("Is in Menu " + ct.name.get() + " " + ct.inmenu.get());
+            ////////Log.p("Is in Menu " + ct.name.get() + " " + ct.inmenu.get());
             if (ct.inmenu.get().contains("true")) {
                 ct.refreshIcon();
                 String mediaUrl = ServerAPI.mediaUrl(ct.icon.get(0));
@@ -346,7 +348,7 @@ public class ChooseService extends Form {
                 Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
                 FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
                 EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth() * 2, p.getHeight() * 2), false);
-                //////////log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
+                ////////////Log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
                 if ((ct.icon.get(0)) != null) {
                     Image i = URLImage.createToStorage(placeholder, ct.name.get(),
                             mediaUrl);
@@ -362,12 +364,12 @@ public class ChooseService extends Form {
                         Dialog ipd = ip.showInfiniteBlocking();
                         //check if the category is a group category 
                         //a group category has a the isgroup field as true
-                        ////////log.p("Is this a group " + ct.isgroup.get());
+                        //////////Log.p("Is this a group " + ct.isgroup.get());
                         if (!ct.isgroup.get().contains("true")) {
                             ArrayList<Service> s = localAPI.serviceList(ct);
                             ArrayList<Service> ss = new ArrayList<Service>();
-                            ////////log.p("Selected Category " + ct.name.get());
-                            ////////log.p("\n " + ct.name.get() + " has " + s.size() + " members");
+                            //////////Log.p("Selected Category " + ct.name.get());
+                            //////////Log.p("\n " + ct.name.get() + " has " + s.size() + " members");
                             User u = localAPI.me();
                             u.refreshGroups();
                             for (Service z : s) {

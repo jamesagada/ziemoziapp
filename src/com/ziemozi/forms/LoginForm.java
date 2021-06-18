@@ -23,15 +23,15 @@ import com.ziemozi.server.local.localAPI;
 public class LoginForm extends Form {
 
     //private Label logo = new Label("\uf308", "IconFont");
-    private Label logo = new Label("ZIEMOZI","LoginTitle");
-    private TextField user = new TextField("", "Email or Phone", 30,
+    private final Label logo = new Label("ZIEMOZI","LoginTitle");
+    private final TextField user = new TextField("", "Email or Phone", 30,
         TextField.EMAILADDR);
-    private TextField password = new TextField("", "Password", 30,
+    private final TextField password = new TextField("", "Password", 30,
         TextField.PASSWORD);
 
-    private Button login = new Button("Log In");
-    private Button signUp = new Button("Sign Up for Ziemozi");
-    private Button needHelp = new Button("Need Help?");
+    private final Button login = new Button("Log In");
+    private final Button signUp = new Button("Sign Up for Ziemozi");
+    private final Button needHelp = new Button("Need Help?");
 
     public LoginForm() {
         super(new BorderLayout());
@@ -53,7 +53,7 @@ public class LoginForm extends Form {
             ServerAPI.login(u, new Callback<User>() {
                 @Override
                 public void onSucess(User value) {
-                    //////log.p("Get user records for " + value._id.get());
+                    ////////Log.p("Get user records for " + value._id.get());
                     ServerAPI.loadUsers(value._id.get());
                     d.dispose();
                     UIController.showMainUI();
