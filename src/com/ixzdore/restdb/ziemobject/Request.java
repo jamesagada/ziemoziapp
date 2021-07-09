@@ -37,6 +37,7 @@ import java.util.Vector;
 public class Request implements PropertyBusinessObject {
 
     public final Property<String, Request> _id = new Property<>("_id");
+    public final Property<String, Request> request_location = new Property<>("request_location");
     public final IntProperty<Request> id = new IntProperty<>("id");
     public final Property<String, Request> _parent_id = new Property<>("_parent_id");
     public final Property<String, Request> _parent_def = new Property<>("_parent_def");
@@ -67,7 +68,7 @@ public class Request implements PropertyBusinessObject {
     public final Property<String, Request> request_longitude = new Property("request_longitude");
     public final Property<String, Request> request_address = new Property("request_address");
     public final PropertyIndex idx = new PropertyIndex(this, "Request",
-            _id, keep_private, escalations, parent, status, provider,
+            _id, keep_private, escalations, parent, status, provider,request_location,
             service, summary, request_parameters, _created, likes, comments, ziemozi_user,
             _parent_id, _parent_def, _parent_field, request_address, f_summary,request_longitude, request_latitude);
 
@@ -124,10 +125,12 @@ public class Request implements PropertyBusinessObject {
         //also get the current location from the ServerAPI
         //and put it into the map
         Location loc = ServerAPI.getCurrentLocation();
+        String location = ServerAPI.getCurrentLocationName();
         //////////Log.p("Current Location: " + loc);
         //////////Log.p("Current Latitude: " + loc.getLatitude());
         a.put("request_latitude", loc.getLatitude());
         a.put("request_longitude", loc.getLongitude());
+        a.put("request_location",location);
         //////////Log.p("Latitude: " + a.get("request_latitude"));
         //////////Log.p("Summarized as " + a.get("summary"));
         // we save the request first here
@@ -453,7 +456,8 @@ public class Request implements PropertyBusinessObject {
             i++;
         }
         //add the tags for service, location, provider,category,reporter
-        rs = rs + " <p> ReportedFrom -- " + this.request_latitude + "," + this.request_latitude + " </p>";
+        rs = rs + " <p> ReportedAround -- " + this.request_location + " </p>";
+        rs = rs + " <p> ReportedFrom -- " + this.request_latitude + "," + this.request_longitude + " </p>";
         rs = rs + " <p> Service -- " + this.service.get(0).name + " </p>";
         rs = rs + " <p> ReportedBy -- " + this.ziemozi_user.get(0).fullName() + ","
                 + this.ziemozi_user.get(0).email + "," + this.ziemozi_user.get(0).phone + " </p>";

@@ -57,6 +57,7 @@ public class FileEditor extends BaseEditorImpl {
         FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         //this is the button to pick image
         pickImage = new Button();
         pickImage.setIcon(FontImage.createMaterial(

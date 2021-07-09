@@ -52,6 +52,7 @@ public class BooleanEditor extends BaseEditorImpl {
         editContainer.putClientProperty("editor", this);
        // editContainer.setLayout(new GridLayout(2));
        editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+       editContainer.setScrollableY(false);
        editContainer.getAllStyles().setPaddingBottom(5);
         editContainer.getAllStyles().setBorder(Border.createEtchedLowered());
       //  datePicker.getPicker().setDate(new Date());

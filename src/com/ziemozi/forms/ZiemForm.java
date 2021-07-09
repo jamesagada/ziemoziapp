@@ -27,7 +27,7 @@ public class ZiemForm extends Form {
     
     Form previous;
     public ZiemForm(Object p,String title) {
-        super(title, BoxLayout.y());
+        super(title, new BoxLayout(BoxLayout.Y_AXIS));
         add(createService(p));
         previous = getCurrentForm();
         getToolbar().addMaterialCommandToLeftBar("", 

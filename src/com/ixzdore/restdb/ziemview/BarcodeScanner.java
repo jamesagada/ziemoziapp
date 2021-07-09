@@ -49,14 +49,14 @@ public class BarcodeScanner extends BaseEditorImpl {
     public final Container editContainer = new Container();
     public final TextField textField = new TextField(); //to be used for editing
     public final Label textLabel = new Label();
-    public final SignatureComponent sig = new SignatureComponent();
+    //public final SignatureComponent sig = new SignatureComponent();
     public final SpanButton scanCode = new SpanButton("Scan");
     public final SpanLabel textView = new SpanLabel(); //to be used for view
     public final Container headerContainer = new Container();
 
     public BarcodeScanner() {
         editContainer.putClientProperty("editor", this);
-        editContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
+        editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         scanCode.getAllStyles().setBorder(Border.createBevelRaised());
         scanCode.addActionListener((evt) -> {
             //
@@ -68,6 +68,7 @@ public class BarcodeScanner extends BaseEditorImpl {
                     textField.setText(contents);
                     requestParameter.value.set(textField.getText());                    
                     editContainer.revalidate();
+                    editContainer.repaint();
                 }
 
                 public void scanCanceled() {
@@ -106,6 +107,7 @@ public class BarcodeScanner extends BaseEditorImpl {
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
+        textField.setText("Scan");
         helpButton.setUIID("Label");
 
         //////System.out.println("Attribute to edit is " + attr.getPropertyIndex().toJSON());
@@ -151,6 +153,7 @@ public class BarcodeScanner extends BaseEditorImpl {
 
         editContainer.add(headerContainer).add(scanCode).add(textField);
         editContainer.revalidate();
+        editContainer.repaint();
         return editContainer;
     }
 

@@ -19,6 +19,7 @@ import com.codename1.io.Log;
 import com.codename1.io.Util;
 import com.codename1.l10n.ParseException;
 import com.codename1.l10n.SimpleDateFormat;
+import com.codename1.location.LocationManager;
 import com.codename1.ui.Button;
 import com.codename1.ui.Component;
 import static com.codename1.ui.Component.LEFT;
@@ -59,7 +60,7 @@ public class LESensor extends BaseEditorImpl {
     public final Container editContainer = new Container();
     public final TextField textField = new TextField(); //to be used for editing
     public final Label textLabel = new Label();
-    public final SignatureComponent sig = new SignatureComponent();
+    //public final SignatureComponent sig = new SignatureComponent();
     public final SpanButton scanCode = new SpanButton("BLE Scan");
     public final SpanLabel textView = new SpanLabel(); //to be used for view
     public final Container headerContainer = new Container();
@@ -71,8 +72,10 @@ public class LESensor extends BaseEditorImpl {
         ////////Log.p("LESensor");
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         devicesCnt.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         scanCode.getAllStyles().setBorder(Border.createBevelRaised());
+        LocationManager locationManager = LocationManager.getLocationManager();
         scanCode.addActionListener((evt) -> {
             //
             //devices.clear();
@@ -107,14 +110,12 @@ public class LESensor extends BaseEditorImpl {
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             JSONObject res = (JSONObject) evt.getSource();
-                            System.out.println("response " + res);
 
                             if (res.getString("status").equals("scanResult")) {
                                 //if this is a new device add it
                                 if (!devices.containsKey(res.getString("address"))) {
                                     devices.put(res.getString("address"), res);
-                                    requestParameter.value.set(
-                                            Result.fromContent(devices).toString());
+
                                     updateUI();
                                 }
                             }
@@ -147,6 +148,7 @@ public class LESensor extends BaseEditorImpl {
             mb.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
+                    requestParameter.value.set(detail.getText());
                     Dialog.show( "BLE Device" , detail.getText(), "ok", "");
                   }
                 

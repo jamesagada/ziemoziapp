@@ -49,6 +49,7 @@ public class DateEditor extends BaseEditorImpl {
     public DateEditor() {
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         //editContainer.setLayout(new GridLayout(2));
         //textField.setUIID("SmallLabel");
         editContainer.getAllStyles().setPaddingBottom(5);

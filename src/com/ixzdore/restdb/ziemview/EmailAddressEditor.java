@@ -41,6 +41,8 @@ public class EmailAddressEditor extends BaseEditorImpl{
          editContainer.getAllStyles().setPaddingBottom(10);
         editContainer.getAllStyles().setBgColor(0x0f);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
+
         editorConstraints.add(TextArea.EMAILADDR);
         //editorConstraints.add(RegexConstraint.validEmail());
         textField.setConstraint(TextArea.EMAILADDR);

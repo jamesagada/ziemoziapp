@@ -36,6 +36,19 @@ import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.layouts.GridLayout;
 import com.codename1.ui.plaf.RoundBorder;
 import com.ixzdore.restdb.ziemobject.Fare;
+import com.ixzdore.restdb.ziemobject.NbsCategory;
+import com.ixzdore.restdb.ziemobject.NbsCity;
+import com.ixzdore.restdb.ziemobject.NbsCountry;
+import com.ixzdore.restdb.ziemobject.NbsDataSet;
+import com.ixzdore.restdb.ziemobject.NbsDetail;
+import com.ixzdore.restdb.ziemobject.NbsDivision;
+import com.ixzdore.restdb.ziemobject.NbsItem;
+import com.ixzdore.restdb.ziemobject.NbsLGA;
+import com.ixzdore.restdb.ziemobject.NbsLocation;
+import com.ixzdore.restdb.ziemobject.NbsMinistry;
+import com.ixzdore.restdb.ziemobject.NbsPeriod;
+import com.ixzdore.restdb.ziemobject.NbsPeriodtype;
+import com.ixzdore.restdb.ziemobject.NbsState;
 import com.ixzdore.restdb.ziemobject.RequestParameter;
 import com.ixzdore.restdb.ziemobject.Route;
 import com.ixzdore.restdb.ziemobject.ServiceAttribute;
@@ -101,6 +114,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         //headerContainer.setLayout(new GridLayout(1,4));
         headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
 
         //editContainer.getAllStyles().setBorder(Border.createRidgeBorder(2));
         multiSelect.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
@@ -153,6 +167,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         this.serviceAttribute = attr;
         textLabel.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
+
         //helpButton.setUIID("SmallLabel");
 
         helpButton.addActionListener(new ActionListener() {
@@ -380,12 +395,13 @@ public class MultiObjectListEditor extends BaseEditorImpl {
             if (value.length() <2 ) {
                 value = first_name + " " + last_name;
              }
-            if (name.length() > 2) {
+            if (name.length() > 4) {
                 description = name;
             }
             if (name.length() < 2){
                 name = first_name + " " + last_name;
             }
+            if (name == "NULL") name=description;
             //description = description + ".." + summary ;
                 //data.add(createListEntry(name, description + " " + value, px));
                 data.add(createListEntry(name, " " + value, px));                
@@ -421,6 +437,23 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         objectFactory.put("Route", Route.class);
         objectFactory.put("Fare", Fare.class);
         objectFactory.put("Stop", Stop.class);
+        // nbs specific
+        objectFactory.put("NbsDataSet", NbsDataSet.class);
+        objectFactory.put("NbsDataset", NbsDataSet.class);
+        objectFactory.put("NbsDivision", NbsDivision.class);
+        objectFactory.put("NbsCategory", NbsCategory.class);
+        objectFactory.put("NbsMinistry", NbsMinistry.class);
+        objectFactory.put("NbsItem", NbsItem.class);
+        objectFactory.put("NbsDetail", NbsDetail.class);
+        objectFactory.put("NbsLocation", NbsLocation.class);
+        objectFactory.put("NbsPeriod", NbsPeriod.class);
+        objectFactory.put("NbsPeriodtype", NbsPeriodtype.class);
+        objectFactory.put("NbsState", NbsState.class);
+        objectFactory.put("NbsLGA", NbsLGA.class);
+        objectFactory.put("NbsCity", NbsCity.class);
+        objectFactory.put("NbsCountry", NbsCountry.class);
+
+
     }
 
     private void addOptionsFromObjectList() {
@@ -440,7 +473,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         ArrayList<PropertyBusinessObject> ol = localAPI.genericPBOZiemSearch(objType,
                 cClass,
                 "", 0, 9999, "", "");
-        //Log.p("PBOs found " + ol.size());
+        //Log.p(objType + "  PBOs found " + ol.size());
         ArrayList<Map<String, Object>> data = new ArrayList<>();
         ArrayList<Map<String, Object>> selectedData = new ArrayList<>();
         for (PropertyBusinessObject px : ol) {
@@ -465,13 +498,14 @@ public class MultiObjectListEditor extends BaseEditorImpl {
              if (px.getPropertyIndex().get("plain_summary") != null)            
                 description = "" + px.getPropertyIndex().get("plain_summary").toString();            
             //String value = "" + px.getPropertyIndex().get("value");
-
-            description = _id + ".." + name + ".." + description + ".." + summary;
-            ////////Log.p("Multi object desc " + description);
+            if ((name == null) || (name == "NULL") || (name.contains("NULL"))) name = description;
+            description =  name + ".." + description + ".." + summary;
+            ////////
             
             data.add(createListEntry(name, description, px));
-            if (name.length() > 2 ) description = name;
+            if (name.length() > 4 ) description = name;
             //this is used to track the options even when search may change the order
+            //Log.p("Multi object desc " + description);
             String rDesc = ml.getMultiListModel().getSize()+"."+description;
             //ml.getMultiListModel().addItem( description);
             //moptions.add(description);
@@ -541,6 +575,45 @@ public class MultiObjectListEditor extends BaseEditorImpl {
         
         TextField tf = new TextField();
         tf.setHint("Search");
+        tf.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent evt) {
+                {
+                    //if it is changed we need to go through the ml list and
+                    //mark them as visible or invisible
+                    ArrayList<String> searchResult = new ArrayList<String>();
+                    MultipleSelectionListModel mm = ml.getMultiListModel();
+
+                    while (mm.getSize() > 0) {
+                        mm.removeItem(0);
+                    }
+                    for (int i = 0; i < moptions.size(); i++) {
+                        //String ls = moptions.get(i);
+                        ml.getMultiListModel().addItem(moptions.get(i));
+                        ml.getMultiListModel().removeSelectedIndices(i);
+                    }
+                    mm = ml.getMultiListModel();
+
+                    for (int i = 0; i < mm.getSize(); i++) {
+                        ml.getMultiListModel().removeSelectedIndices(i);
+                        ////////Log.p("Match " + tf.getText() + "::" + mm.getItemAt(i).toString());
+                        if (mm.getItemAt(i).toString().contains(tf.getText())) {
+                            searchResult.add(mm.getItemAt(i).toString());
+                        }
+                    }
+                    while (mm.getSize() > 0) {
+                        mm.removeItem(0);
+                    }
+                    for (int i = 0; i < searchResult.size(); i++) {
+                        //String ls = moptions.get(i);
+                        ml.getMultiListModel().addItem(searchResult.get(i));
+                    }
+
+                    ml.revalidateWithAnimationSafety();
+                    ml.refresh();
+                    ml.repaint();
+                }
+            }
+        });
         tf.addDataChangedListener(new DataChangedListener(){
             @Override
             public void dataChanged(int type, int index) {
@@ -576,7 +649,7 @@ public class MultiObjectListEditor extends BaseEditorImpl {
 
                ml.revalidateWithAnimationSafety();
                ml.refresh();
-               
+               ml.repaint();
               }
         });
         Dialog d = new Dialog("Select");

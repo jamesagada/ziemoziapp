@@ -3,6 +3,7 @@ package com.ziemozi.ziemozi;
 import com.codename1.components.InfiniteProgress;
 import com.codename1.components.ToastBar;
 import com.codename1.io.Log;
+import com.codename1.io.Storage;
 import com.ziemozi.forms.LoginForm;
 import com.ziemozi.forms.MainForm;
 import com.ziemozi.forms.SignupForm;
@@ -110,12 +111,15 @@ public class UIController {
         Timer t = new Timer();
           TimerTask ta = new TimerTask(){
 
-             public void run() 
-             {
-                                 // ////Log.p("Syncing definitions ");
-               //ToastBar.showInfoMessage("Syncing messages ...");
-               localAPI.saveRequestsToServer();
-               ServerAPI.loadRequests();
+             public void run() {
+                 // ////Log.p("Syncing definitions ");
+                 //ToastBar.showInfoMessage("Syncing messages ...");
+                 //first check that a user exists
+                 if (Storage.getInstance().exists("me.json")) {
+                     //Log.p("Me.json Exists " + Storage.getInstance().exists("me.json"));
+                     localAPI.saveRequestsToServer();
+                     ServerAPI.loadRequests();
+                 }
              }
           };
           TimerTask tb = new TimerTask(){
@@ -124,11 +128,14 @@ public class UIController {
              {
 //                 ToastBar.showInfoMessage("Syncing definitions and setups ...");
                  //////Log.p("Syncing definitions ");
-                ServerAPI.loadDefinitions();
+                 if (Storage.getInstance().exists("me.json")) {
+                     //Log.p("Me.json Exists for definitions " + Storage.getInstance().exists("me.json"));
+                     ServerAPI.loadDefinitions();
+                 }
              }
           };
 
         t.schedule(ta,1000,5000);
-        t.schedule(tb, 5000,36000);
+        t.schedule(tb, 5000,60000);
        }
 }

@@ -1,12 +1,15 @@
 package com.ziemozi.forms;
 
 //import com.codename1.camerakit.CameraKit;
+import java.io.IOException;
+
 import com.codename1.capture.Capture;
 import com.codename1.components.FloatingActionButton;
 import com.codename1.components.RSSReader;
 import com.codename1.components.ToastBar;
 import com.codename1.contacts.Contact;
 import com.codename1.io.Log;
+import com.codename1.ui.Image;
 import com.codename1.ui.plaf.Style;
 import com.ziemozi.server.ServerAPI;
 import com.codename1.ui.Button;
@@ -51,11 +54,25 @@ public class MainForm extends Form {
                 new MoreContainer());
         mainUI.setUIID("TabZ");
         add(CENTER, mainUI);
+        Image sosImage;
+        try {
+            sosImage = Image.createImage("/ziem_sos.png").scaled(96,96);
+        } catch (IOException ex) {
+            sosImage=Image.createImage(10, 10);
+        }
+        Image ziemImage;
+        try {
+            ziemImage = Image.createImage("/ziem_logo.png").scaled(96,96);
+        } catch (IOException ex) {
+            ziemImage=Image.createImage(96, 96);
+        }
 
-        getToolbar().addMaterialCommandToLeftBar("",
-                MATERIAL_WARNING, 4, e -> sos());
-        getToolbar().addMaterialCommandToRightBar("",
-                MATERIAL_CHAT, 4, e -> new ChooseService(new Category()).show());
+        getToolbar().addCommandToLeftBar("", sosImage,e -> sos());
+        getToolbar().addCommandToRightBar("", ziemImage,e -> new ChooseService(new Category()).show());
+        //getToolbar().addMaterialCommandToLeftBar("",
+        //        MATERIAL_WARNING, 4, e -> sos());
+        //getToolbar().addMaterialCommandToRightBar("",
+        //        MATERIAL_CHAT, 4, e -> new ChooseService(new Category()).show());
         Button searchButton = new Button("Search", "TitleSearch");
        // setMaterialIcon(searchButton, MATERIAL_SEARCH);
         searchButton.setMaterialIcon(MATERIAL_SEARCH);

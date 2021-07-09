@@ -60,6 +60,7 @@ public class BaseEditorImpl extends Component implements BaseEditor{
     @Override
     public Container edit(ServiceAttribute attr) {
         requestParameter.value.set(attr.default_value.get());
+        editContainer.setScrollableY(false);
         return null;
     }
 
@@ -128,7 +129,7 @@ public class BaseEditorImpl extends Component implements BaseEditor{
     public Button helpButton(){
         //create a help button
         Button h = new Button();
-        h.setUIID("SmallLabel");
+        h.setUIID("MultiLine1");
         h.setIcon(FontImage.createMaterial(FontImage.MATERIAL_HELP,
                 h.getSelectedStyle()));
         h.getStyle().setAlignment(LEFT);

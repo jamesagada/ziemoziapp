@@ -64,6 +64,7 @@ public class MultiListEditor extends BaseEditorImpl {
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         multiSelect.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         mlist.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         mlist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {

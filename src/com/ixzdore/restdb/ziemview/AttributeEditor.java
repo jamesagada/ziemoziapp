@@ -48,6 +48,7 @@ public class AttributeEditor extends Container {
         //HashMap can then be loaded from storage - these can be updated as needed
         //Each Display type will then have an entry
         this.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        this.setScrollableY(false);
         ServiceAttributeType st;
         this.attribute = serviceAttribute;
         

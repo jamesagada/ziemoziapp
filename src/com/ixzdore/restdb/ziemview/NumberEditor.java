@@ -45,6 +45,7 @@ public class NumberEditor extends BaseEditorImpl{
          editContainer.getAllStyles().setPaddingBottom(10);
         editContainer.getAllStyles().setBgColor(0x0f);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         //textField.setUIID("SmallLabel");
         headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
           //        editContainer.setLayout(new GridLayout(2));

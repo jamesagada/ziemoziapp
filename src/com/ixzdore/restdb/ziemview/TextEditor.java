@@ -38,6 +38,7 @@ public class TextEditor extends BaseEditorImpl{
     public TextEditor(){
          editContainer.putClientProperty("editor", this);  
          editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        editContainer.setScrollableY(false);
         editContainer.getAllStyles().setBgColor(0x0f);
         //textField.setUIID("SmallLabel");
         headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));

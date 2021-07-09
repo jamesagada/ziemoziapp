@@ -169,7 +169,7 @@ public class BrowserViewer extends BaseEditorImpl{
     private Image makeLogo(String ref, String logo) {
         Style s = UIManager.getInstance().getComponentStyle("TITLE");
         FontImage p = FontImage.createMaterial(FontImage.MATERIAL_OPEN_IN_BROWSER, s);
-        EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth()*8, p.getHeight()*8), false);
+        EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth()*6, p.getHeight()*4), false);
         if (logo != null) {
             String url = ServerAPI.mediaUrl(logo);
             Image i = URLImage.createToStorage(placeholder, ref,

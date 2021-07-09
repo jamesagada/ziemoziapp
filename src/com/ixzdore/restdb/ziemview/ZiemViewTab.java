@@ -11,6 +11,8 @@ import com.codename1.components.SpanLabel;
 import com.codename1.components.ToastBar;
 import com.codename1.io.Log;
 import com.codename1.properties.ListProperty;
+
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ import java.util.Map;
 
 //Read more: https://javarevisited.blogspot.com/2017/09/java-8-sorting-hashmap-by-values-in.html#ixzz6m5AvLPeC
 //import com.codename1.components.Button;
+import com.codename1.ui.InfiniteContainer;
 import com.ixzdore.restdb.ziemview.AttributeEditor;
 import com.codename1.properties.Property;
 import com.codename1.properties.PropertyBusinessObject;
@@ -122,7 +125,7 @@ public class ZiemViewTab {
         parameterTypeContainer.revalidate();
         contentContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         contentContainer.setScrollableY(true);
-        contentContainer.setSmoothScrolling(true);
+        //contentContainer.setSmoothScrolling(true);
         contentContainer.add(txtRequestButton);
         contentContainer.revalidate();
         contentAndParameter.setLayout(new BorderLayout());
@@ -132,13 +135,13 @@ public class ZiemViewTab {
         if (showPanels) {
             //contentAndParameter.add(BorderLayout.WEST, parameterTypeContainer);
         }
-        contentAndParameter.add(BorderLayout.CENTER, contentContainer);
+        //contentAndParameter.add(BorderLayout.CENTER, contentContainer);
         contentAndParameter.revalidate();
         BorderLayout l = new BorderLayout();
         l.setCenterBehavior(BorderLayout.CENTER_BEHAVIOR_CENTER_ABSOLUTE);
         requestContainer.setLayout(l);
-        requestContainer.add(BorderLayout.CENTER, contentAndParameter);
-
+        //requestContainer.add(BorderLayout.CENTER, contentAndParameter);
+        requestContainer.add(BorderLayout.CENTER, contentContainer);
         if (showPanels) {
             requestContainer.add(BorderLayout.NORTH, serviceContainer);
         }
@@ -295,23 +298,13 @@ public class ZiemViewTab {
         Button serviceButton = new Button();
         //set the icon
         serviceButton.setUIID("SmallLabel");
-        serviceButton.getAllStyles().setBorder(Border.createBevelRaised());
+       // serviceButton.getAllStyles().setBorder(Border.createBevelRaised());
         //set the action listener so that when we click on this the service
         //parameterContainer shows the parameters for this service.
         if (service.logo.size() > 0) {
             String logo = service.logo.get(0);
             serviceButton = makeLogoButton(service.label.get(), logo);
-            //serviceButton.setText(service.name.get()); 
-            //serviceButton.set;
-            //Image roundMask = Image.createImage(placeholder.getWidth(), placeholder.getHeight(), 0xff000000);
-            //Graphics gr = roundMask.getGraphics();
-            //gr.setColor(0xffffff);
-            //gr.fillArc(0, 0, placeholder.getWidth(), placeholder.getHeight(), 0, 360);
 
-            //URLImage.ImageAdapter ada = URLImage.createMaskAdapter(roundMask);
-            //Image i = URLImage.createToStorage(placeholder, attr.name.get(),
-            //       "https://ziemozi-a3ef.restdb.io/media/" + logo + "?s=t");
-            //parameterButton.setIcon(i);
         } else {
             serviceButton.setIcon(FontImage.createMaterial(FontImage.MATERIAL_ADD_ALERT, serviceButton.getSelectedStyle()));
         }
@@ -528,20 +521,42 @@ public class ZiemViewTab {
 
     private Button makeLogoButton(String ref, String logo) {
         Button b = new Button();
-        Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+        //Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+        Style s = new Style();
+        s.setFgColor(0xc2c2c2);
+        s.setBgTransparency(255);
+        s.setBgColor(0xe9e9e9);
         FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
         EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth(), p.getHeight()), false);
+
+        Image roundMask = Image.createImage(placeholder.getWidth()*2,
+                placeholder.getHeight()*2, 0xff000000);
+        Graphics g = roundMask.getGraphics();
+        g.setAntiAliased(true);
+        g.setColor(0x000000);
+        g.fillRect(0, 0, placeholder.getWidth()*2,
+                placeholder.getHeight()*2);
+        g.setColor(0xffffff);
+        g.fillArc(0, 0, placeholder.getWidth()*2,
+                placeholder.getHeight()*2, 0, 360);
+
         if (logo != null) {
             String url = ServerAPI.mediaUrl(logo);
-            Image i = URLImage.createToStorage(placeholder, ref,
+            //Log.p(url);
+            Image i = URLImage.createToStorage(placeholder, logo,
                     url);
-            b.setIcon(i);
+            //i.applyMask(roundMask.createMask());
+            b.setIcon(i.scaled(placeholder.getWidth()*2,
+                    placeholder.getHeight()*2));
+       //     b.setIcon(i.scaled(placeholder.getWidth()*2,
+       //             placeholder.getHeight()*2).applyMask(roundMask.createMask()));
+
         } else {
             b.setIcon(p);
         }
         b.setUIID("SmallLabel");
         b.setText(ref);
-        b.getAllStyles().setBorder(Border.createEtchedRaised());
+        //b.getAllStyles().setBorder(Border.createEtchedRaised());
         return b;
     }
 
@@ -855,7 +870,9 @@ public class ZiemViewTab {
         tab.setUIID("TabZ");
         tab.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         tab.setName(getTabTitle(gm));
-
+        tab.setScrollableY(true);
+        tab.setScrollVisible(true);
+        Container theTab = new Container();
         //Label l = UIUtils.createHalfSpace();
         //l.setName("Space");
         //tab.add(l);
@@ -863,6 +880,7 @@ public class ZiemViewTab {
         //
         HashMap gms = sortAttributeMap(gm);
         Set attributeKeys = gms.keySet();
+        Component[] attr_comps=new Component[attributeKeys.size()];
         //add dummy components which we can swapout later
         ////////////Log.p("Number of attributes to tab "+attributeKeys.size());
         addDummyComponents(tab, attributeKeys.size());
@@ -895,6 +913,7 @@ public class ZiemViewTab {
             }
         }//
         $(".Dummy").remove();
+
         int i = 0;
         while (i < tab.getComponentCount()) {
 
@@ -906,10 +925,33 @@ public class ZiemViewTab {
             }
             i++;
         }
-        //tab.addComponent(0, new Label("________________________________________________________"));
-        tab.repaint();
+
+        Component[] cc = new Component[tab.getComponentCount()];
+        i=0;
+        while (i<tab.getComponentCount()){
+            cc[i]=tab.getComponentAt(i);
+            //Log.p(cc[i].getName());
+            i++;
+        }
+        tab.removeAll();
+        tab.addComponent(makeinfinitecntainer(cc));
+       // tab.repaint();
         return tab;
     }
+
+    private Component makeinfinitecntainer(final Component[] tc) {
+        InfiniteContainer ic = new InfiniteContainer() {
+            @Override public Component[] fetchComponents(final int index, final int amount) {
+                if (index == 0) {
+                    return tc;
+                }else{
+                    return null;
+                }
+            }
+        };
+        return ic;
+    }
+
     private static HashMap sortAttributeMap(HashMap map)
     {
         List list = new LinkedList(map.entrySet());
@@ -927,9 +969,12 @@ public class ZiemViewTab {
                 String ss2 = s2.display_sequence.get();
                 if ( ss2.contains(".")) ss2 = s2.display_sequence.get().substring(0,
                         s2.display_sequence.get().indexOf(".")-1);
-
-                rtval = Integer.parseInt(ss1) -
-                        Integer.parseInt(ss2);
+                try {
+                    rtval = Integer.parseInt(ss1) -
+                            Integer.parseInt(ss2);
+                }catch(Exception e){
+                    Log.p(e.getMessage());
+                }
                 return rtval;
             }
         });

@@ -79,21 +79,31 @@ public class VideoEditor extends BaseEditorImpl {
         Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
         FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
         editContainer.putClientProperty("editor", this);
-        editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
-        //this is the button to pick image
+        editContainer.setLayout(new BorderLayout());
         pickImage = new Button();
-        pickImage.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_PHOTO_LIBRARY, s));
+        Image pickLogo = FontImage.createMaterial(
+                FontImage.MATERIAL_PHOTO_LIBRARY, s).scaled(p.getWidth()*2,p.getHeight()*2);
+        pickImage.setIcon(pickLogo);
+        pickImage.setText("Gallery");
+        pickImage.setTextPosition(BOTTOM);
         //pickImage.setUIID("Label");
         //this is the buttoon to capture through the camera
         captureImage = new Button();
-        captureImage.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_CAMERA_ENHANCE, s));
+        Image captureLogo= FontImage.createMaterial(
+                FontImage.MATERIAL_CAMERA_ENHANCE, s).scaled(p.getWidth()*2,p.getHeight()*2);
+        captureImage.setIcon(captureLogo);
+        captureImage.setText("Camera");
+        captureImage.setTextPosition(BOTTOM);
+        captureImage.setUIID("SmallLabel");
+        pickImage.setUIID("SmallLabel");
         //captureImage.setUIID("Label");
         //
-        //imageButton = new Button();
-        imageButton.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_PLAY_CIRCLE_OUTLINE, s));
+        Image pixLogo= FontImage.createMaterial(
+                FontImage.MATERIAL_PLAY_CIRCLE_OUTLINE, s).scaled(p.getWidth()*4,
+                p.getHeight()*4);
+        imageButton.setIcon(pixLogo.scaled(
+                pixLogo.getWidth()*64,pixLogo.getHeight()*8));
+
         //imageButton.setIconPosition(BorderLayout.CENTER);
 
         //imageButton.setTextPosition(BOTTOM);
@@ -107,12 +117,15 @@ public class VideoEditor extends BaseEditorImpl {
         imageControls = new Container();
         //GridLayout l = new GridLayout(3);
         //l.setAutoFit(true);
-        //pickImage.setText("Pick");
+        pickImage.setText("Gallery");
         pickImage.setTextPosition(BOTTOM);
-        //captureImage.setText("Capture");
+        captureImage.setText("Capture");
         captureImage.setTextPosition(BOTTOM);
+
         //imageControls.setLayout(l);
-        imageControls.add(textLabel).add(pickImage).add(captureImage);
+        imageControls.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+        headerContainer.setLayout(new BoxLayout(BoxLayout.X_AXIS));
+        imageControls.add(pickImage).add(captureImage);
         mp.setAutoplay(true);
 
     }
@@ -245,6 +258,8 @@ public class VideoEditor extends BaseEditorImpl {
         });
         //editContainer.add(textLabel).add(helpButton).add(textField);
         //editContainer.add(helpButton).add(textField);
+        helpButton.setText(textLabel.getText().trim());
+        helpButton.setTextPosition(Label.LEFT);
         headerContainer.add(helpButton);
         //editContainer.add(helpButton);
         //editContainer.add(helpButton).add(p);
@@ -255,15 +270,16 @@ public class VideoEditor extends BaseEditorImpl {
             //    textLabel.setText(textLabel.getText()+"*");
         }
         if (attr.multiplicity.getBoolean()) {
-            imageControls.add(addAnotherButton);
+            headerContainer.add(addAnotherButton);
         }
-
         if (textLabel.getText() == null) {
             imageButton.setEnabled(false);
         }
         //imageControls.add(addAnotherButton);
-
-        editContainer.add(headerContainer).add(imageControls).add(imageButton);
+        editContainer.add(BorderLayout.NORTH, headerContainer);
+        editContainer.add(BorderLayout.CENTER, imageButton);
+        editContainer.add(BorderLayout.EAST, imageControls);
+        //editContainer.add(headerContainer).add(imageControls).add(imageButton);
 
         editContainer.revalidate();
         return editContainer;

@@ -18,6 +18,19 @@ import com.codename1.io.File;
 import com.codename1.io.FileSystemStorage;
 import com.ixzdore.restdb.ziemobject.Comment;
 import com.ixzdore.restdb.ziemobject.Fare;
+import com.ixzdore.restdb.ziemobject.NbsCategory;
+import com.ixzdore.restdb.ziemobject.NbsCity;
+import com.ixzdore.restdb.ziemobject.NbsCountry;
+import com.ixzdore.restdb.ziemobject.NbsDataSet;
+import com.ixzdore.restdb.ziemobject.NbsDetail;
+import com.ixzdore.restdb.ziemobject.NbsDivision;
+import com.ixzdore.restdb.ziemobject.NbsItem;
+import com.ixzdore.restdb.ziemobject.NbsLGA;
+import com.ixzdore.restdb.ziemobject.NbsLocation;
+import com.ixzdore.restdb.ziemobject.NbsMinistry;
+import com.ixzdore.restdb.ziemobject.NbsPeriod;
+import com.ixzdore.restdb.ziemobject.NbsPeriodtype;
+import com.ixzdore.restdb.ziemobject.NbsState;
 import com.ixzdore.restdb.ziemobject.Notification;
 import com.ixzdore.restdb.ziemobject.Post;
 import com.ixzdore.restdb.ziemobject.Route;
@@ -93,10 +106,16 @@ public class ServerAPI {
     public static final String dbConfig = "/setup.sql";
     public static final String dbname = "ziemozi";
 
+    /*
     private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
             "cloud_name", "okwui",
             "api_key", "839478323249426",
             "api_secret", "2sKLEGlDj_qwtJGHsifS9fZ_m8I"));
+    */
+    private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+            "cloud_name", "ixzdorelabs-com",
+            "api_key", "164677627358152",
+            "api_secret", "AiPqD_hwFe-eiAcKuIZFqx7qa1g"));
 
     // Disable private CDN URLs as this doesn't seem to work with free accounts
     private static RequestBuilder verifyGet(String path) {
@@ -883,6 +902,7 @@ public class ServerAPI {
                 + "{" + "\"_created\": " + "-1" + " }}";
         hint = fetchUrl;
         //////////////////Log.p("Hint " + hint);
+        try{
         Response<Map> result = get(url).
                 queryParam("q", text).
                 queryParam("h", hint).
@@ -892,8 +912,7 @@ public class ServerAPI {
                 queryParam("metafields", "true").
                 queryParam("fetchChildren", "true").
                 getAsJsonMap();
-        ////////////////Log.p("\nResponse for " + url + " is " + result.getResponseCode());
-        ////////Log.p("\n Response Data" + result.getResponseData(), Log.DEBUG);
+
 
         if ((result.getResponseCode() == 200)&&(result.getResponseData() != null)) {
             ArrayList<Map> l = new ArrayList<Map>();
@@ -916,11 +935,15 @@ public class ServerAPI {
                     ////////Log.p(type.getSimpleName() +" -->\n" + pb.getPropertyIndex().toJSON());
                     responseList.add((T) pb);
                 } catch (Exception err) {
-                    Log.e(err);
-                    throw new RuntimeException(err);
+                    Log.p(err.getMessage());
+                    //throw new RuntimeException(err);
                 }
             }
             return responseList;
+        }
+        return null;
+        }catch(Exception e){
+            Log.p(e.getMessage());
         }
         return null;
     }
@@ -1131,10 +1154,11 @@ private static void showMapC(Map m) {
                     || base_type.equalsIgnoreCase("file")) {
                 String[] imageList = Util.split(rqp.value.get(), "||");
                 for (String img : imageList) {
-                    //for each image, save and append back to value
-                    //////////Log.p("Image to save " + img);
+                     //
+
                     if (!img.isEmpty()) {
                         try {
+
                             Map uploadResult = cloudinary.uploader().
                                     upload(img, ObjectUtils.emptyMap());
                             String uploadUrl = uploadResult.get("url").toString();
@@ -1294,19 +1318,36 @@ private static void showMapC(Map m) {
         //////////////////Log.p("Load To Local Database");
         //dbProvider = ServerAPI.dataProvider();
        // Log.p("Updating definitions");
-        loadServices();
-        loadCategories();
-        loadServiceAttributes();
-        loadServoceAttributeTypes();
-        loadWallets();        
-        loadProviders();
-        loadServiceContacts();
-        loadGroups();
-        loadFares();
-        loadRoutes();
-        loadRouteStops();
-        loadStops();
-
+        if (Storage.getInstance().exists("me.json")){
+            loadServices();
+            loadCategories();
+            loadServiceAttributes();
+            loadServoceAttributeTypes();
+            loadWallets();
+            loadProviders();
+            loadServiceContacts();
+            loadGroups();
+            loadFares();
+            loadRoutes();
+            loadRouteStops();
+            loadStops();
+            loadNbsDefinitions();
+        }
+    }
+    public static void loadNbsDefinitions(){
+        loadNbs("nbsdataset",NbsDataSet.class);
+        loadNbs("nbsdivision",NbsDivision.class);
+        loadNbs("nbscategory",NbsCategory.class);
+        loadNbs("nbsstate",NbsState.class);
+        loadNbs("nbslga",NbsLGA.class);
+        loadNbs("nbsitem",NbsItem.class);
+        loadNbs("nbsdetail",NbsDetail.class);
+        loadNbs("nbsperiod",NbsPeriod.class);
+        loadNbs("nbsperiodtype",NbsPeriodtype.class);
+        loadNbs("nbslocation",NbsLocation.class);
+        loadNbs("nbscountry",NbsCountry.class);
+        loadNbs("nbsministry",NbsMinistry.class);
+        loadNbs("nbscity",NbsCity.class);
     }
     public static void loadToLocalDatabase() {
         //open database
@@ -1341,6 +1382,7 @@ private static void showMapC(Map m) {
         loadRoutes();
         loadRouteStops();
         loadStops();
+        loadNbsDefinitions();
     }
 //
         public static void loadWallets(){
@@ -1520,15 +1562,16 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         //////Log.p("Logging out");
         if (Storage.getInstance().exists("me.json")) {
             Storage.getInstance().deleteStorageFile("me.json");
-            ServerAPI.me = new User();
+            //Log.p("Me.json exists? " + Storage.getInstance().exists("me.json"));
+           // ServerAPI.me = new User();
         }
         //clear the cache
-        Storage.getInstance().clearCache();
-        Storage.getInstance().clearStorage();
+
         //////Log.p("Clearing database");
         
         cleardb();
-        //////Log.p("Initializing Database");
+        Storage.getInstance().clearCache();
+        //Log.p("Initializing Database");
         initDb();
         //////Log.p("Done with Server logout");
        
@@ -1559,6 +1602,19 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
         dbClasses.add(new Fare());
         dbClasses.add(new Stop());
         dbClasses.add(new RouteStops());
+        dbClasses.add(new NbsCategory());
+        dbClasses.add(new NbsDivision());
+        dbClasses.add(new NbsDataSet());
+        dbClasses.add(new NbsMinistry());
+        dbClasses.add(new NbsState());
+        dbClasses.add(new NbsCity());
+        dbClasses.add(new NbsCountry());
+        dbClasses.add(new NbsLocation());
+        dbClasses.add(new NbsLGA());
+        dbClasses.add(new NbsItem());
+        dbClasses.add(new NbsDetail());
+        dbClasses.add(new NbsPeriod());
+        dbClasses.add( new NbsPeriodtype());
         //
         //if db does not exist,let us create it
         //create a new configuration file /setup.sql
@@ -1668,10 +1724,10 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
 
     public static Image getServiceImage(Service service) {
         Style s = new Style();
-        s.setFgColor(0xff0000);
+        s.setFgColor(0xffff00);
         s.setBgTransparency(0);
-        FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PLACE, s, Display.getInstance().convertToPixels(3));
-        EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth()/16, p.getHeight()/16), false);
+        FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PLACE, s, Display.getInstance().convertToPixels(5));
+        EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth()*2, p.getHeight()*2), false);
       if ( service == null ) {
             return p;
       }
@@ -1691,14 +1747,14 @@ public static ArrayList<PropertyBusinessObject> privacyCheckRequests(ArrayList<P
                 try {
                     //we have the image and we can just load it
                     Image i =  Image.createImage(Storage.getInstance().createInputStream(service.label.get()));
-                    return i.scaled(p.getWidth()/16, p.getHeight()/16);
+                    return i.scaled(p.getWidth()*2, p.getHeight()*2);
                 } catch (IOException ex) {
                     //dont do anything and try again
                 }
             }
             Image i = URLImage.createToStorage(placeholder, service.label.get(),
                     url );
-               return i.scaled(p.getWidth()/16, p.getHeight()/16);
+               return i.scaled(p.getWidth()*2, p.getHeight()*2);
         } else {
            return p;
         }
@@ -1712,9 +1768,9 @@ public static void cleardb(){
             db.close();
             
         } catch (IOException ex) {
-            ex.printStackTrace();
+           Log.e(ex);
                         ////Log.p("Failed to Delete Database");
-                Log.sendLogAsync();            
+                //Log.sendLogAsync();
         }
         db=null;
 }
@@ -1723,5 +1779,50 @@ public static void cleardb(){
         Response res = post(url).body(
                 body).getAsString();
         return res.getResponseData().toString();
+    }
+
+    public static void loadNbs(String url, Class pbo){
+        Boolean nbs = false;
+        if (nbs) {
+            Log.p(url);
+            // between two dates {"_changed":{"$gt":{"$date":"2016-08-01"},"$lt":{"$date":"2016-08-05"}}}
+            ArrayList<PropertyBusinessObject> defs =
+                    ServerAPI.genericZiemSearch(url,
+                            pbo, "", 0, 99999, "", "");
+
+            Log.p("Found " + defs.size());
+            Boolean saved = localAPI.saveLocalBatch(defs);
+            Log.p("Saved definitions " + url + " " + saved);
+        }
+    }
+
+    public static String getCurrentLocationName() {
+        String location_name="N/A";
+        String city = "";
+        String country="";
+        String state ="";
+        String locality=""
+;        Location loc = getCurrentLocation();
+        String location_url = "https://api.bigdatacloud.net/data/reverse-geocode-client?";
+        location_url = location_url + "latitude=" + loc.getLatitude() +"&" ;
+        location_url = location_url + "longitude=" + loc.getLongitude() + "&";
+        location_url = location_url + "locality=en";
+
+        Response<Map> result = Rest.get(location_url).getAsJsonMap();
+
+        if ((result.getResponseCode() == 200)&&(result.getResponseData() != null)) {
+            Log.p(result.getResponseData().toString());
+                if (result.getResponseData().get("countryName") != null)
+                    country = result.getResponseData().get("countryName").toString();
+                if (result.getResponseData().get("principalSubdivision") != null)
+                    state = result.getResponseData().get("principalSubdivision").toString();
+                if (result.getResponseData().get("city") != null)
+                    city = result.getResponseData().get("city").toString();
+                if (result.getResponseData().get("locality") != null)
+                    locality = result.getResponseData().get("locality").toString();
+            }
+            location_name = locality + ", " + city + " ," + state + " ," + country;
+        return location_name;
+
     }
 }

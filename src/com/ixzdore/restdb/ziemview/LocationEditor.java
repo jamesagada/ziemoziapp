@@ -73,6 +73,7 @@ public class LocationEditor extends BaseEditorImpl {
 
     public LocationEditor() {
         editContainer.putClientProperty("editor", this);
+        editContainer.setScrollableY(false);
         editContainer.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         //setCurrentPosition();
         showMap.addActionListener(new ActionListener() {

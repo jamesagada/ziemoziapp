@@ -3,6 +3,7 @@ package com.ziemozi.forms;
 import com.codename1.components.InfiniteProgress;
 import com.codename1.components.SpanLabel;
 import com.codename1.components.ToastBar;
+import com.codename1.ui.Graphics;
 import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.plaf.Border;
 import com.ixzdore.restdb.ziemobject.Post;
@@ -254,16 +255,38 @@ public class ChooseService extends Form {
 
                 Button b = new Button(ct.name.get());
                 b.setUIID("SmallLabel");
-                b.getAllStyles().setBorder(Border.createEtchedRaised());
+                //b.getAllStyles().setBorder(Border.createEtchedRaised());
                 b.setTextPosition(BOTTOM);
                 Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+                s=new Style();
+
+                s.setFgColor(0xc2c2c2);
+                s.setBgTransparency(255);
+                s.setBgColor(0xe9e9e9);
                 FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
-                EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth() * 2, p.getHeight() * 2), false);
+                EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(
+                        p.getWidth() * 2, p.getHeight() * 2), false);
                 ////////////Log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
+                Image roundMask = Image.createImage(placeholder.getWidth()*2
+                        , placeholder.getHeight()*2, 0xff000000);
+                Graphics g = roundMask.getGraphics();
+                g.setAntiAliased(true);
+                g.setColor(0x000000);
+                g.fillRect(0, 0, placeholder.getWidth()*2, placeholder.getHeight()*2);
+                g.setColor(0xffffff);
+                g.fillArc(0, 0, placeholder.getWidth()*2, placeholder.getHeight()*2, 0, 360);
+
                 if ((ct.icon.get(0)) != null) {
-                    Image i = URLImage.createToStorage(placeholder, ct.name.get(),
+                    Image i = URLImage.createToStorage(placeholder, ct.icon.get(0),
                             mediaUrl);
-                    b.setIcon(i);
+                    //Image i = URLImage.createToStorage(placeholder,ct._id.get(),
+                     //       mediaUrl,URLImage.createMaskAdapter(roundMask.createMask()));
+                    //i.applyMask(roundMask.createMask());
+                    b.setIcon(i.scaled(placeholder.getWidth()*2,
+                            placeholder.getHeight()*2));
+                  //  b.setIcon(i.scaled(placeholder.getWidth()*2,
+                    //        placeholder.getHeight()*2).applyMask(roundMask.createMask()));
+
                 } else {
                     b.setIcon(p);
                 }
@@ -346,16 +369,38 @@ public class ChooseService extends Form {
                 b.setUIID("SmallLabel");
                 b.setTextPosition(BOTTOM);
                 Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+                s = new Style();
+                s.setFgColor(0xc2c2c2);
+                s.setBgTransparency(255);
+                s.setBgColor(0xe9e9e9);
                 FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
-                EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(p.getWidth() * 2, p.getHeight() * 2), false);
+                EncodedImage placeholder = EncodedImage.createFromImage(p.scaled(
+                        p.getWidth() * 2, p.getHeight() * 2), false);
                 ////////////Log.p("\n\n" + ct.name.get() + "\n" + ct.getPropertyIndex().toString());
+                Image roundMask = Image.createImage(placeholder.getWidth()*2,
+                        placeholder.getHeight()*2, 0xff000000);
+                Graphics gr = roundMask.getGraphics();
+                gr.setAntiAliased(true);
+                gr.setColor(0x000000);
+                gr.fillRect(0, 0, placeholder.getWidth()*2, placeholder.getHeight()*2);
+                gr.setColor(0xffffff);
+                gr.fillArc(0, 0, placeholder.getWidth()*2, placeholder.getHeight()*2, 0, 360);
+
                 if ((ct.icon.get(0)) != null) {
-                    Image i = URLImage.createToStorage(placeholder, ct.name.get(),
-                            mediaUrl);
-                    b.setIcon(i);
+                    Image i = URLImage.createToStorage(placeholder, ct.icon.get(0),
+                           mediaUrl);
+                    //Image i = URLImage.createToStorage(placeholder,ct._id.get(),
+                    //        mediaUrl,URLImage.createMaskAdapter(roundMask.createMask()));
+                    //i.applyMask(roundMask.createMask());
+                    b.setIcon(i.scaled(placeholder.getWidth()*2,
+                            placeholder.getHeight()*2));
+                   // b.setIcon(i.scaled(placeholder.getWidth()*2,
+//                            placeholder.getHeight()*2).applyMask(roundMask.createMask()));
+
                 } else {
                     b.setIcon(p);
                 }
+
                 b.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {

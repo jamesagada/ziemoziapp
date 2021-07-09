@@ -48,6 +48,7 @@ import com.ixzdore.restdb.ziemobject.UserPreference;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,9 +76,17 @@ public class localAPI {
     private static final String dbname = "ziemozi";
 
     private static final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
-            "cloud_name", "okwui",
-            "api_key", "839478323249426",
-            "api_secret", "2sKLEGlDj_qwtJGHsifS9fZ_m8I"));
+            "cloud_name", "ixzdorelabs-com",
+            "api_key", "164677627358152",
+            "api_secret", "AiPqD_hwFe-eiAcKuIZFqx7qa1g"));
+
+    /*
+      cloud_name: ixzdorelabs-com
+  api_key: '164677627358152'
+  api_secret: AiPqD_hwFe-eiAcKuIZFqx7qa1g
+  enhance_image_tag: true
+  static_file_support: true
+  */
 
     // Disable private CDN URLs as this doesn't seem to work with free accounts
     private static RequestBuilder verifyGet(String path) {
@@ -387,6 +396,7 @@ public class localAPI {
         addToQueue(mp);
         return mp;
     }
+
 
     public static User me() {
         if (!Storage.getInstance().exists("me.json")) {
@@ -1247,6 +1257,8 @@ public class localAPI {
                             //////////////////////Log.p("Image upload failed \n" + e.getMessage());
                             posted = false;
                         }
+                        //save to restdb media archive
+
                     }
                 }
                 r.value.set(value);
@@ -2000,24 +2012,26 @@ public class localAPI {
             v.add(batch);
             i = i + batchsize;
         }
+
         for (ArrayList<PropertyBusinessObject> pp : v) {
             try {
                 Database db = Display.getInstance().openOrCreate("ziemozi");
                 com.ixzdore.properties.SQLMap sm = SQLMap.create(db);
-//            db.beginTransaction();
-                //////////////Log.p("Saving " + p.size() + "Records");
+           //db.beginTransaction();
+               // Log.p("Saving Batch" + (p.size()-pp.size()) + "Records");
                 sm.bulkInsert(pp);
 //            sm.setVerbose(true);
 //            sm.createTable(p);
 //            sm.insert(p);
                 saved = true;
-//            db.commitTransaction();
+            //db.commitTransaction();
+
                 sm = null;
                 db.close();
             } catch (Exception e) {
                 //e.printStackTrace();
                 saved = false;
-                //Log.p("\n\n" + e.getMessage());
+                Log.p("\n\n" + e.getMessage());
                 //Log.sendLogAsync();           
             }
             //if for some reason we did not save any batch we still continue
@@ -2663,7 +2677,7 @@ public class localAPI {
             query = query + " " + "ORDER BY _created DESC ";
         }
         query = query + " LIMIT " + page + "," + size + ";";
-       //Log.p(query);
+      // Log.p(query);
         //HashMap mquery = new HashMap();
         //mquery.put("ORDER BY", "_created");
         //mquery.put("LIMIT", size );
@@ -2701,12 +2715,12 @@ public class localAPI {
 
             cur.close();
             db.close();
-            //////////log.p("Generic Search Found " + url + " " + l.size() + " records");
+           // Log.p("Generic Search Found " + url + " " + l.size() + " records");
 
             for (Map m : l) {
                 try {
                     showMapp(m);
-                    //////////log.p("Type " + type.getCanonicalName());
+                   // Log.p("Type " + type.getCanonicalName());
                     PropertyBusinessObject pb
                             = (PropertyBusinessObject) type.newInstance();
                     //////////log.p("\n\n Creating property object " + pb.getPropertyIndex().toString());
@@ -2715,14 +2729,16 @@ public class localAPI {
                     //////////log.p("PropetyBusinessObject \n" + pb.getPropertyIndex().toString() +"\n");
                     responseList.add(pb);
                 } catch (Exception err) {
-                    //////////log.p("Error " + err.getMessage());
-                    // err.printStackTrace();
+                    Log.p("Error " + err.getMessage());
+                    err.printStackTrace();
                 }
             }
             // cur.close();
 
         } catch (Exception ex) {
-           //Log.p(ex.getMessage());
+            //ex.printStackTrace();
+           Log.p(ex.getMessage());
+
         }
 
         return responseList;
@@ -3028,6 +3044,42 @@ public class localAPI {
             return a;
         }
  
+    }
+
+    public static MultipartRequest uploadMediaTo(String mime, String fileName, byte[] data,
+            SuccessCallback<String> callback) {
+            MultipartRequest mp = new MultipartRequest() {
+            private String mediaId;
+
+            @Override
+            protected void readResponse(InputStream input)
+                    throws IOException {
+                JSONParser jp = new JSONParser();
+                Map<String, Object> result = jp.parseJSON(new InputStreamReader(input, "UTF-8"));
+                String[] ids=(String [])result.get("ids");
+                mediaId =ids[0];
+            }
+            @Override
+            protected void postResponse() {
+                callback.onSucess(mediaId);
+            }
+        };
+        mp.setUrl(BASE_URL + "media");
+        mp.addRequestHeader("x-apikey", API_KEY);
+        mp.addRequestHeader("Accept", "application/json");
+        if (data == null) {
+            try {
+                mp.addData("file", fileName, mime);
+            } catch (IOException err) {
+                Log.e(err);
+                throw new RuntimeException(err);
+            }
+        } else {
+            mp.addData("file", data, mime);
+        }
+        mp.setFilename("file", fileName);
+        addToQueue(mp);
+        return mp;
     }
 
 }

@@ -11,8 +11,10 @@ import com.codename1.components.ScaleImageButton;
 import com.codename1.components.ScaleImageLabel;
 import com.codename1.components.SpanLabel;
 import com.codename1.components.ToastBar;
+import com.codename1.io.File;
 import com.codename1.io.FileSystemStorage;
 import com.codename1.io.Log;
+import com.codename1.io.Storage;
 import com.codename1.io.Util;
 import com.codename1.ui.Button;
 import static com.codename1.ui.CN.convertToPixels;
@@ -70,26 +72,41 @@ public class ImageEditor extends BaseEditorImpl {
     public final ScaleImageLabel imageLabel = new ScaleImageLabel();
 
     public ImageEditor() {
-        Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+        //Style s = UIManager.getInstance().getComponentStyle("MultiLine1");
+        Style s=new Style();
         FontImage p = FontImage.createMaterial(FontImage.MATERIAL_PORTRAIT, s);
         editContainer.putClientProperty("editor", this);
         editContainer.setLayout(new BorderLayout());
         //editContainer.getStyle().setBorder(Border.createBevelRaised());
         //this is the button to pick image
-
+        editContainer.setScrollableY(false);
         pickImage = new Button();
-        pickImage.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_PHOTO_LIBRARY, s));
+        Image pickLogo = FontImage.createMaterial(
+                FontImage.MATERIAL_PHOTO_LIBRARY, s).scaled(p.getWidth()*2,p.getHeight()*2);
+        pickImage.setIcon(pickLogo);
+        pickImage.setText("Gallery");
+        pickImage.setTextPosition(BOTTOM);
         //pickImage.setUIID("Label");
         //this is the buttoon to capture through the camera
         captureImage = new Button();
-        captureImage.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_CAMERA_ENHANCE, s));
+        Image captureLogo= FontImage.createMaterial(
+                FontImage.MATERIAL_CAMERA_ENHANCE, s).scaled(p.getWidth()*2,p.getHeight()*2);
+        captureImage.setIcon(captureLogo);
+        captureImage.setText("Camera");
+        captureImage.setTextPosition(BOTTOM);
+        captureImage.setUIID("SmallLabel");
+        pickImage.setUIID("SmallLabel");
         //captureImage.setUIID("Label");
         //
+        Image pixLogo= FontImage.createMaterial(
+                FontImage.MATERIAL_PORTRAIT, s).scaled(p.getWidth()*4,
+                p.getHeight()*4);
+
         imageButton = new ScaleImageButton();
-        imageButton.setIcon(FontImage.createMaterial(
-                FontImage.MATERIAL_PHOTO_LIBRARY, s));
+        imageButton.setIcon(pixLogo.scaled(
+                pixLogo.getWidth()*64,pixLogo.getHeight()*8));
+        imageLabel.setIcon(pixLogo.scaled(
+                pixLogo.getWidth()*64,pixLogo.getHeight()*8));
         //initialize the viewer
         imageViewer = new ImageViewer();
         //imageViewer.setImage(FontImage.createMaterial(
@@ -103,7 +120,7 @@ public class ImageEditor extends BaseEditorImpl {
         //pickImage.setTextPosition(BOTTOM);
         //captureImage.setText("Capture");
         //captureImage.setTextPosition(BOTTOM);
-        imageControls.setLayout(l);
+        imageControls.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
         GridLayout m = new GridLayout(2);
         m.setAutoFit(true);
         //headerContainer.setLayout(m);
@@ -139,7 +156,13 @@ public class ImageEditor extends BaseEditorImpl {
         //pickImage.setText(attr.display_label.get());
         textField.setHint(attr.description.get());
         setEditorConstraints();
-
+        helpButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                Dialog.show(attr.display_label.get(),
+                        attr.help_text.get(), "ok", "");
+            }
+        });
         //System.out.println("Attribute to edit is " + attr.getPropertyIndex().toJSON());
         // textField.setText(attr.default_value.get().toString());
         //imageButton.getStyle().setAlignment(LEFT);
@@ -151,6 +174,11 @@ public class ImageEditor extends BaseEditorImpl {
                     public void actionPerformed(ActionEvent evt) {
                         String s = (String) evt.getSource();
                         setImage(s, imageLabel);
+                        //Log.p("Size " +  FileSystemStorage.getInstance().getLength(s));                       setImage(s, imageLabel);
+                       if (  FileSystemStorage.getInstance().getLength(s) >50000 ) {
+                            ToastBar.showErrorMessage("This File is too big");
+                            s="";
+                        }
                         requestParameter.value.set(s);
                         //System.out.println("Parameter is " + requestParameter.getPropertyIndex().toJSON());
 
@@ -165,6 +193,11 @@ public class ImageEditor extends BaseEditorImpl {
             public void actionPerformed(ActionEvent evt) {            
                 String s = Capture.capturePhoto(375,500);
                 setImage(s, imageLabel);
+                //Log.p("Size " +  FileSystemStorage.getInstance().getLength(s));                       setImage(s, imageLabel);
+                if (  FileSystemStorage.getInstance().getLength(s) >50000 ) {
+                    ToastBar.showErrorMessage("This File is too big");
+                    s="";
+                }
                 requestParameter.value.set(s);
                 //System.out.println("Parameter is " + requestParameter.getPropertyIndex().toJSON());
                 imageLabel.repaint();
@@ -185,7 +218,7 @@ public class ImageEditor extends BaseEditorImpl {
                 // ////////Log.p(editContainer.getParent().getParent().toString());
                 Component c = new AttributeEditor(serviceAttribute, true);
                 $(c).addTags("attribute");
-                                            c.putClientProperty("attribute", "attribute");
+                c.putClientProperty("attribute", "attribute");
                 editContainer.getParent().getParent().addComponent(c);
                 editContainer.getParent().getParent().revalidate();
                 editContainer.getParent().getParent().repaint();
@@ -222,7 +255,7 @@ public class ImageEditor extends BaseEditorImpl {
         }
         editContainer.add(BorderLayout.NORTH, headerContainer);
         editContainer.add(BorderLayout.CENTER, imageLabel);
-        editContainer.add(BorderLayout.SOUTH, imageControls);
+        editContainer.add(BorderLayout.EAST, imageControls);
         //editContainer.add(headerContainer).add(imageControls).add(imageViewer);
         editContainer.revalidate();
         return editContainer;
@@ -314,15 +347,14 @@ public class ImageEditor extends BaseEditorImpl {
         else {
             if (filePath.indexOf("http") >= 0) {
             //get image from cache or from the url
-                iv.setIcon(getImage(9f,filePath));
+                iv.setIcon(getImage(16f,filePath));
                 iv.getParent().revalidate();
             } 
             else {
                 if (filePath.indexOf("file:") >= 0) {
                     try {
-                    //Image i1 = Image.createImage(filePath);
-                 
-                        Image i1 = Image.createImage(FileSystemStorage.getInstance().openInputStream(filePath));
+                    Image i1 = Image.createImage(filePath);
+                        //Log.p("Size " +  FileSystemStorage.getInstance().getLength(filePath));                        Image i1 = Image.createImage(FileSystemStorage.getInstance().openInputStream(filePath));
                         iv.setIcon(i1);
                         iv.getParent().revalidate();
                     } catch (Exception ex) {
@@ -331,6 +363,9 @@ public class ImageEditor extends BaseEditorImpl {
             }
         }
         }
+
+
+
         //ToastBar.showErrorMessage("Image load failed for " + this.name);
     }
 

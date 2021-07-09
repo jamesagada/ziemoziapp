@@ -56,6 +56,7 @@ public class Ziemozi implements PushCallback {
         Log.setReportingLevel(Log.REPORTING_DEBUG);
         DefaultCrashReporter.init(true, 2);
         theme = UIManager.initFirstTheme("/theme");
+        UIManager.getInstance().getLookAndFeel().setFadeScrollBar(false);
         //manager = new StartAppManager();
        // manager.initAndroidSDK("200083762", "141359216", true);
         // Enable Toolbar on all Forms by default
